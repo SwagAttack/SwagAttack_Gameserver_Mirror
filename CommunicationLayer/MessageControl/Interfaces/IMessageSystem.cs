@@ -3,27 +3,21 @@ using MessageControl.DTO;
 
 namespace MessageControl.Interfaces
 {
-    public delegate void MessageCommand(IMessage cmd);
     public interface IMessageSystem
     {
         /*
          * Attaches caller to the message system
          * Caller will be notified on the given ID
          */
-        bool Attach(string id, MessageCommand cmd);
+        bool Attach(string id, HandlerDelegate cmd);
         /*
          * Detaches caller from the message system
          */
-        bool Detatch(string id, MessageCommand cmd);
+        bool Detatch(string id, HandlerDelegate cmd);
+
         /*
-         * For notifying the message system on inputs from input control
-         * inputkey : key identifying the data received
-         * input : actual data
+         * For retrieving commands coupled to IDs
          */
-        void Notify(string inputkey, string input);
-        /*
-         * For sending a message to the clients of the game server
-         */
-        void SendMessage(IMessage msg);
+        HandlerDelegate FindSubscriberDel(string id);
     }
 }

@@ -7,66 +7,52 @@ namespace MessageControl.Controllers
 {
     public class MessageSystem : IMessageSystem
     {
-        private readonly Dictionary<string, HashSet<MessageCommand>> _subscriberCommands;
+        private readonly Dictionary<string, HandlerDelegate> _subscriberCommands;
 
-        private readonly IMessageConverter _msgConverter;
-        private readonly IInputOutputControl _inputOutputControl;
+        private readonly IInput _input;
 
-        public MessageSystem(IInputOutputControl inputOutputControl, IMessageConverter msgConverter)
+        public MessageSystem(IInput input)
         {
-            _inputOutputControl = inputOutputControl;
-            _inputOutputControl.Input.InputEvent += Notify;
+            _input = input;
 
-            _msgConverter = msgConverter;
+            _input.InputEvent += FindSubscriberDel;
 
-            _subscriberCommands = new Dictionary<string, HashSet<MessageCommand>>();
+            _subscriberCommands = new Dictionary<string, HandlerDelegate>();
         }
 
-        public bool Attach(string id, MessageCommand cmd)
+        public bool Attach(string id, HandlerDelegate cmd)
         {
             lock (_subscriberCommands)
             {
                 if (!_subscriberCommands.ContainsKey(id))
                 {
-                    _subscriberCommands.Add(id, new HashSet<MessageCommand>());
+                    _subscriberCommands.Add(id, cmd);
+                    return true;
                 }
 
-                return _subscriberCommands[id].Add(cmd);
+                return false;
             }
         }
 
-        public bool Detatch(string id, MessageCommand cmd)
+        public bool Detatch(string id, HandlerDelegate cmd)
         {
             lock (_subscriberCommands)
             {
-                return _subscriberCommands.ContainsKey(id) && _subscriberCommands[id].Remove(cmd);
+                return _subscriberCommands.Remove(id);
             }
         }
 
-        public void Notify(string inputkey, string input)
+        public HandlerDelegate FindSubscriberDel(string id)
         {
             lock (_subscriberCommands)
             {
-                if (!_subscriberCommands.ContainsKey(input)) return;
-
-                var msg = _msgConverter.ConvertToInput(inputkey, input);
-
-                if (msg == null) return;
-
-                foreach (var cmd in _subscriberCommands[inputkey])
+                if (_subscriberCommands.ContainsKey(id))
                 {
-                    cmd(msg);
+                    return _subscriberCommands[id];
                 }
-            }
-        }
 
-        public void SendMessage(IMessage msg)
-        {
-            var msgToSend = _msgConverter.ConvertToOutput(msg);
-            if (msgToSend != null)
-            {
-                _inputOutputControl.Output.SendMessage(msgToSend.Item1, msgToSend.Item2);
-            }         
+                return null;
+            }
         }
     }
 }

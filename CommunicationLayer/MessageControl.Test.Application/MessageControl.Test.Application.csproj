@@ -4,15 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7B2AE9A2-24BF-4E1F-ADC8-BB7187DF39BB}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MessageControl</RootNamespace>
-    <AssemblyName>MessageControl</AssemblyName>
+    <ProjectGuid>{44F45EE4-C566-4A5C-83AE-2E1EB016F8FB}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MessageControl.Test.Application</RootNamespace>
+    <AssemblyName>MessageControl.Test.Application</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -40,14 +42,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\Input.cs" />
-    <Compile Include="Controllers\MessageSystem.cs" />
-    <Compile Include="Controllers\ProtocolConverter.cs" />
-    <Compile Include="DTO\IMessage.cs" />
-    <Compile Include="Interfaces\IInput.cs" />
-    <Compile Include="Interfaces\IMessageSystem.cs" />
-    <Compile Include="Interfaces\IProtocolConverter.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MessageControl\MessageControl.csproj">
+      <Project>{7b2ae9a2-24bf-4e1f-adc8-bb7187df39bb}</Project>
+      <Name>MessageControl</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
