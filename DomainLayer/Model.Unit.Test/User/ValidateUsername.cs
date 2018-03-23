@@ -22,20 +22,28 @@ namespace Model.Unit.Test.User
         }
 
         [Test]
-        public void Username0Characters_returnsFalse()
+        public void Username0Characters_isNotSet()
         {
-            Assert.That(() => uut.Username = "", Throws.TypeOf<ArgumentException>().With.Message.EqualTo("Name cannot be empty!"));
+            uut.Username = "";
+            Assert.That(() => uut.Username == null);
         }
 
         [Test]
-        public void Username7Characters_returnsFalse()
+        public void Username0Characters_ThrowsArgumentException()
         {
+            Assert.That(() => uut.Username = "", Throws.TypeOf<ArgumentException>().With.Message.EqualTo("Username cannot be empty!"));
+            Assert.That(() => uut.Username == null);
+        }
 
+        [Test]
+        public void Username7Characters_ThrowsArgumentException()
+        {
+            Assert.That(() => uut.Username = "Testtes", Throws.TypeOf<ArgumentException>().With.Message.EqualTo("Username cannot be less than 8 characters"));
         }
         [Test]
-        public void Username8Characters_returnsTrue()
+        public void Username8Characters_ThrowsNothing()
         {
-
+            Assert.That(() => uut.Username = "Testtest" , Throws.Nothing);
         }
 
     }

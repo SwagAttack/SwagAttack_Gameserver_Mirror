@@ -9,6 +9,11 @@ namespace Models.User
 {
     public class User : IUser
     {
+        private void throwArgumentIf(bool condition, string message)
+        {
+            if(condition)
+                throw new ArgumentException(message);
+        }
         private string _username;
         private string _givenName;
         private string _lastName;
@@ -20,8 +25,9 @@ namespace Models.User
             get { return _username; }
             set
             {
-                if(string.IsNullOrEmpty(value))
-                    throw new ArgumentException("Name cannot be empty!");
+                throwArgumentIf(string.IsNullOrEmpty(value),"Username cannot be empty!");
+                throwArgumentIf(value.Length < 8, "Username cannot be less than 8 characters");
+
                 _username = value;
             }
         }
