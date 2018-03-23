@@ -25,6 +25,16 @@ namespace Models.User
             }
         }
 
+        public string Password
+        {
+            get { return _password; }
+            set
+            {
+                ValidatePassword(value);
+                _password = value;
+            }
+        }
+
         public string GivenName
         {
             get { return _givenName; }
@@ -43,12 +53,6 @@ namespace Models.User
             set { _email = value; }
         }
 
-        public string Password
-        {
-            get { return _password; }
-            set { _password = value; }
-        }
-
         private void throwArgumentIf(bool condition, string message)
         {
             if (condition)
@@ -61,6 +65,12 @@ namespace Models.User
             throwArgumentIf(value.Length < 8, "value cannot be less than 8 characters");
             throwArgumentIf(value.Length > 20, "value cannot be more than 20 characters");
             throwArgumentIf(value.Any(x => !Char.IsLetterOrDigit(x)), "value only be letters from a to z or numbers");
+        }
+
+        private void ValidatePassword(string value)
+        {
+            throwArgumentIf(string.IsNullOrEmpty(value), "value cannot be empty!");
+            throwArgumentIf(value.Length < 8, "value cannot be less than 8 characters");
         }
     }
 }
