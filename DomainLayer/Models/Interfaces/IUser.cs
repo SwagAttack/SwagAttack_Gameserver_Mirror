@@ -10,7 +10,7 @@ namespace Models.Interfaces
     {
         string Username { get; set; }
         string GivenName { get; set; }
-        string SurName { get; set; }
+        string LastName { get; set; }
         string Email { get; set; }
         string Password { get; set; }
     }

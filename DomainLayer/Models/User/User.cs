@@ -11,7 +11,7 @@ namespace Models.User
     {
         private string _username;
         private string _givenName;
-        private string _surName;
+        private string _lastName;
         private string _email;
         private string _password;
 
@@ -27,10 +27,10 @@ namespace Models.User
             set { _givenName = value; }
         }
 
-        public string SurName
+        public string LastName
         {
-            get { return _surName; }
-            set { _surName = value; }
+            get { return _lastName; }
+            set { _lastName = value; }
         }
 
         public string Email
