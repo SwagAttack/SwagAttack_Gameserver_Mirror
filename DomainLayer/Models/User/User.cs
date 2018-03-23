@@ -9,11 +9,6 @@ namespace Models.User
 {
     public class User : IUser
     {
-        private void throwArgumentIf(bool condition, string message)
-        {
-            if(condition)
-                throw new ArgumentException(message);
-        }
         private string _username;
         private string _givenName;
         private string _lastName;
@@ -25,9 +20,7 @@ namespace Models.User
             get { return _username; }
             set
             {
-                throwArgumentIf(string.IsNullOrEmpty(value),"Username cannot be empty!");
-                throwArgumentIf(value.Length < 8, "Username cannot be less than 8 characters");
-
+                ValidateUsername(value);
                 _username = value;
             }
         }
@@ -54,6 +47,20 @@ namespace Models.User
         {
             get { return _password; }
             set { _password = value; }
+        }
+
+        private void throwArgumentIf(bool condition, string message)
+        {
+            if (condition)
+                throw new ArgumentException(message);
+        }
+
+        private void ValidateUsername(string value)
+        {
+            throwArgumentIf(string.IsNullOrEmpty(value), "value cannot be empty!");
+            throwArgumentIf(value.Length < 8, "value cannot be less than 8 characters");
+            throwArgumentIf(value.Length > 20, "value cannot be more than 20 characters");
+            throwArgumentIf(value.Any(x => !Char.IsLetterOrDigit(x)), "value only be letters from a to z or numbers");
         }
     }
 }
