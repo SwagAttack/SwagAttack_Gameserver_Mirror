@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Models.Interfaces;
-
+using System.ComponentModel.DataAnnotations;
 namespace Models.User
 {
     public class User : IUser
@@ -18,7 +18,12 @@ namespace Models.User
         public string Username
         {
             get { return _username; }
-            set { _username = value; }
+            set
+            {
+                if(string.IsNullOrEmpty(value))
+                    throw new ArgumentException("Name cannot be empty!");
+                _username = value;
+            }
         }
 
         public string GivenName
