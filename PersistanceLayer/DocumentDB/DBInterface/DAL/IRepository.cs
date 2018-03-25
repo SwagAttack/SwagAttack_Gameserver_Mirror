@@ -40,10 +40,7 @@ namespace DBInterface.DAL
         /// <param name="id">the id of of the item</param>
         /// <returns></returns>
         Task<T> GetItemAsync(string id);
-        /// <summary>
-        /// setup the db and documents
-        /// </summary>
-        void Initialize(); 
+
         //IEnumerable<T> GetAll();
         //IEnumerable<T> Find(Expression<Func<T, bool>> predicate);
         //T Single(Expression<Func<T, bool>> predicate);
