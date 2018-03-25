@@ -66,4 +66,13 @@ namespace Models
         }
     }
 
+    public class NameThrow : BaseThrow
+    {
+        protected override void validateMore(string value)
+        {
+            throwArgumentIf((value.Contains(".") || value.Length < 2), "Initials is not allowed");
+            throwArgumentIf(value.Any(x => !Char.IsLetter(x)), "Name can only contain letters");
+        }
+    }
+
 }

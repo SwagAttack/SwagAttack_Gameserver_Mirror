@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Models.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+
 namespace Models.User
 {
     public class User : IUser
@@ -47,14 +49,24 @@ namespace Models.User
 
         public string GivenName
         {
-            get { return _givenName; }
-            set { _givenName = value; }
+            get {return _givenName;}
+            set
+            {
+                new NameThrow().Validate(value);
+
+                //capital letter
+                _givenName = char.ToUpper(value[0]) + value.Substring(1);
+            }
         }
 
         public string LastName
         {
             get { return _lastName; }
-            set { _lastName = value; }
+            set
+            {
+                new NameThrow().Validate(value);
+                _lastName = char.ToUpper(value[0]) + value.Substring(1);
+            }
         }
 
     }
