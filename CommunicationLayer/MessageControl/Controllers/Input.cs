@@ -101,6 +101,7 @@ namespace MessageControl.Controllers
 
                 if (ProtocolConverter.IsEndOfSequence(received))
                 {
+
                     Console.WriteLine($"Read: {received}");
 
                     var key = ProtocolConverter.ConvertToKey(received);
