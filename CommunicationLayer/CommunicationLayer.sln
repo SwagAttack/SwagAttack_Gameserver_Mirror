@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageControl", "MessageCo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageControl.Test.Application", "MessageControl.Test.Application\MessageControl.Test.Application.csproj", "{44F45EE4-C566-4A5C-83AE-2E1EB016F8FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RESTControl", "RESTControl\RESTControl.csproj", "{F707F568-BB06-42CA-9C50-AE75A548C36D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{44F45EE4-C566-4A5C-83AE-2E1EB016F8FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44F45EE4-C566-4A5C-83AE-2E1EB016F8FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44F45EE4-C566-4A5C-83AE-2E1EB016F8FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F707F568-BB06-42CA-9C50-AE75A548C36D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F707F568-BB06-42CA-9C50-AE75A548C36D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F707F568-BB06-42CA-9C50-AE75A548C36D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F707F568-BB06-42CA-9C50-AE75A548C36D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

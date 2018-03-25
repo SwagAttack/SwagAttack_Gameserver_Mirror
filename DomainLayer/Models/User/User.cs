@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Models.Interfaces;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using Newtonsoft.Json;
 
 namespace Models.User
 {
@@ -17,6 +18,7 @@ namespace Models.User
         private string _email;
         private string _password;
 
+        [JsonProperty(Required = Required.Always)]
         public string Username
         {
             get { return _username; }
@@ -27,6 +29,7 @@ namespace Models.User
             }
         }
 
+        [JsonProperty(Required = Required.Always)]
         public string Password
         {
             get { return _password; }
@@ -36,7 +39,8 @@ namespace Models.User
                 _password = value;
             }
         }
-
+        
+        [JsonProperty(Required = Required.Always)]
         public string Email
         {
             get { return _email; }
@@ -47,6 +51,7 @@ namespace Models.User
             }
         }
 
+        [JsonProperty(Required = Required.Always)]
         public string GivenName
         {
             get {return _givenName;}
@@ -58,7 +63,8 @@ namespace Models.User
                 _givenName = char.ToUpper(value[0]) + value.Substring(1);
             }
         }
-
+        
+        [JsonProperty(Required = Required.Always)]
         public string LastName
         {
             get { return _lastName; }
