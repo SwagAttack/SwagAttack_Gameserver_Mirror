@@ -20,7 +20,7 @@ namespace Models.User
             get { return _username; }
             set
             {
-                ValidateUsername(value);
+                new UsernameThrow().Validate(value);
                 _username = value;
             }
         }
@@ -30,7 +30,7 @@ namespace Models.User
             get { return _password; }
             set
             {
-                ValidatePassword(value);
+                new PasswordThrow().Validate(value);
                 _password = value;
             }
         }
@@ -51,26 +51,6 @@ namespace Models.User
         {
             get { return _email; }
             set { _email = value; }
-        }
-
-        private void throwArgumentIf(bool condition, string message)
-        {
-            if (condition)
-                throw new ArgumentException(message);
-        }
-
-        private void ValidateUsername(string value)
-        {
-            throwArgumentIf(string.IsNullOrEmpty(value), "value cannot be empty!");
-            throwArgumentIf(value.Length < 8, "value cannot be less than 8 characters");
-            throwArgumentIf(value.Length > 20, "value cannot be more than 20 characters");
-            throwArgumentIf(value.Any(x => !Char.IsLetterOrDigit(x)), "value only be letters from a to z or numbers");
-        }
-
-        private void ValidatePassword(string value)
-        {
-            throwArgumentIf(string.IsNullOrEmpty(value), "value cannot be empty!");
-            throwArgumentIf(value.Length < 8, "value cannot be less than 8 characters");
         }
     }
 }
