@@ -35,6 +35,16 @@ namespace Models.User
             }
         }
 
+        public string Email
+        {
+            get { return _email; }
+            set
+            {
+                new EmailThrow().Validate(value);
+                _email = value;
+            }
+        }
+
         public string GivenName
         {
             get { return _givenName; }
@@ -47,10 +57,5 @@ namespace Models.User
             set { _lastName = value; }
         }
 
-        public string Email
-        {
-            get { return _email; }
-            set { _email = value; }
-        }
     }
 }

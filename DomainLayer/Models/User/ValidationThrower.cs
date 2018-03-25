@@ -37,12 +37,11 @@ namespace Models
         }
     }
 
-    class UsernameThrow : BaseThrow
+    public class UsernameThrow : BaseThrow
     {
 
         protected override void validateMore(string value)
-        {
-            throwArgumentIf(string.IsNullOrEmpty(value), "value cannot be empty!");
+        { 
             throwArgumentIf(value.Length < 8, "value cannot be less than 8 characters");
             throwArgumentIf(value.Length > 20, "value cannot be more than 20 characters");
             throwArgumentIf(value.Any(x => !Char.IsLetterOrDigit(x)), "value only be letters from a to z or numbers");
@@ -50,12 +49,21 @@ namespace Models
 
     }
 
-    class PasswordThrow : BaseThrow
+    public class PasswordThrow : BaseThrow
     {
         protected override void validateMore(string value)
         {
-            throwArgumentIf(string.IsNullOrEmpty(value), "value cannot be empty!");
             throwArgumentIf(value.Length < 8, "value cannot be less than 8 characters");
         }
     }
+
+    public class EmailThrow : BaseThrow
+    {
+        protected override void validateMore(string value)
+        {
+            throwArgumentIf(value.Length < 5, "value cannot be less than 5 characters");
+            throwArgumentIf(!(value.Contains("@") && value.Contains(".")), "Not a valid Email");
+        }
+    }
+
 }
