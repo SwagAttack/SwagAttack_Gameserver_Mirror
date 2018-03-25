@@ -59,11 +59,17 @@ namespace DBInterface.DAL
 
         public async Task<User> GetUserById(string id)
         {
-            User querySalesOrder = Client.CreateDocumentQuery<User>(documentCollection.DocumentsLink)
+
+            User TheUser = Client.CreateDocumentQuery<User>(documentCollection.DocumentsLink)
                 .Where(so => so.Email == id)
                 .AsEnumerable()
                 .FirstOrDefault();
-            return querySalesOrder;
+            if (TheUser == null)
+            {
+                throw new ArgumentException("User dosent exsist");
+            }
+            
+            return TheUser;
         }
 
     }

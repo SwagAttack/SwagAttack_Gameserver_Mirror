@@ -1,6 +1,8 @@
 ﻿
 using System;
+using System.Net;
 using DBInterface.DAL;
+using DBInterface.UnitOfWork;
 using DocumentDB.Repository;
 using Models.User;
 
@@ -18,12 +20,11 @@ namespace Testing_to_Domain
             newUser.Password = "123%%%aaaa";
             newUser.Username = "1337User";
 
-            UserRepository<User> x = new UserRepository<User>();
+            UnitOfWork xy = new UnitOfWork();
 
-            //x.AddUser(newUser);
+            xy.AddUser(newUser);
+            Console.WriteLine(xy.GetUserById("ab@ab.dk").GivenName);
 
-            User xy = x.GetUserById("ab@ab.dk").Result;
-            Console.WriteLine(xy.Email + xy.GivenName);
         }
     }
 }
