@@ -1,29 +1,30 @@
 ﻿
 using System;
 using System.Net;
-using DBInterface.DAL;
+using DBInterface;
 using DBInterface.UnitOfWork;
 using DocumentDB.Repository;
 using Models.User;
 
 namespace Testing_to_Domain
 {
-    class Program
+    internal static class Program
     {
-
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            User newUser = new User();
-            newUser.Email = "ab@ab.dk";
-            newUser.GivenName = "TestingName";
-            newUser.LastName = "TestingLastName";
-            newUser.Password = "123%%%aaaa";
-            newUser.Username = "1337User";
+            var newUser = new User
+            {
+                Email = "ab@ab.dk",
+                GivenName = "TestingName",
+                LastName = "TestingLastName",
+                Password = "123%%%aaaa",
+                Username = "1337User"
+            };
 
-            UnitOfWork xy = new UnitOfWork();
+            UnitOfWork xy = new UnitOfWork(new DbContext());
 
-            xy.AddUser(newUser);
-            Console.WriteLine(xy.GetUserById("ab@ab.dk").GivenName);
+            xy._userRepository.AddUser(newUser).Wait();
+            Console.WriteLine(xy._userRepository.GetUserByEmail("ab@ab.dk").Email);
 
         }
     }

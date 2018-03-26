@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBInterface", "DBInterface\DBInterface.csproj", "{F89847DE-91BC-43BE-93F9-ED3A44994A0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing_For_DocumentDB", "Testing\Testing_For_DocumentDB.csproj", "{45E05EA9-C6C9-4AEA-BFB0-0FC5635D40B6}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing_to_Domain", "Testing_to_Domain\Testing_to_Domain.csproj", "{B550E092-9BFE-457A-A3EE-2115FC7B4818}"
 EndProject
 Global
@@ -19,10 +17,6 @@ Global
 		{F89847DE-91BC-43BE-93F9-ED3A44994A0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F89847DE-91BC-43BE-93F9-ED3A44994A0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F89847DE-91BC-43BE-93F9-ED3A44994A0F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{45E05EA9-C6C9-4AEA-BFB0-0FC5635D40B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{45E05EA9-C6C9-4AEA-BFB0-0FC5635D40B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{45E05EA9-C6C9-4AEA-BFB0-0FC5635D40B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{45E05EA9-C6C9-4AEA-BFB0-0FC5635D40B6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B550E092-9BFE-457A-A3EE-2115FC7B4818}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B550E092-9BFE-457A-A3EE-2115FC7B4818}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B550E092-9BFE-457A-A3EE-2115FC7B4818}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -32,7 +26,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8
 		SolutionGuid = {E4B1225D-3A68-4631-8718-84DCAA66227E}
+		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8
 	EndGlobalSection
 EndGlobal
