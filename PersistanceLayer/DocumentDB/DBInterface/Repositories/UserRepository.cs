@@ -13,6 +13,7 @@ namespace DBInterface.Repositories
         public UserRepository(DbContext context) : base(context)
         {
         }
+        
         public async Task AddUser(User thisUser)
         {
             try
@@ -22,9 +23,9 @@ namespace DBInterface.Repositories
             }
             catch (Exception e)
             {
-                
-                Document created = await _Context.Client.CreateDocumentAsync(_Context.UserCollection.DocumentsLink, thisUser);
+                Document created = await _Context.UserClient.CreateDocumentAsync(_Context.UserCollection.DocumentsLink, thisUser);
                 Console.WriteLine(created);
+                
             }
 
         }
@@ -32,8 +33,8 @@ namespace DBInterface.Repositories
         public User GetUserByEmail(string id)
         {
 
-            User TheUser = _Context.Client.CreateDocumentQuery<User>(_Context.UserCollection.DocumentsLink)
-                .Where(so => so.Email == id)
+            User TheUser = _Context.UserClient.CreateDocumentQuery<User>(_Context.UserCollection.DocumentsLink)
+                .Where(x => x.Email == id)
                 .AsEnumerable()
                 .FirstOrDefault();
             if (TheUser == null)
@@ -44,5 +45,19 @@ namespace DBInterface.Repositories
             return TheUser;
         }
 
+        public void DeleteUserByEmail(string Email)
+        {
+            Document doc = GetDoc(Email);
+            if (doc != null)
+            {
+                _Context.UserClient.DeleteDocumentAsync(doc.SelfLink).Wait();
+            }
+        }
+
+        private Document GetDoc(string id)
+        {
+            return _Context.UserClient.CreateDocumentQuery(_Context.UserCollection.DocumentsLink).Where(x => x.Id == id)
+                .AsEnumerable().FirstOrDefault();
+        }
     }
 }

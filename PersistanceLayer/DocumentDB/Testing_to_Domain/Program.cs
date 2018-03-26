@@ -26,6 +26,8 @@ namespace Testing_to_Domain
             xy._userRepository.AddUser(newUser).Wait();
             Console.WriteLine(xy._userRepository.GetUserByEmail("ab@ab.dk").Email);
 
+            xy._userRepository.DeleteUserByEmail("ab@ab.dk");
+
         }
     }
 }

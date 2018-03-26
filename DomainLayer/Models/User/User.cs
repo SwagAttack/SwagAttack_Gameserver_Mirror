@@ -39,8 +39,8 @@ namespace Models.User
                 _password = value;
             }
         }
-        
-        [JsonProperty(Required = Required.Always)]
+
+        [JsonProperty(Required = Required.Always, PropertyName = "id")]
         public string Email
         {
             get { return _email; }

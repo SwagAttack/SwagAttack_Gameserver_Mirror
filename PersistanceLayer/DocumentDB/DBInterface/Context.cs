@@ -12,7 +12,7 @@ namespace DBInterface
     {
         private const string EndpointUrl = "https://localhost:8081";
         private const string PrimaryKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
-        public DocumentClient Client;
+        public DocumentClient UserClient;
         public DocumentCollection UserCollection;
 
         public DbContext()
@@ -37,9 +37,9 @@ namespace DBInterface
 
         private async Task LoadDB()
         {
-            Client = new DocumentClient(new Uri(EndpointUrl), PrimaryKey);
-            await Client.CreateDatabaseIfNotExistsAsync(new Database { Id = "UserDB" });
-            UserCollection = await Client.CreateDocumentCollectionIfNotExistsAsync(UriFactory.CreateDatabaseUri("UserDB"),
+            UserClient = new DocumentClient(new Uri(EndpointUrl), PrimaryKey);
+            await UserClient.CreateDatabaseIfNotExistsAsync(new Database { Id = "UserDB" });
+            UserCollection = await UserClient.CreateDocumentCollectionIfNotExistsAsync(UriFactory.CreateDatabaseUri("UserDB"),
                 new DocumentCollection { Id = "UserCollection" });
         }
     }
