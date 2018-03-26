@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RESTControl.Controllers;
 using RESTControl.DAL_Simulation;
+using RESTControl.Interfaces;
 
 namespace RESTControl
 {
@@ -26,7 +27,9 @@ namespace RESTControl
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
             services.AddSingleton<IUnitOfWork, UnitOfWork>();
+            services.AddSingleton<IUserController, UserController>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

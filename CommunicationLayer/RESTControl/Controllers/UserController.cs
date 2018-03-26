@@ -1,82 +1,66 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Models.User;
-using Newtonsoft.Json;
+﻿using System.Linq;
+using Models.Interfaces;
 using RESTControl.DAL_Simulation;
+using RESTControl.Interfaces;
 
 namespace RESTControl.Controllers
 {
-    [Produces("application/json")]
-    [Route("api/User")]
-    public class UserController : Controller
+    /// <summary>
+    /// Application User Controller
+    /// The main purpose of this class is to decouple the framework from our application logic
+    /// </summary>
+    public class UserController : IUserController
     {
-        private IUnitOfWork _unitOfWork;
-
+        private readonly IUnitOfWork _unitOfWork;
         public UserController(IUnitOfWork uow)
         {
             _unitOfWork = uow;
-
-            if (_unitOfWork.Users.Count == 0)
-            {
-
-            }
         }
-
-        [HttpGet("{username}/{password}", Name = "GetUser")]
-        public IActionResult Get(string username, string password)
+        public IUser GetUser(string username, string password)
         {
-            var user = _unitOfWork.Users.SingleOrDefault(u => u.Password == password && u.Username == username);
-            if (user == null)
-            {
-                return NotFound("Wrong username or password");
-            }
-            return new ObjectResult(user);
-        }
+            var user = _unitOfWork.Users.FirstOrDefault(u => u.Username == username);
 
-        [HttpPost]
-        public IActionResult Post([FromBody]User user)
-        {
-            if (ModelState.IsValid)
+            if (user != null)
             {
-                if (_unitOfWork.Users.FirstOrDefault(u => u.Username == user.Username) == null)
+                if (user.Password == password)
                 {
-                    _unitOfWork.Users.Add(user);
+                    return user;
                 }
+            }
 
-                return CreatedAtRoute("GetUser", new { username = user.Username, password = user.Password }, user);
-            }
-            else
-            {
-                return BadRequest("Not a valid user");
-            }
+            return null;
         }
 
-        [HttpPut]
-        public IActionResult Put([FromBody] User user)
+        public IUser CreateUser(IUser user)
         {
-            if (ModelState.IsValid)
+            if (_unitOfWork.Users.FirstOrDefault(u=> u.Username == user.Username) == null)
             {
-                var us = _unitOfWork.Users.FirstOrDefault(u => u.Username == user.Username);
-                if (us != null)
-                {
-                    
-                }
+                _unitOfWork.Users.Add(user);
+                return user;
+            }
 
-                return CreatedAtRoute("GetUser", new { username = user.Username, password = user.Password }, user);
-            }
-            else
-            {
-                return BadRequest("Not a valid user");
-            }
+            return null;
         }
 
+        public IUser UpdateUser(string username, string password, IUser user)
+        {
+            var result = _unitOfWork.Users.FirstOrDefault(u => u.Username == username);
+
+            if (result != null)
+            {
+                if (result.Password == password)
+                {
+                    result.Username = user.Username;
+                    result.Password = user.Password;
+                    result.Email = user.Email;
+                    result.GivenName = user.GivenName;
+                    result.LastName = user.LastName;
+
+                    return result;
+                }
+            }
+
+            return null;
+        }
     }
 }
