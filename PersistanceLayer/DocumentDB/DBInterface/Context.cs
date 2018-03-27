@@ -8,18 +8,26 @@ using Microsoft.Azure.Documents.Client;
 
 namespace DBInterface
 {
-    public class DbContext
+    public interface IDBContext
     {
-        private const string EndpointUrl = "https://localhost:8081";
-        private const string PrimaryKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
         /// <summary>
         /// For all connection to database
         /// </summary>
-        public DocumentClient UserClient;
+        DocumentClient UserClient { get; set; }
         /// <summary>
         /// for information about the users
         /// </summary>
-        public DocumentCollection UserCollection;
+        DocumentCollection UserCollection { get; set; }
+    }
+
+    public class DbContext : IDBContext
+    {
+        private const string EndpointUrl = "https://localhost:8081";
+        private const string PrimaryKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
+
+        public DocumentClient UserClient { get; set; }
+
+        public DocumentCollection UserCollection { get; set; }
 
         /// <summary>
         /// Set up the database connection
@@ -52,7 +60,8 @@ namespace DBInterface
             UserClient = new DocumentClient(new Uri(EndpointUrl), PrimaryKey);
             await UserClient.CreateDatabaseIfNotExistsAsync(new Database { Id = "UserDB" });
             UserCollection = await UserClient.CreateDocumentCollectionIfNotExistsAsync(UriFactory.CreateDatabaseUri("UserDB"),
-                new DocumentCollection { Id = "UserCollection" });
+            new DocumentCollection { Id = "UserCollection" });
         }
+
     }
 }

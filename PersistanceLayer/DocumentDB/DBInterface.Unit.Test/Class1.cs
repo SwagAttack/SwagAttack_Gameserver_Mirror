@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Azure.Documents.Client;
 using Models.User;
 using NUnit.Framework;
 
@@ -12,8 +13,7 @@ namespace DBInterface.Unit.Test
     public class Class1
     {
         private UnitOfWork.UnitOfWork uut_;
-        private User TestUser_;
-
+        private User TestUser_; 
         [SetUp]
         public void setup()
         {
@@ -26,6 +26,7 @@ namespace DBInterface.Unit.Test
                 Password = "123%%%aaaa",
                 Username = "1337User"
             };
+
         }
 
         [Test]
@@ -33,6 +34,12 @@ namespace DBInterface.Unit.Test
         {
             uut_._userRepository.AddUser(TestUser_).Wait();
             Assert.That(TestUser_.Email == uut_._userRepository.GetUserByEmail(TestUser_.Email).Email);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            uut_._userRepository.DeleteUserByEmail("ab@ab.dk");
         }
 
     }
