@@ -32,7 +32,7 @@ namespace DBInterface.Repositories
 
         public User GetUserByEmail(string id)
         {
-
+            
             User TheUser = _Context.UserClient.CreateDocumentQuery<User>(_Context.UserCollection.DocumentsLink)
                 .Where(x => x.Email == id)
                 .AsEnumerable()

@@ -12,9 +12,18 @@ namespace DBInterface
     {
         private const string EndpointUrl = "https://localhost:8081";
         private const string PrimaryKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
+        /// <summary>
+        /// For all connection to database
+        /// </summary>
         public DocumentClient UserClient;
+        /// <summary>
+        /// for information about the users
+        /// </summary>
         public DocumentCollection UserCollection;
 
+        /// <summary>
+        /// Set up the database connection
+        /// </summary>
         public DbContext()
         {
             try
@@ -34,7 +43,10 @@ namespace DBInterface
             }
 
         }
-
+        /// <summary>
+        /// The method to both get/set database and collection(s)
+        /// </summary>
+        /// <returns></returns>
         private async Task LoadDB()
         {
             UserClient = new DocumentClient(new Uri(EndpointUrl), PrimaryKey);
