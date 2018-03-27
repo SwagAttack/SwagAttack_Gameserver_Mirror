@@ -59,6 +59,7 @@ namespace DBInterface
         {
             UserClient = new DocumentClient(new Uri(EndpointUrl), PrimaryKey);
             await UserClient.CreateDatabaseIfNotExistsAsync(new Database { Id = "UserDB" });
+
             UserCollection = await UserClient.CreateDocumentCollectionIfNotExistsAsync(UriFactory.CreateDatabaseUri("UserDB"),
             new DocumentCollection { Id = "UserCollection" });
         }

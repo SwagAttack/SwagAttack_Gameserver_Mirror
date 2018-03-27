@@ -54,6 +54,13 @@ namespace DBInterface.Repositories
             }
         }
 
+        public void ReplaceUser(User ThisUser)
+        {
+
+            Document doc = GetDoc(ThisUser.Email);
+            _Context.UserClient.ReplaceDocumentAsync(doc.SelfLink, ThisUser).Wait();
+        }
+
         private Document GetDoc(string id)
         {
             return _Context.UserClient.CreateDocumentQuery(_Context.UserCollection.DocumentsLink).Where(x => x.Id == id)
