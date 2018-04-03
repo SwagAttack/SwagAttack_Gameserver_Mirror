@@ -1,7 +1,10 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Models.User;
 using RESTControl.DAL_Simulation;
+using RESTControl.Filters;
 using RESTControl.Interfaces;
 
 namespace RESTControl.RESTControllers
@@ -23,7 +26,6 @@ namespace RESTControl.RESTControllers
         [HttpGet("{username}/{password}", Name = "GetUser")]
         public IActionResult Get(string username, string password)
         {
-
             var user = _userController.GetUser(username, password);
 
             if (user == null)
@@ -35,46 +37,33 @@ namespace RESTControl.RESTControllers
         }
 
         [HttpPost]
+        [ValidateUserModelState]
         public IActionResult Post([FromBody]User user)
         {
-            if (ModelState.IsValid)
-            {
-                var result = _userController.CreateUser(user);
+            var result = _userController.CreateUser(user);
 
-                if(result != null)
-                {
-                    return CreatedAtRoute("GetUser", new { username = result.Username, password = result.Password }, result);
-                }else
-                {
-                    return BadRequest("Username already exists");
-                }             
-            }
-            else
+            if(result != null)
             {
-                return BadRequest(ModelState);
-            }
+                return CreatedAtRoute("GetUser", new { username = result.Username, password = result.Password }, result);
+            }else
+            {
+                return BadRequest("Username already exists");
+            }             
         }
 
         [HttpPut("{username}/{password}")]
+        [ValidateUserModelState]
         public IActionResult Put(string username, string password, [FromBody] User user)
         {
-            if (ModelState.IsValid)
-            {
+            var result = _userController.UpdateUser(username, password, user);
 
-                var result = _userController.UpdateUser(username, password, user);
-
-                if (result != null)
-                {
-                    return CreatedAtRoute("GetUser", new { username = result.Username, password = result.Password }, result);
-                }else
-                {
-                    return BadRequest("Wrong username or password");
-                }                
-            }
-            else
+            if (result != null)
             {
-                return BadRequest("Not a valid user");
-            }
+                return CreatedAtRoute("GetUser", new { username = result.Username, password = result.Password }, result);
+            }else
+            {
+                return BadRequest("Wrong username or password");
+            }                
         }
 
     }
