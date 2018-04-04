@@ -1,18 +1,20 @@
-﻿using Models.User;
+﻿
+using Models.User;
 using NUnit.Framework;
 
-namespace DBInterface.Unit.Test
+namespace DBInterface.Unit.Test1
 {
     [TestFixture]
-    public class Class1
+    public class Test
     {
         private UnitOfWork.UnitOfWork uut_;
-        private User TestUser_;
+        private User _testUser;
+
         [SetUp]
         public void setup()
         {
             uut_ = new UnitOfWork.UnitOfWork(new DbContext());
-            TestUser_ = new User
+            _testUser = new User
             {
                 Email = "ab@ab.dk",
                 GivenName = "TestingName",
@@ -20,20 +22,19 @@ namespace DBInterface.Unit.Test
                 Password = "123%%%aaaa",
                 Username = "1337User"
             };
-
         }
 
-        [TestCase()]
+        [Test]
         public void AddUserToDB()
         {
-            uut_._userRepository.AddUser(TestUser_).Wait();
-            Assert.That(TestUser_.Email == uut_._userRepository.GetUserByEmail(TestUser_.Email).Email);
+            uut_.UserRepository.AddUser(_testUser).Wait();
+            Assert.That(_testUser.Email == uut_.UserRepository.GetUserByEmail(_testUser.Email).Email);
         }
 
         [TearDown]
         public void TearDown()
         {
-            uut_._userRepository.DeleteUserByEmail("ab@ab.dk");
+            uut_.UserRepository.DeleteUserByEmail("ab@ab.dk");
         }
 
     }
