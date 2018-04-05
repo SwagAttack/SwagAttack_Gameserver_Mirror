@@ -28,7 +28,7 @@ namespace DBInterface.Unit.Test1
         public void AddUserToDB()
         {
             uut_.UserRepository.AddUser(_testUser).Wait();
-            Assert.That(_testUser.Email == uut_.UserRepository.GetUserByEmail(_testUser.Email).Email);
+            Assert.That(_testUser.Username == uut_.UserRepository.GetUserByUsername(_testUser.Username).Username);
         }
 
         [TearDown]

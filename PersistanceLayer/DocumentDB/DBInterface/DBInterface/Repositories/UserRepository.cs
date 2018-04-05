@@ -18,7 +18,7 @@ namespace DBInterface.Repositories
         {
             try
             {
-                GetUserByEmail(thisUser.Email);
+                GetUserByUsername(thisUser.Username);
                 Console.WriteLine("user already exsist!");
             }
             catch (Exception e)
@@ -30,11 +30,11 @@ namespace DBInterface.Repositories
 
         }
 
-        public User GetUserByEmail(string id)
+        public User GetUserByUsername(string id)
         {
 
             User TheUser = _Context.UserClient.CreateDocumentQuery<User>(_Context.UserCollection.DocumentsLink)
-                .Where(x => x.Email == id)
+                .Where(x => x.Username == id)
                 .AsEnumerable()
                 .FirstOrDefault();
             if (TheUser == null)
@@ -45,9 +45,9 @@ namespace DBInterface.Repositories
             return TheUser;
         }
 
-        public void DeleteUserByEmail(string Email)
+        public void DeleteUserByEmail(string Username)
         {
-            Document doc = GetDoc(Email);
+            Document doc = GetDoc(Username);
             if (doc != null)
             {
                 _Context.UserClient.DeleteDocumentAsync(doc.SelfLink).Wait();
@@ -57,7 +57,7 @@ namespace DBInterface.Repositories
         public void ReplaceUser(User ThisUser)
         {
 
-            Document doc = GetDoc(ThisUser.Email);
+            Document doc = GetDoc(ThisUser.Username);
             _Context.UserClient.ReplaceDocumentAsync(doc.SelfLink, ThisUser).Wait();
         }
 

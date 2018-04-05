@@ -23,7 +23,7 @@ namespace Testing_to_Domain
             UnitOfWork xy = new UnitOfWork(new DbContext());
 
             xy.UserRepository.AddUser(newUser).Wait();
-            Console.WriteLine(xy.UserRepository.GetUserByEmail("ab@ab.dk").Email);
+            Console.WriteLine(xy.UserRepository.GetUserByUsername("ab@ab.dk").Email);
 
             xy.UserRepository.DeleteUserByEmail("ab@ab.dk");
 
