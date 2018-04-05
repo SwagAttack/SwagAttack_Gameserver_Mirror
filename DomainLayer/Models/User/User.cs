@@ -18,7 +18,7 @@ namespace Models.User
         private string _email;
         private string _password;
 
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(Required = Required.Always, PropertyName = "id")]
         public string Username
         {
             get { return _username; }
@@ -40,7 +40,7 @@ namespace Models.User
             }
         }
 
-        [JsonProperty(Required = Required.Always, PropertyName = "id")]
+        [JsonProperty(Required = Required.Always)]
         public string Email
         {
             get { return _email; }
