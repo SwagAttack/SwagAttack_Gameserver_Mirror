@@ -6,5 +6,6 @@ namespace DBInterface.UnitOfWork
 {
     interface IunitOfWork
     {
+
     }
 }

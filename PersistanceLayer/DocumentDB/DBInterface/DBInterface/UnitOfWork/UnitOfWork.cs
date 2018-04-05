@@ -5,7 +5,7 @@ using DBInterface.Repositories;
 namespace DBInterface.UnitOfWork
 {
 
-    public class UnitOfWork
+    public class UnitOfWork : IunitOfWork
     {
         public readonly UserRepository UserRepository;
         private readonly DbContext _context;
