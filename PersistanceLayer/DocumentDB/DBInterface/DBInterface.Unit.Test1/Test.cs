@@ -34,7 +34,7 @@ namespace DBInterface.Unit.Test1
         [TearDown]
         public void TearDown()
         {
-            uut_.UserRepository.DeleteUserByEmail("ab@ab.dk");
+            uut_.UserRepository.DeleteUserByUsername("ab@ab.dk");
         }
 
     }

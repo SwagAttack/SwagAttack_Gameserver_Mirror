@@ -45,7 +45,7 @@ namespace DBInterface.Repositories
             return TheUser;
         }
 
-        public void DeleteUserByEmail(string Username)
+        public void DeleteUserByUsername(string Username)
         {
             Document doc = GetDoc(Username);
             if (doc != null)
