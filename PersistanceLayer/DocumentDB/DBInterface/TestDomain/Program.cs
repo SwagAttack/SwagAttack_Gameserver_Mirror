@@ -1,9 +1,8 @@
 ﻿
 using System;
-using System.Net;
 using DBInterface;
 using DBInterface.UnitOfWork;
-using DocumentDB.Repository;
+
 using Models.User;
 
 namespace Testing_to_Domain
@@ -23,13 +22,14 @@ namespace Testing_to_Domain
 
             UnitOfWork xy = new UnitOfWork(new DbContext());
 
-            xy._userRepository.AddUser(newUser).Wait();
-            Console.WriteLine(xy._userRepository.GetUserByEmail("ab@ab.dk").Email);
+            xy.UserRepository.AddUser(newUser).Wait();
+            Console.WriteLine(xy.UserRepository.GetUserByUsername("1337User").Username);
 
-            //xy._userRepository.DeleteUserByEmail("ab@ab.dk");
+            xy.UserRepository.DeleteUserByUsername("1337User");
 
-            //newUser.GivenName = "replacedName";
-            //xy._userRepository.ReplaceUser(newUser);
+            xy.UserRepository.AddUser(newUser).Wait();
+            newUser.GivenName = "replacedName";
+            xy.UserRepository.ReplaceUser(newUser);
 
         }
     }
