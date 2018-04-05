@@ -2,11 +2,11 @@
 {
     public class Repository<T> where T : class
     {
-        protected readonly DbContext _Context;
+        protected readonly DbContext Context;
 
         public Repository(DbContext context)
         {
-            _Context = context;
+            Context = context;
         }
 
     }

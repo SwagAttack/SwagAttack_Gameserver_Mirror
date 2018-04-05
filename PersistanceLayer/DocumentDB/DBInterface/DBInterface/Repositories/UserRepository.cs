@@ -23,7 +23,7 @@ namespace DBInterface.Repositories
             }
             catch (Exception e)
             {
-                Document created = await _Context.UserClient.CreateDocumentAsync(_Context.UserCollection.DocumentsLink, thisUser);
+                Document created = await Context.UserClient.CreateDocumentAsync(Context.UserCollection.DocumentsLink, thisUser);
                 Console.WriteLine(created);
 
             }
@@ -33,37 +33,37 @@ namespace DBInterface.Repositories
         public User GetUserByUsername(string id)
         {
 
-            User TheUser = _Context.UserClient.CreateDocumentQuery<User>(_Context.UserCollection.DocumentsLink)
+            User theUser = Context.UserClient.CreateDocumentQuery<User>(Context.UserCollection.DocumentsLink)
                 .Where(x => x.Username == id)
                 .AsEnumerable()
                 .FirstOrDefault();
-            if (TheUser == null)
-            {
-                throw new ArgumentException("User dosent exsist");
-            }
+            //if (theUser == null)
+            //{
+            //    throw new ArgumentException("User dosent exsist");
+            //}
 
-            return TheUser;
+            return theUser;
         }
 
-        public void DeleteUserByUsername(string Username)
+        public void DeleteUserByUsername(string username)
         {
-            Document doc = GetDoc(Username);
+            Document doc = GetDoc(username);
             if (doc != null)
             {
-                _Context.UserClient.DeleteDocumentAsync(doc.SelfLink).Wait();
+                Context.UserClient.DeleteDocumentAsync(doc.SelfLink).Wait();
             }
         }
 
-        public void ReplaceUser(User ThisUser)
+        public void ReplaceUser(User thisUser)
         {
 
-            Document doc = GetDoc(ThisUser.Username);
-            _Context.UserClient.ReplaceDocumentAsync(doc.SelfLink, ThisUser).Wait();
+            Document doc = GetDoc(thisUser.Username);
+            Context.UserClient.ReplaceDocumentAsync(doc.SelfLink, thisUser).Wait();
         }
 
         private Document GetDoc(string id)
         {
-            return _Context.UserClient.CreateDocumentQuery(_Context.UserCollection.DocumentsLink).Where(x => x.Id == id)
+            return Context.UserClient.CreateDocumentQuery(Context.UserCollection.DocumentsLink).Where(x => x.Id == id)
                 .AsEnumerable().FirstOrDefault();
         }
     }

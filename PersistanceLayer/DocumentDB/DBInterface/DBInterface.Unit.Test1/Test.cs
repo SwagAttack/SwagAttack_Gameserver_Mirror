@@ -7,13 +7,13 @@ namespace DBInterface.Unit.Test1
     [TestFixture]
     public class Test
     {
-        private UnitOfWork.UnitOfWork uut_;
+        private UnitOfWork.UnitOfWork _uut;
         private User _testUser;
 
         [SetUp]
-        public void setup()
+        public void Setup()
         {
-            uut_ = new UnitOfWork.UnitOfWork(new DbContext());
+            _uut = new UnitOfWork.UnitOfWork(new DbContext());
             _testUser = new User
             {
                 Email = "ab@ab.dk",
@@ -25,16 +25,16 @@ namespace DBInterface.Unit.Test1
         }
 
         [Test]
-        public void AddUserToDB()
+        public void AddUserToDb()
         {
-            uut_.UserRepository.AddUser(_testUser).Wait();
-            Assert.That(_testUser.Username == uut_.UserRepository.GetUserByUsername(_testUser.Username).Username);
+            _uut.UserRepository.AddUser(_testUser).Wait();
+            Assert.That(_testUser.Username == _uut.UserRepository.GetUserByUsername(_testUser.Username).Username);
         }
 
         [TearDown]
         public void TearDown()
         {
-            uut_.UserRepository.DeleteUserByUsername("ab@ab.dk");
+            _uut.UserRepository.DeleteUserByUsername("ab@ab.dk");
         }
 
     }

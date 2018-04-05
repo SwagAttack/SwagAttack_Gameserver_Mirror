@@ -5,7 +5,7 @@ using Microsoft.Azure.Documents.Client;
 
 namespace DBInterface
 {
-    public interface IDBContext
+    public interface IDbContext
     {
         /// <summary>
         /// For all connection to database
@@ -17,7 +17,7 @@ namespace DBInterface
         DocumentCollection UserCollection { get; set; }
     }
 
-    public class DbContext : IDBContext
+    public class DbContext : IDbContext
     {
         //private const string EndpointUrl = "https://localhost:8081";
         //private const string PrimaryKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
@@ -36,7 +36,7 @@ namespace DBInterface
         {
             try
             {
-                LoadDB().Wait();
+                LoadDb().Wait();
             }
             catch (DocumentClientException de)
             {
@@ -55,7 +55,7 @@ namespace DBInterface
         /// The method to both get/set database and collection(s)
         /// </summary>
         /// <returns></returns>
-        private async Task LoadDB()
+        private async Task LoadDb()
         {
             UserClient = new DocumentClient(new Uri(EndpointUrl), PrimaryKey);
             await UserClient.CreateDatabaseIfNotExistsAsync(new Database { Id = "UserDB" });
