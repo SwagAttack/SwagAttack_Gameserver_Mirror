@@ -29,8 +29,24 @@ namespace DBInterface.Unit.Test1
         [Test]
         public void AddUserToDb()
         {
-            _uut.UserRepository.AddUser(_testUser).Wait();
+            _uut.UserRepository.AddUserAsyncTask(_testUser);
             Assert.That(_testUser.Username == _uut.UserRepository.GetUserByUsername(_testUser.Username).Username);
+        }
+
+        [Test]
+        public void ReplaceUserInDB()
+        {
+            _testUser.GivenName = "Replaced";
+            _uut.UserRepository.ReplaceUser(_testUser);
+            Assert.That(_testUser.GivenName == _uut.UserRepository.GetUserByUsername(_testUser.Username).GivenName);
+        }
+
+        [Test]
+        public void DeleteUserInDB()
+        {
+            _uut.UserRepository.DeleteUserByUsername(_testUser.Username);
+            Assert.That(_uut.UserRepository.GetUserByUsername(_testUser.Username), Is.Null);
+            _uut.UserRepository.AddUserAsyncTask(_testUser); // put it up again
         }
 
         [TearDown]

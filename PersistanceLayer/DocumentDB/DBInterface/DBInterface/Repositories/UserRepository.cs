@@ -7,26 +7,18 @@ using Models.Interfaces;
 //https://github.com/Azure/azure-documentdb-dotnet/blob/f374cc601f4cf08d11c88f0c3fa7dcefaf7ecfe8/samples/code-samples/DocumentManagement/Program.cs#L198
 namespace DBInterface.Repositories
 {
-    public class UserRepository : Repository<IUser>
+    public class UserRepository : Repository<IUser>, IUserRepository
     {
         public UserRepository(DbContext context) : base(context)
         {
         }
 
-        public async Task AddUser(IUser thisUser)
+        public void AddUserAsyncTask(IUser thisUser)
         {
-            try
+            if (GetUserByUsername(thisUser.Username) == null)
             {
-                GetUserByUsername(thisUser.Username);
-                Console.WriteLine("user already exsist!");
+                Context.UserClient.CreateDocumentAsync(Context.UserCollection.DocumentsLink, thisUser).Wait();
             }
-            catch (Exception e)
-            {
-                Document created = await Context.UserClient.CreateDocumentAsync(Context.UserCollection.DocumentsLink, thisUser);
-                Console.WriteLine(created);
-
-            }
-
         }
 
         public IUser GetUserByUsername(string id)
@@ -36,10 +28,6 @@ namespace DBInterface.Repositories
                 .Where(x => x.Username == id)
                 .AsEnumerable()
                 .FirstOrDefault();
-            if (theUser == null)
-            {
-                throw new ArgumentException("User dosent exsist");
-            }
 
             return theUser;
         }
