@@ -2,17 +2,18 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
+using Models.Interfaces;
 
 //https://github.com/Azure/azure-documentdb-dotnet/blob/f374cc601f4cf08d11c88f0c3fa7dcefaf7ecfe8/samples/code-samples/DocumentManagement/Program.cs#L198
 namespace DBInterface.Repositories
 {
-    public class UserRepository : Repository<User>
+    public class UserRepository : Repository<IUser>
     {
         public UserRepository(DbContext context) : base(context)
         {
         }
 
-        public async Task AddUser(Models.User.User thisUser)
+        public async Task AddUser(IUser thisUser)
         {
             try
             {
@@ -28,10 +29,10 @@ namespace DBInterface.Repositories
 
         }
 
-        public Models.User.User GetUserByUsername(string id)
+        public IUser GetUserByUsername(string id)
         {
 
-            Models.User.User theUser = Context.UserClient.CreateDocumentQuery<Models.User.User>(Context.UserCollection.DocumentsLink)
+            IUser theUser = Context.UserClient.CreateDocumentQuery<Models.User.User>(Context.UserCollection.DocumentsLink)
                 .Where(x => x.Username == id)
                 .AsEnumerable()
                 .FirstOrDefault();
@@ -52,9 +53,8 @@ namespace DBInterface.Repositories
             }
         }
 
-        public void ReplaceUser(Models.User.User thisUser)
+        public void ReplaceUser(IUser thisUser)
         {
-
             Document doc = GetDoc(thisUser.Username);
             Context.UserClient.ReplaceDocumentAsync(doc.SelfLink, thisUser).Wait();
         }
