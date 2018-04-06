@@ -1,6 +1,8 @@
 ﻿
+using Microsoft.Azure.Documents;
 using Models.User;
 using NUnit.Framework;
+using User = Models.User.User;
 
 namespace DBInterface.Unit.Test1
 {

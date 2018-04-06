@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <Reference Include="Models">
-      <HintPath>..\..\..\..\DomainLayer\Models\bin\Debug\Models.dll</HintPath>
+      <HintPath>..\..\..\..\DomainLayer\DomainLayer\Models\bin\Debug\netcoreapp2.0\Models.dll</HintPath>
     </Reference>
   </ItemGroup>
 

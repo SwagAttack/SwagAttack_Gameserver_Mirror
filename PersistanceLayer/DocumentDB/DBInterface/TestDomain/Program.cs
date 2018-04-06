@@ -2,8 +2,9 @@
 using System;
 using DBInterface;
 using DBInterface.UnitOfWork;
-
+using Microsoft.Azure.Documents;
 using Models.User;
+using User = Models.User.User;
 
 namespace Testing_to_Domain
 {
@@ -11,6 +12,7 @@ namespace Testing_to_Domain
     {
         private static void Main(string[] args)
         {
+            
             var newUser = new User
             {
                 Email = "ab@ab.dk",
@@ -23,13 +25,14 @@ namespace Testing_to_Domain
             UnitOfWork xy = new UnitOfWork(new DbContext());
 
             xy.UserRepository.AddUser(newUser).Wait();
-            Console.WriteLine(xy.UserRepository.GetUserByUsername("1337User").Username);
 
-            xy.UserRepository.DeleteUserByUsername("1337User");
+            //Console.WriteLine(xy.UserRepository.GetUserByUsername("1337User").Username);
 
-            xy.UserRepository.AddUser(newUser).Wait();
-            newUser.GivenName = "replacedName";
-            xy.UserRepository.ReplaceUser(newUser);
+            //xy.UserRepository.DeleteUserByUsername("1337User");
+
+            //xy.UserRepository.AddUser(newUser).Wait();
+            //newUser.GivenName = "replacedName";
+            //xy.UserRepository.ReplaceUser(newUser);
 
         }
     }

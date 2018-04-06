@@ -2,19 +2,17 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
-using User = Models.User.User;
 
 //https://github.com/Azure/azure-documentdb-dotnet/blob/f374cc601f4cf08d11c88f0c3fa7dcefaf7ecfe8/samples/code-samples/DocumentManagement/Program.cs#L198
 namespace DBInterface.Repositories
 {
     public class UserRepository : Repository<User>
     {
-
         public UserRepository(DbContext context) : base(context)
         {
         }
 
-        public async Task AddUser(User thisUser)
+        public async Task AddUser(Models.User.User thisUser)
         {
             try
             {
@@ -30,17 +28,17 @@ namespace DBInterface.Repositories
 
         }
 
-        public User GetUserByUsername(string id)
+        public Models.User.User GetUserByUsername(string id)
         {
 
-            User theUser = Context.UserClient.CreateDocumentQuery<User>(Context.UserCollection.DocumentsLink)
+            Models.User.User theUser = Context.UserClient.CreateDocumentQuery<Models.User.User>(Context.UserCollection.DocumentsLink)
                 .Where(x => x.Username == id)
                 .AsEnumerable()
                 .FirstOrDefault();
-            //if (theUser == null)
-            //{
-            //    throw new ArgumentException("User dosent exsist");
-            //}
+            if (theUser == null)
+            {
+                throw new ArgumentException("User dosent exsist");
+            }
 
             return theUser;
         }
@@ -54,7 +52,7 @@ namespace DBInterface.Repositories
             }
         }
 
-        public void ReplaceUser(User thisUser)
+        public void ReplaceUser(Models.User.User thisUser)
         {
 
             Document doc = GetDoc(thisUser.Username);
