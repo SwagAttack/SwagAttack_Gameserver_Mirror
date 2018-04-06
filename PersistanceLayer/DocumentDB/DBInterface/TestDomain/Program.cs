@@ -22,7 +22,7 @@ namespace Testing_to_Domain
                 Username = "1337User"
             };
 
-            UnitOfWork xy = new UnitOfWork(new DbContext());
+            IUnitOfWork xy = new UnitOfWork(new DbContext());
 
             xy.UserRepository.AddUser(newUser);
 
