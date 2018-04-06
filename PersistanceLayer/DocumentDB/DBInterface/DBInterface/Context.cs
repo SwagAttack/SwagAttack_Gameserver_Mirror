@@ -19,14 +19,17 @@ namespace DBInterface
 
     public class DbContext : IDbContext
     {
-        private const string EndpointUrl = "https://localhost:8081";
-        private const string PrimaryKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
+        //local
 
-        //private const string EndpointUrl = "https://swagattackuserdb.documents.azure.com:443/";
+        //private const string EndpointUrl = "https://localhost:8081";
+        //private const string PrimaryKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
 
-        //private const string PrimaryKey ="YAKAaZw4Rjx8eVV3WSvWbIU9P4yjgBxbBmDYSR51dCWc7bqlkW1088MPvEZRsdB5KHPL30NiN8hnRnFk0I3B6w==";
+        //Out
+
+        private const string EndpointUrl = "https://swagattackuserdb.documents.azure.com:443/";
+        private const string PrimaryKey = "YAKAaZw4Rjx8eVV3WSvWbIU9P4yjgBxbBmDYSR51dCWc7bqlkW1088MPvEZRsdB5KHPL30NiN8hnRnFk0I3B6w==";
+
         public DocumentClient UserClient { get; set; }
-
         public DocumentCollection UserCollection { get; set; }
 
         /// <summary>

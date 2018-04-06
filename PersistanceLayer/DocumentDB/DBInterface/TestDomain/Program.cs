@@ -26,13 +26,13 @@ namespace Testing_to_Domain
 
             xy.UserRepository.AddUser(newUser).Wait();
 
-            //Console.WriteLine(xy.UserRepository.GetUserByUsername("1337User").Username);
+            Console.WriteLine(xy.UserRepository.GetUserByUsername("1337User").Username);
 
-            //xy.UserRepository.DeleteUserByUsername("1337User");
+            xy.UserRepository.DeleteUserByUsername("1337User");
 
-            //xy.UserRepository.AddUser(newUser).Wait();
-            //newUser.GivenName = "replacedName";
-            //xy.UserRepository.ReplaceUser(newUser);
+            xy.UserRepository.AddUser(newUser).Wait();
+            newUser.GivenName = "replacedName";
+            xy.UserRepository.ReplaceUser(newUser);
 
         }
     }
