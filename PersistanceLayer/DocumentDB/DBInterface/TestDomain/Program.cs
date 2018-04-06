@@ -24,13 +24,13 @@ namespace Testing_to_Domain
 
             UnitOfWork xy = new UnitOfWork(new DbContext());
 
-            xy.UserRepository.AddUserAsyncTask(newUser);
+            xy.UserRepository.AddUser(newUser);
 
             Console.WriteLine(xy.UserRepository.GetUserByUsername("1337User").Username);
 
             xy.UserRepository.DeleteUserByUsername("1337User");
 
-            xy.UserRepository.AddUserAsyncTask(newUser);
+            xy.UserRepository.AddUser(newUser);
             newUser.GivenName = "replacedName";
             xy.UserRepository.ReplaceUser(newUser);
 

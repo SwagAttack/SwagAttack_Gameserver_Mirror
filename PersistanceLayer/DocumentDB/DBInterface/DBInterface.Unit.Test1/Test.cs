@@ -29,7 +29,7 @@ namespace DBInterface.Unit.Test1
         [Test]
         public void AddUserToDb()
         {
-            _uut.UserRepository.AddUserAsyncTask(_testUser);
+            _uut.UserRepository.AddUser(_testUser);
             Assert.That(_testUser.Username == _uut.UserRepository.GetUserByUsername(_testUser.Username).Username);
         }
 
@@ -46,7 +46,7 @@ namespace DBInterface.Unit.Test1
         {
             _uut.UserRepository.DeleteUserByUsername(_testUser.Username);
             Assert.That(_uut.UserRepository.GetUserByUsername(_testUser.Username), Is.Null);
-            _uut.UserRepository.AddUserAsyncTask(_testUser); // put it up again
+            _uut.UserRepository.AddUser(_testUser); // put it up again
         }
 
         [TearDown]

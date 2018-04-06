@@ -13,7 +13,7 @@ namespace DBInterface.Repositories
         {
         }
 
-        public void AddUserAsyncTask(IUser thisUser)
+        public void AddUser(IUser thisUser)
         {
             if (GetUserByUsername(thisUser.Username) == null)
             {

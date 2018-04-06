@@ -13,7 +13,7 @@ namespace DBInterface.Repositories
         /// </summary>
         /// <param name="thisUser">The user wants added</param>
         /// <returns></returns>
-        void AddUserAsyncTask(IUser thisUser);
+        void AddUser(IUser thisUser);
         /// <summary>
         /// Given the username, a user can be found
         /// </summary>
