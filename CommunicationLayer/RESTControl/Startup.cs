@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DBInterface;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RESTControl.Controllers;
-using RESTControl.DAL_Simulation;
+using DBInterface.UnitOfWork;
 using RESTControl.Interfaces;
 
 namespace RESTControl
@@ -27,11 +28,9 @@ namespace RESTControl
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-
-      
-
-            services.AddSingleton<IUnitOfWork, UnitOfWork>();
-            services.AddSingleton<IUserController, UserController>();
+     
+            services.AddTransient<IUnitOfWork>(u => new UnitOfWork(new DbContext()));
+            services.AddTransient<IUserController, UserController>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

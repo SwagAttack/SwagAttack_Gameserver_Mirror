@@ -1,7 +1,9 @@
 ﻿using System.Linq;
 using Models.Interfaces;
-using RESTControl.DAL_Simulation;
+using Models.User;
 using RESTControl.Interfaces;
+using DBInterface.UnitOfWork;
+using DBInterface.Repositories;
 
 namespace RESTControl.Controllers
 {
@@ -18,7 +20,7 @@ namespace RESTControl.Controllers
         }
         public IUser GetUser(string username, string password)
         {
-            var user = _unitOfWork.Users.FirstOrDefault(u => u.Username == username);
+            var user = _unitOfWork.UserRepository.GetUserByUsername(username);
 
             if (user != null)
             {
@@ -33,9 +35,9 @@ namespace RESTControl.Controllers
 
         public IUser CreateUser(IUser user)
         {
-            if (_unitOfWork.Users.FirstOrDefault(u=> u.Username == user.Username) == null)
+            if (_unitOfWork.UserRepository.GetUserByUsername(user.Username) == null)
             {
-                _unitOfWork.Users.Add(user);
+                _unitOfWork.UserRepository.AddUser(user);
                 return user;
             }
 
@@ -44,17 +46,19 @@ namespace RESTControl.Controllers
 
         public IUser UpdateUser(string username, string password, IUser user)
         {
-            var result = _unitOfWork.Users.FirstOrDefault(u => u.Username == username);
+            var result = _unitOfWork.UserRepository.GetUserByUsername(username);
 
             if (result != null)
             {
                 if (result.Password == password)
                 {
-                    result.Username = user.Username;
+                    //result.Username = user.Username;
                     result.Password = user.Password;
                     result.Email = user.Email;
                     result.GivenName = user.GivenName;
                     result.LastName = user.LastName;
+
+                    _unitOfWork.UserRepository.ReplaceUser(user);
 
                     return result;
                 }
