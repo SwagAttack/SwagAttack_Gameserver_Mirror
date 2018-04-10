@@ -1,9 +1,7 @@
 ﻿using System.Linq;
 using Models.Interfaces;
-using Models.User;
 using RESTControl.Interfaces;
 using DBInterface.UnitOfWork;
-using DBInterface.Repositories;
 
 namespace RESTControl.Controllers
 {
