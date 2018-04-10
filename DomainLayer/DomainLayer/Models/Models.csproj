@@ -5,6 +5,11 @@
     <ApplicationIcon />
     <OutputType>Library</OutputType>
     <StartupObject />
+    <PackageId>SwagAttack_Models</PackageId>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>SwagAttack_Dev_Team</Authors>
+    <Company>SwagAttack</Company>
+    <Product>SwagAttack_Models</Product>
   </PropertyGroup>
 
   <ItemGroup>
