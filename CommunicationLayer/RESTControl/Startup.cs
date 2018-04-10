@@ -28,6 +28,8 @@ namespace RESTControl
         {
             services.AddMvc();
 
+      
+
             services.AddSingleton<IUnitOfWork, UnitOfWork>();
             services.AddSingleton<IUserController, UserController>();
         }
