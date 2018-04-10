@@ -11,6 +11,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RESTControl.Controllers;
 using DBInterface.UnitOfWork;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 using RESTControl.Filters;
 using RESTControl.Interfaces;
 
@@ -28,8 +30,12 @@ namespace RESTControl
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(options => { options.Filters.Add(typeof(ValidateModelStateAttribute)); });
-     
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(typeof(ValidateModelStateAttribute));
+                options.Filters.Add(new RequireHttpsAttribute());
+            });
+
             services.AddTransient<IUnitOfWork>(u => new UnitOfWork(new DbContext()));
             services.AddTransient<IUserController, UserController>();
         }
@@ -42,6 +48,9 @@ namespace RESTControl
                 app.UseDeveloperExceptionPage();
             }
 
+            var options = new RewriteOptions().AddRedirectToHttps();
+
+            app.UseRewriter(options);
             app.UseMvc();
         }
     }
