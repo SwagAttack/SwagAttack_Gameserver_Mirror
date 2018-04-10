@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Controllers;
+using Application.Interfaces;
 using DBInterface;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,10 +11,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Communication.Controllers;
 using DBInterface.UnitOfWork;
 using Communication.Filters;
-using Communication.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace Communication
 {
@@ -28,7 +30,11 @@ namespace Communication
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(options => { options.Filters.Add(typeof(ValidateModelStateAttribute)); });
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(typeof(ValidateModelStateAttribute));
+                options.Filters.Add(new RequireHttpsAttribute());
+            });
      
             services.AddTransient<IUnitOfWork>(u => new UnitOfWork(new DbContext()));
             services.AddTransient<IUserController, UserController>();
@@ -42,6 +48,9 @@ namespace Communication
                 app.UseDeveloperExceptionPage();
             }
 
+            var options = new RewriteOptions().AddRedirectToHttps();
+
+            app.UseRewriter(options);
             app.UseMvc();
         }
     }

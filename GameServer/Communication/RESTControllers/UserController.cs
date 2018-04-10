@@ -1,16 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Models.User;
 using Communication.Filters;
-using Communication.Interfaces;
 
 namespace Communication.RESTControllers
 {
-    /// <summary>
-    /// REST Api User Controller
-    /// </summary>
+    // <summary>
+    // REST Api User Controller
+    // </summary>
     [Produces("application/json")]
     [Route("api/User")]
     public class UserController : Controller
@@ -40,13 +40,13 @@ namespace Communication.RESTControllers
         {
             var result = _userController.CreateUser(user);
 
-            if(result != null)
+            if (result != null)
             {
                 return CreatedAtRoute("GetUser", new { username = result.Username, password = result.Password }, result);
-            }else
-            {
-                return BadRequest("Username already exists");
-            }             
+            }
+
+            return BadRequest("Username already exists");
+
         }
 
         [HttpPut("{username}/{password}")]
@@ -57,10 +57,10 @@ namespace Communication.RESTControllers
             if (result != null)
             {
                 return CreatedAtRoute("GetUser", new { username = result.Username, password = result.Password }, result);
-            }else
-            {
-                return BadRequest("Wrong username or password");
-            }                
+            }
+
+            return BadRequest("Wrong username or password");
+
         }
 
     }
