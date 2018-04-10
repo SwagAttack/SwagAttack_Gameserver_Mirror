@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace RESTControl.Filters
 {
-    public class ValidateUserModelStateAttribute : ActionFilterAttribute
+    public class ValidateModelStateAttribute : ActionFilterAttribute
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {

@@ -3,7 +3,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Models.User;
-using RESTControl.DAL_Simulation;
 using RESTControl.Filters;
 using RESTControl.Interfaces;
 
@@ -37,7 +36,6 @@ namespace RESTControl.RESTControllers
         }
 
         [HttpPost]
-        [ValidateUserModelState]
         public IActionResult Post([FromBody]User user)
         {
             var result = _userController.CreateUser(user);
@@ -52,7 +50,6 @@ namespace RESTControl.RESTControllers
         }
 
         [HttpPut("{username}/{password}")]
-        [ValidateUserModelState]
         public IActionResult Put(string username, string password, [FromBody] User user)
         {
             var result = _userController.UpdateUser(username, password, user);
