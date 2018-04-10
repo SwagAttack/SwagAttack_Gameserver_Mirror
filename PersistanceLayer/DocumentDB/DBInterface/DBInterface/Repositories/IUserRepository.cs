@@ -6,7 +6,7 @@ using Models.Interfaces;
 
 namespace DBInterface.Repositories
 {
-    interface IUserRepository
+    public interface IUserRepository
     {
         /// <summary>
         /// Adding a user to the userDB, from the user model

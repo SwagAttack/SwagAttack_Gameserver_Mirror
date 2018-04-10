@@ -7,6 +7,6 @@ namespace DBInterface.UnitOfWork
 {
     public interface IUnitOfWork
     {
-        UserRepository UserRepository { get; }
+        IUserRepository UserRepository { get; }
     }
 }

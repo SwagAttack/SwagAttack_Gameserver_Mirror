@@ -14,6 +14,6 @@ namespace DBInterface.UnitOfWork
             UserRepository = new UserRepository(_context);
 
         }
-        public UserRepository UserRepository { get; }
+        public IUserRepository UserRepository { get; }
     }
 }
