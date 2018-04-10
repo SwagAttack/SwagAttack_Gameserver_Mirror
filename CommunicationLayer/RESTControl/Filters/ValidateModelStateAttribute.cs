@@ -14,10 +14,7 @@ namespace RESTControl.Filters
 
                 foreach (var state in context.ModelState)
                 {
-                    foreach (var err in state.Value.Errors)
-                    {
-                        errors.Add(state.Key, err.Exception.GetBaseException().Message);
-                    }
+                      errors.Add(state.Key, state.Value.Errors[0].Exception.GetBaseException().Message);
                 }
 
                 context.Result = new BadRequestObjectResult(errors);
