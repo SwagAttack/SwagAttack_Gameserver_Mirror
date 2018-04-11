@@ -1,3 +1,4 @@
+using System;
 using Application.Controllers;
 using Application.Interfaces;
 using DBInterface;
@@ -29,10 +30,8 @@ namespace Communication
             services.AddMvc(options =>
             {
                 options.Filters.Add(typeof(ValidateModelStateAttribute));
-                options.Filters.Add(new RequireHttpsAttribute());
+                //options.Filters.Add(new RequireHttpsAttribute());
             });
-
-            services.AddIdentity<User, IdentityRole>();
 
             services.AddTransient<IUnitOfWork>(u => new UnitOfWork(new DbContext()));
             services.AddTransient<IUserController, UserController>();
@@ -46,11 +45,9 @@ namespace Communication
                 app.UseDeveloperExceptionPage();
             }
 
-            var options = new RewriteOptions().AddRedirectToHttps();
+            //var options = new RewriteOptions().AddRedirectToHttps();
 
-            app.UseRewriter(options);
-
-            app.UseAuthentication();
+            //app.UseRewriter(options);
 
             app.UseMvc();
         }

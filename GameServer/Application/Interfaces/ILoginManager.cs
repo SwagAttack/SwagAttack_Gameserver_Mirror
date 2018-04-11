@@ -6,6 +6,5 @@ namespace Application.Interfaces
     {
         bool Login(IUser user);
         bool CheckLoginStatus(IUser user);
-        void UpdateLoginStatus(IUser user, bool status);
     }
 }

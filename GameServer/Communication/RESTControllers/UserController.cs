@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Models.User;
 using Communication.Filters;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Communication.RESTControllers
 {
