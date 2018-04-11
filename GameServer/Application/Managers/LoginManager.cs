@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Application.Interfaces;
 using Models.Interfaces;
@@ -8,31 +9,44 @@ namespace Application.Managers
 {
     public class LoginManager : ILoginManager
     {
-        private static LoginManager _instance = null;
+        private static ILoginManager _instance = null;
+
+        public IReadOnlyDictionary<string, DateTime> LoggedInUsers
+        {
+            get
+            {
+                lock (_loggedInUsers)
+                {
+                    return _loggedInUsers;
+                }           
+            }
+        }
 
         private readonly Dictionary<string, DateTime> _loggedInUsers;
 
-        private readonly Timer _timeoutTimer;
-        private int _timeoutCounter;
-        private const int MaxTimeoutCount = 60 * 2; /* Every two min */
+        private readonly ITimer _timeoutTimer;
 
-        
-        public ILoginManager GetInstance()
+        public static ILoginManager GetInstance(ITimer timer)
         {
-            return _instance ?? (_instance = new LoginManager());
+            return _instance ?? (_instance = new LoginManager(timer));
         }
 
-        public bool Login(IUser user)
+        public bool Login(IUser user, DateTime timeout)
         {
             lock (_loggedInUsers)
             {
                 if (!_loggedInUsers.ContainsKey(user.Username))
                 {
-                    _loggedInUsers[user.Username] = new DateTime().AddMinutes(20);
+                    _loggedInUsers[user.Username] = timeout.AddMinutes(20);
                     return true;
                 }
                 return false;
             }
+        }
+
+        public bool Login(IUser user)
+        {
+            return Login(user, DateTime.Now);
         }
 
         public bool CheckLoginStatus(IUser user)
@@ -50,34 +64,35 @@ namespace Application.Managers
             }
         }
 
-        private LoginManager()
+        public LoginManager(ITimer timeoutTimer)
         {
             _loggedInUsers = new Dictionary<string, DateTime>();
-            _timeoutTimer = new Timer(HandleTimeout, null, 1000, 1000);
+            _timeoutTimer = timeoutTimer;
+
+            _timeoutTimer.ExpiredEvent += TimeoutTimerOnExpiredEvent;
+            _timeoutTimer.Start(60); // Start for 60 seconds
         }
 
-        private void HandleTimeout(object stateInfo)
+        private void TimeoutTimerOnExpiredEvent(object sender, EventArgs eventArgs)
         {
-            if (++_timeoutCounter < MaxTimeoutCount)
-            {
-                return;
-            }
-            else
-            {
-                var now = DateTime.Now;
+            var timer = (ITimer)sender;
+            var now = DateTime.Now;
 
-                lock (_loggedInUsers)
+            lock (_loggedInUsers)
+            {
+                foreach (var loggedInUser in _loggedInUsers.Keys.ToList())
                 {
-                    foreach (var loggedInUser in _loggedInUsers)
+                    // Get the timeout
+                    var timeout = _loggedInUsers[loggedInUser];
+                    // User expired
+                    if (timeout.CompareTo(now) < 0)
                     {
-                        // User expired
-                        if(!(loggedInUser.Value.CompareTo(now) < 0))
-                        {
-                            _loggedInUsers.Remove(loggedInUser.Key);
-                        }
+                        _loggedInUsers.Remove(loggedInUser);
                     }
                 }
             }
+
+            timer.Start(60);
         }
     }
 }
