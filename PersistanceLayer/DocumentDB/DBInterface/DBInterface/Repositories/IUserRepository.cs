@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
 using Models.Interfaces;
 
 namespace DBInterface.Repositories
@@ -30,5 +31,8 @@ namespace DBInterface.Repositories
         /// </summary>
         /// <param name="thisUser">the updated user</param>
         void ReplaceUser(IUser thisUser);
+
+        Task<Document> GetUserByUsernameAsync(string id);
+
     }
 }
