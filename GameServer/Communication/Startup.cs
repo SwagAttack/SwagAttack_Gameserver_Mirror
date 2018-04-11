@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Application.Controllers;
 using Application.Interfaces;
 using DBInterface;
@@ -9,12 +5,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using DBInterface.UnitOfWork;
 using Communication.Filters;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
+using Models.User;
 
 namespace Communication
 {
@@ -35,7 +31,9 @@ namespace Communication
                 options.Filters.Add(typeof(ValidateModelStateAttribute));
                 options.Filters.Add(new RequireHttpsAttribute());
             });
-     
+
+            services.AddIdentity<User, IdentityRole>();
+
             services.AddTransient<IUnitOfWork>(u => new UnitOfWork(new DbContext()));
             services.AddTransient<IUserController, UserController>();
         }
@@ -51,6 +49,9 @@ namespace Communication
             var options = new RewriteOptions().AddRedirectToHttps();
 
             app.UseRewriter(options);
+
+            app.UseAuthentication();
+
             app.UseMvc();
         }
     }

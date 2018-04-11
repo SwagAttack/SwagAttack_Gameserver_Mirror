@@ -13,10 +13,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Managers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="SwagAttack_DBInterface" Version="1.0.1" />
   </ItemGroup>
 
