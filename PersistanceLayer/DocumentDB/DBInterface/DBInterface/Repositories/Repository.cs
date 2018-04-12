@@ -2,12 +2,22 @@
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        public readonly DbContext Context;
-        private DbContext _context;
+        private static DbContext _context;
+
+        public static DbContext GetContext()
+        {
+            return _context;
+        }
+
+        private static void SetContext(DbContext value)
+        {
+            _context = value;
+        }
 
         public Repository(DbContext context)
         {
-            Context = context;
+            SetContext(context);
         }
+
     }
 }

@@ -1,22 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DBInterface.Repositories;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 
 namespace DBInterface
 {
-    public interface IDbContext
-    {
-        /// <summary>
-        /// For all connection to database
-        /// </summary>
-        DocumentClient UserClient { get; set; }
-        /// <summary>
-        /// for information about the users
-        /// </summary>
-        DocumentCollection UserCollection { get; set; }
-    }
-
     public class DbContext : IDbContext
     {
         //local
