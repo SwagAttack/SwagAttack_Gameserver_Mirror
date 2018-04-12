@@ -55,7 +55,7 @@ namespace Application.Test.Unittests
 
             _uut.Login(user);
 
-            Thread.Sleep(5);
+            Thread.Sleep(15000);
 
             _uut.Login(user);
 

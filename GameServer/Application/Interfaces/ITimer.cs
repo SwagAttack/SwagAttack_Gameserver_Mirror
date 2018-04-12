@@ -7,6 +7,8 @@ namespace Application.Interfaces
         event EventHandler TickEvent;
         event EventHandler ExpiredEvent;
         void StartWithSeconds(int seconds);
+        void StartWithMinutes(int minutes);
+        void Start(int minutes, int seconds);
         void Stop();
     }
 }

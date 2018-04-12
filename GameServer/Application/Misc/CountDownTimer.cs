@@ -27,6 +27,17 @@ namespace Application.Misc
             _timeoutTimer.Enabled = true;
         }
 
+        public void StartWithMinutes(int minutes)
+        {
+            StartWithSeconds(minutes * 60);
+        }
+
+        public void Start(int minutes, int seconds)
+        {
+            _timeRemainingInSeconds = (minutes * 60) + seconds;
+            _timeoutTimer.Enabled = true;
+        }
+
         public void Stop()
         {
             _timeoutTimer.Enabled = false;
