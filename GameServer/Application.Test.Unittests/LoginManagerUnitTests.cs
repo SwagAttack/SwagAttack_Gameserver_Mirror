@@ -127,7 +127,7 @@ namespace Application.Test.Unittests
 
             // Act and assert
 
-            Assert.That(_uut.CheckLoginStatus(user), Is.EqualTo(false));
+            Assert.That(_uut.CheckLoginStatus(user.Username), Is.EqualTo(false));
         }
 
         [Test]
@@ -144,7 +144,7 @@ namespace Application.Test.Unittests
 
             // Assert
 
-            Assert.That(_uut.CheckLoginStatus(user), Is.EqualTo(true));
+            Assert.That(_uut.CheckLoginStatus(user.Username), Is.EqualTo(true));
         }
 
         [Test]
@@ -161,7 +161,7 @@ namespace Application.Test.Unittests
 
             Thread.Sleep(5);
 
-            _uut.CheckLoginStatus(user);
+            _uut.Login(user);
 
             var fakeTime_littleMore = DateTime.Now.AddMinutes(20).AddSeconds(1);
             var fakeTime_littleLess = DateTime.Now.AddMinutes(20).AddSeconds(-1);

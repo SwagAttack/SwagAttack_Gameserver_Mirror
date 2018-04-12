@@ -53,14 +53,14 @@ namespace Application.Managers
             Login(user, DateTime.Now.AddMinutes(20));
         }
 
-        public bool CheckLoginStatus(IUser user)
+        public bool CheckLoginStatus(string username)
         {
             lock (_loggedInUsers)
             {
-                if (_loggedInUsers.ContainsKey(user.Username))
+                if (_loggedInUsers.ContainsKey(username))
                 {
                     /* Reset timeout */
-                    _loggedInUsers[user.Username] = DateTime.Now.AddMinutes(20);
+                    _loggedInUsers[username] = DateTime.Now.AddMinutes(20);
                     return true;
                 }
                    

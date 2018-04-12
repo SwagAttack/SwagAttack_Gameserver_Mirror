@@ -10,10 +10,12 @@ namespace Application.Controllers
     /// </summary>
     public class UserController : IUserController
     {
+        private readonly ILoginManager _loginManager;
         private readonly IUnitOfWork _unitOfWork;
-        public UserController(IUnitOfWork uow)
+        public UserController(IUnitOfWork unitOfWork, ILoginManager loginManager)
         {
-            _unitOfWork = uow;
+            _unitOfWork = unitOfWork;
+            _loginManager = loginManager;
         }
         public IUser GetUser(string username, string password)
         {
@@ -23,6 +25,7 @@ namespace Application.Controllers
             {
                 if (user.Password == password)
                 {
+                    _loginManager.Login(user);
                     return user;
                 }
             }
@@ -35,6 +38,7 @@ namespace Application.Controllers
             if (_unitOfWork.UserRepository.GetUserByUsername(user.Username) == null)
             {
                 _unitOfWork.UserRepository.AddUser(user);
+                _loginManager.Login(user);
                 return user;
             }
 
@@ -47,7 +51,7 @@ namespace Application.Controllers
 
             if (result != null)
             {
-                if (result.Password == password)
+                if (result.Password == password && _loginManager.CheckLoginStatus(username))
                 {
                     //result.Username = user.Username;
                     result.Password = user.Password;
@@ -55,7 +59,7 @@ namespace Application.Controllers
                     result.GivenName = user.GivenName;
                     result.LastName = user.LastName;
 
-                    _unitOfWork.UserRepository.ReplaceUser(user);
+                    _unitOfWork.UserRepository.ReplaceUser(result);
 
                     return result;
                 }

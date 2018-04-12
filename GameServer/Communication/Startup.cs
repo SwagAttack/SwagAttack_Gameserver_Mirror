@@ -55,7 +55,7 @@ namespace Communication
             //            ClockSkew = TimeSpan.FromMinutes(5) //5 minute tolerance for the expiration date
             //        };
             //    });
-
+           
             services.AddTransient<IUnitOfWork>(u => new UnitOfWork(new DbContext()));
             services.AddTransient<IUserController, UserController>();
         }
