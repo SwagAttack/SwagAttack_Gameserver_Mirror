@@ -140,7 +140,7 @@ namespace Application.Managers
             {
                 foreach (var loggedOutUser in loggedOutUsers)
                 {
-                    if (_loggedInUsers.ContainsKey(loggedOutUser))
+                    if (_listeners.ContainsKey(loggedOutUser))
                     {
                         foreach (var handler in _listeners[loggedOutUser].ToList())
                         {
