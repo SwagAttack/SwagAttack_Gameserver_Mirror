@@ -5,7 +5,7 @@ using Application.Interfaces;
 
 namespace Application.Misc
 {
-    public class SecondsTimer : ITimer
+    public class CountDownTimer : ITimer
     {
         public event EventHandler TickEvent;
         public event EventHandler ExpiredEvent;
@@ -13,7 +13,7 @@ namespace Application.Misc
         private readonly System.Timers.Timer _timeoutTimer;
         private int _timeRemainingInSeconds;
 
-        public SecondsTimer()
+        public CountDownTimer()
         {
             _timeoutTimer = new System.Timers.Timer();
 
@@ -21,7 +21,7 @@ namespace Application.Misc
             _timeoutTimer.Interval = 1000;
             _timeoutTimer.AutoReset = true;
         }
-        public void Start(int seconds)
+        public void StartWithSeconds(int seconds)
         {
             _timeRemainingInSeconds = seconds;
             _timeoutTimer.Enabled = true;

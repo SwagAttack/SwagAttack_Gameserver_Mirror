@@ -6,7 +6,7 @@ namespace Application.Interfaces
     {
         event EventHandler TickEvent;
         event EventHandler ExpiredEvent;
-        void Start(int seconds);
+        void StartWithSeconds(int seconds);
         void Stop();
     }
 }

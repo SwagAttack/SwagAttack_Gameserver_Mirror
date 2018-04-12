@@ -1,20 +1,20 @@
 ﻿using System.Threading;
+using Application.Misc;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
-using SecondsTimer = Application.Misc.SecondsTimer;
 
 namespace Application.Test.Unittests
 {
     [TestFixture]
-    public class TimerUnitTests
+    public class CountDownTimerUnitTests
     {
-        private SecondsTimer _uut;
+        private CountDownTimer _uut;
         private int _tickCounter;
 
         [SetUp]
         public void SetUp()
         {
-            _uut = new SecondsTimer();
+            _uut = new CountDownTimer();
             _tickCounter = 0;
         }
 
@@ -31,7 +31,7 @@ namespace Application.Test.Unittests
         {
             _uut.TickEvent += (sender, args) => { _tickCounter++; };
 
-            _uut.Start(secondsToWait);
+            _uut.StartWithSeconds(secondsToWait);
 
             Thread.Sleep(msToWait);
 
@@ -45,7 +45,7 @@ namespace Application.Test.Unittests
         {
             _uut.TickEvent += (sender, args) => { _tickCounter++; };
 
-            _uut.Start(secondsToWait);
+            _uut.StartWithSeconds(secondsToWait);
 
             Thread.Sleep(msToWait);
 
@@ -60,7 +60,7 @@ namespace Application.Test.Unittests
             bool isCalled = false;
             _uut.ExpiredEvent += (sender, args) => { isCalled = true; };
 
-            _uut.Start(secondsToWait);
+            _uut.StartWithSeconds(secondsToWait);
 
             Thread.Sleep(msToWait);
 
@@ -75,7 +75,7 @@ namespace Application.Test.Unittests
             bool isCalled = false;
             _uut.ExpiredEvent += (sender, args) => { isCalled = true; };
 
-            _uut.Start(secondsToWait);
+            _uut.StartWithSeconds(secondsToWait);
 
             Thread.Sleep(msToWait);
 

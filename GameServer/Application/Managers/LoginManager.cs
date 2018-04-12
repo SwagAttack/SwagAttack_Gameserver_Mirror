@@ -23,6 +23,7 @@ namespace Application.Managers
         }
 
         private readonly Dictionary<string, DateTime> _loggedInUsers;
+        private readonly Dictionary<string, HashSet<UserLoggedOutHandle>> _listeners;
 
         private readonly ITimer _timeoutTimer;
 
@@ -31,22 +32,25 @@ namespace Application.Managers
             return _instance ?? (_instance = new LoginManager(timer));
         }
 
-        public bool Login(IUser user, DateTime timeout)
+        public void Login(IUser user, DateTime timeout)
         {
             lock (_loggedInUsers)
             {
                 if (!_loggedInUsers.ContainsKey(user.Username))
                 {
-                    _loggedInUsers[user.Username] = timeout.AddMinutes(20);
-                    return true;
+                    _loggedInUsers[user.Username] = timeout;
                 }
-                return false;
+                else
+                {
+                    // Reset timeout
+                    _loggedInUsers[user.Username] = DateTime.Now.AddMinutes(20);
+                }
             }
         }
 
-        public bool Login(IUser user)
+        public void Login(IUser user)
         {
-            return Login(user, DateTime.Now);
+            Login(user, DateTime.Now.AddMinutes(20));
         }
 
         public bool CheckLoginStatus(IUser user)
@@ -55,8 +59,8 @@ namespace Application.Managers
             {
                 if (_loggedInUsers.ContainsKey(user.Username))
                 {
-                    /* Add five minutes */
-                    _loggedInUsers[user.Username] += new TimeSpan(0,5,0);
+                    /* Reset timeout */
+                    _loggedInUsers[user.Username] = DateTime.Now.AddMinutes(20);
                     return true;
                 }
                    
@@ -64,19 +68,58 @@ namespace Application.Managers
             }
         }
 
+        public bool SubscribeOnLogOut(string username, UserLoggedOutHandle handle)
+        {
+            lock (_loggedInUsers)
+            {
+                if (!_loggedInUsers.ContainsKey(username))
+                    return false;
+            }
+
+            lock (_listeners)
+            {
+                if (!_listeners.ContainsKey(username))
+                {
+                    _listeners.Add(username, new HashSet<UserLoggedOutHandle>());
+                }
+
+                return _listeners[username].Add(handle);
+            }
+        }
+
+        public bool UnsubscribeOnLogOut(string username, UserLoggedOutHandle handle)
+        {
+            lock (_loggedInUsers)
+            {
+                if (!_loggedInUsers.ContainsKey(username))
+                    return false;
+            }
+
+            lock (_listeners)
+            {
+                if (!_listeners.ContainsKey(username))
+                    return false;
+
+                return _listeners[username].Remove(handle);
+            }
+        }
+
         public LoginManager(ITimer timeoutTimer)
         {
             _loggedInUsers = new Dictionary<string, DateTime>();
+            _listeners = new Dictionary<string, HashSet<UserLoggedOutHandle>>();
             _timeoutTimer = timeoutTimer;
 
             _timeoutTimer.ExpiredEvent += TimeoutTimerOnExpiredEvent;
-            _timeoutTimer.Start(60); // Start for 60 seconds
+            _timeoutTimer.StartWithSeconds(60); // StartWithSeconds for 60 seconds
         }
 
         private void TimeoutTimerOnExpiredEvent(object sender, EventArgs eventArgs)
         {
             var timer = (ITimer)sender;
             var now = DateTime.Now;
+
+            var loggedOutUsers = new List<string>();
 
             lock (_loggedInUsers)
             {
@@ -87,12 +130,27 @@ namespace Application.Managers
                     // User expired
                     if (timeout.CompareTo(now) < 0)
                     {
-                        _loggedInUsers.Remove(loggedInUser);
+                        loggedOutUsers.Add(loggedInUser);
+                        _loggedInUsers.Remove(loggedInUser);                      
                     }
                 }
             }
 
-            timer.Start(60);
+            lock (_listeners)
+            {
+                foreach (var loggedOutUser in loggedOutUsers)
+                {
+                    if (_loggedInUsers.ContainsKey(loggedOutUser))
+                    {
+                        foreach (var handler in _listeners[loggedOutUser].ToList())
+                        {
+                            handler.Invoke(this, loggedOutUser);
+                        }
+                    }
+                }
+            }
+
+            timer.StartWithSeconds(60);
         }
     }
 }

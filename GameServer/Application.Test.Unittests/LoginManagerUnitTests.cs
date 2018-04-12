@@ -22,23 +22,31 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void Login_CallingOnce_ContainsUserNameAndReturnsTrue()
+        public void Login_CallingOnce_ContainsUserNameWithTimeStampNow()
         {
-            // Setup
+            // Arrange
 
             var user = Substitute.For<IUser>();
             user.Username = "Username";
 
-            // Act and assert
+            var fakeTime_littleMore = DateTime.Now.AddMinutes(20).AddSeconds(1);
+            var fakeTime_littleLess = DateTime.Now.AddMinutes(20).AddSeconds(-1);
 
-            Assert.That(_uut.Login(user), Is.EqualTo(true));  
-            Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username), Is.EqualTo(true));  
+            // Act
+
+            _uut.Login(user);
+
+            // Assert
+
+            Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username), Is.EqualTo(true)); 
+            Assert.That(_uut.LoggedInUsers[user.Username].CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers[user.Username].CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
         }
 
         [Test]
-        public void Login_CalledTwice_ContainsUserNameAndReturnsFalse()
+        public void Login_CalledTwiceWithSleepInBetween_ContainsUserNameWithUpdatedTimestamp()
         {
-            // Setup
+            // Arrange
 
             var user = Substitute.For<IUser>();
             user.Username = "Username";
@@ -47,10 +55,18 @@ namespace Application.Test.Unittests
 
             _uut.Login(user);
 
+            Thread.Sleep(5);
+
+            _uut.Login(user);
+
+            var fakeTime_littleMore = DateTime.Now.AddMinutes(20).AddSeconds(1);
+            var fakeTime_littleLess = DateTime.Now.AddMinutes(20).AddSeconds(-1);
+
             // Assert
 
-            Assert.That(_uut.Login(user), Is.EqualTo(false));
             Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username), Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers[user.Username].CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers[user.Username].CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
         }
 
         [Test]
@@ -59,17 +75,18 @@ namespace Application.Test.Unittests
             // Act
             _fakeTimer.ExpiredEvent += Raise.EventWith(_fakeTimer, EventArgs.Empty);
             // Assert
-            _fakeTimer.Received(2).Start(60);
+            _fakeTimer.Received(2).StartWithSeconds(60);
         }
 
         [Test]
         public void TimerExpired_HasTimedOutUser_RemovesUser()
         {
-            // Setup
+            // Arrange
 
             var user = Substitute.For<IUser>();
             user.Username = "Username";
-            var fakeTime = DateTime.Now.AddMinutes(-21);
+            var fakeTime = DateTime.Now.AddMinutes(-1);
+
             _uut.Login(user, fakeTime);
 
             // Act
@@ -84,11 +101,11 @@ namespace Application.Test.Unittests
         [Test]
         public void TimerExpired_HasUserCloseToExpiring_DoesntRemovesUser()
         {
-            // Setup
+            // Arrange
 
             var user = Substitute.For<IUser>();
             user.Username = "Username";
-            var fakeTime = DateTime.Now.AddMinutes(-19);
+            var fakeTime = DateTime.Now.AddMinutes(1);
             _uut.Login(user, fakeTime);
 
             // Act
@@ -98,6 +115,61 @@ namespace Application.Test.Unittests
             // Assert
 
             Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username), Is.EqualTo(true));
+        }
+
+        [Test]
+        public void CheckLoginStatus_DoesntContainUser_ReturnsFalse()
+        {
+            // Arrange
+
+            var user = Substitute.For<IUser>();
+            user.Username = "Username";
+
+            // Act and assert
+
+            Assert.That(_uut.CheckLoginStatus(user), Is.EqualTo(false));
+        }
+
+        [Test]
+        public void CheckLoginStatus_ContainsUser_ReturnsTrue()
+        {
+            // Arrange
+
+            var user = Substitute.For<IUser>();
+            user.Username = "Username";
+
+            // Act
+
+            _uut.Login(user);
+
+            // Assert
+
+            Assert.That(_uut.CheckLoginStatus(user), Is.EqualTo(true));
+        }
+
+        [Test]
+        public void CheckLoginStatus_ContainsUser_UpdatesTimeStampCorrectly()
+        {
+            // Arrange
+
+            var user = Substitute.For<IUser>();
+            user.Username = "Username";
+
+            // Act
+
+            _uut.Login(user);
+
+            Thread.Sleep(5);
+
+            _uut.CheckLoginStatus(user);
+
+            var fakeTime_littleMore = DateTime.Now.AddMinutes(20).AddSeconds(1);
+            var fakeTime_littleLess = DateTime.Now.AddMinutes(20).AddSeconds(-1);
+
+            // Assert
+
+            Assert.That(_uut.LoggedInUsers[user.Username].CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers[user.Username].CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
         }
 
 

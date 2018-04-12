@@ -3,9 +3,12 @@ using Models.Interfaces;
 
 namespace Application.Interfaces
 {
+    public delegate void UserLoggedOutHandle(object obj, string username);
     public interface ILoginManager 
     {
-        bool Login(IUser user);
+        void Login(IUser user);
         bool CheckLoginStatus(IUser user);
+        bool SubscribeOnLogOut(string username, UserLoggedOutHandle handle);
+        bool UnsubscribeOnLogOut(string username, UserLoggedOutHandle handle);
     }
 }
