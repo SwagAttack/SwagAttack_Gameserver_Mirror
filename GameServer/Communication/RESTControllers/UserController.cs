@@ -30,7 +30,7 @@ namespace Communication.RESTControllers
 
             if (user == null)
             {
-                return NotFound("Wrong username or password");
+                return Unauthorized();
             }
 
             return new ObjectResult(user);
@@ -60,8 +60,7 @@ namespace Communication.RESTControllers
                 return CreatedAtRoute("GetUser", new { username = result.Username, password = result.Password }, result);
             }
 
-            return BadRequest("Wrong username or password");
-
+            return Unauthorized();
         }
 
     }
