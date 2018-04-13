@@ -303,7 +303,7 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void OnTimerExpired_CallsCorrectHandlersForLoggedOutUsers()
+        public void TimerExpired_CallsCorrectHandlersForLoggedOutUsers()
         {
             // Arrange
 

@@ -20,7 +20,7 @@ namespace Application.Interfaces
         /// <summary>
         /// Returns whether the user with username is logged in. If this is the case it updates the users time stamp
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="username"></param>
         /// <returns></returns>
         bool CheckLoginStatus(string username);
         /// <summary>
