@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DBInterface.Repositories;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Persistance.Interfaces;
 
-namespace DBInterface
+namespace Persistance
 {
     public class DbContext : IDbContext
     {

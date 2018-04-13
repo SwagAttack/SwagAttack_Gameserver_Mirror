@@ -1,13 +1,11 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using Domain.Interfaces;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
-using Models.Interfaces;
-using Models.User;
 
 //https://github.com/Azure/azure-documentdb-dotnet/blob/f374cc601f4cf08d11c88f0c3fa7dcefaf7ecfe8/samples/code-samples/DocumentManagement/Program.cs#L198
-namespace DBInterface.Repositories
+namespace Persistance.Repositories
 {
     public class UserRepository : Repository<IUser>, IUserRepository
     {
@@ -29,7 +27,7 @@ namespace DBInterface.Repositories
         public IUser GetUserByUsername(string id)
         {
 
-            IUser theUser = GetContext().UserClient.CreateDocumentQuery<Models.User.User>(GetContext().UserCollection.DocumentsLink)
+            IUser theUser = GetContext().UserClient.CreateDocumentQuery<Domain.Models.User>(GetContext().UserCollection.DocumentsLink)
                 .Where(x => x.Username == id)
                 .AsEnumerable()
                 .FirstOrDefault();
@@ -58,14 +56,14 @@ namespace DBInterface.Repositories
                 .AsEnumerable().FirstOrDefault();
         }
 
-        async Task<Models.Interfaces.IUser> IUserRepository.GetUserByUsernameAsync(string id)
+        async Task<Domain.Interfaces.IUser> IUserRepository.GetUserByUsernameAsync(string id)
         {
             try
             {
 
-                var document = await GetContext().UserClient.ReadDocumentAsync<Models.User.User>(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id));
-                var user = (Models.User.User)(dynamic)document;
-                return user as Models.Interfaces.IUser;
+                var document = await GetContext().UserClient.ReadDocumentAsync<Domain.Models.User>(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id));
+                var user = (Domain.Models.User)(dynamic)document;
+                return user as Domain.Interfaces.IUser;
             }
             catch (DocumentClientException e)
             {

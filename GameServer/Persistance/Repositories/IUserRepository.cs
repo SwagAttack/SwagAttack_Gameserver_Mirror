@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Azure.Documents;
-using Models.Interfaces;
+﻿using System.Threading.Tasks;
+using Domain.Interfaces;
 
-namespace DBInterface.Repositories
+namespace Persistance.Repositories
 {
     public interface IUserRepository
     {
@@ -32,7 +28,7 @@ namespace DBInterface.Repositories
         /// <param name="thisUser">the updated user</param>
         void ReplaceUser(IUser thisUser);
 
-        Task<Models.Interfaces.IUser> GetUserByUsernameAsync(string id);
+        Task<IUser> GetUserByUsernameAsync(string id);
 
     }
 }

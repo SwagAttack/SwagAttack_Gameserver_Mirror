@@ -21,7 +21,7 @@ namespace Communication.RESTControllers
                 new Claim(ClaimTypes.Name, "John"),
                 new Claim(JwtRegisteredClaimNames.Email, "john.doe@blinkingcaret.com"),
                 new Claim(JwtRegisteredClaimNames.Exp,
-                    $"{new DateTimeOffset(DateTime.Now.Add(1)).ToUnixTimeSeconds()}"),
+                    $"{new DateTimeOffset(DateTime.Now.Add(new TimeSpan(1))).ToUnixTimeSeconds()}"),
                 new Claim(JwtRegisteredClaimNames.Nbf, $"{new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()}")
             };
 
