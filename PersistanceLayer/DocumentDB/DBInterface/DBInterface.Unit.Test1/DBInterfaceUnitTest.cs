@@ -12,11 +12,13 @@ namespace DBInterface.Unit.Test1
     public class Test
     {
         private UnitOfWork.UnitOfWork _uut;
-        private User _testUser;
+        private IUser _testUser;
+        private bool _addedUser;
 
         [SetUp]
         public void Setup()
         {
+            _addedUser = false;
             _uut = new UnitOfWork.UnitOfWork(new DbContext());
             _testUser = new User
             {
@@ -29,47 +31,59 @@ namespace DBInterface.Unit.Test1
         }
 
         [Test]
-        public void AddUserToDb()
+        public void AddUserToDb_UserIsAddedToDb()
         {
             _uut.UserRepository.AddUser(_testUser);
             Assert.That(_testUser.Username == _uut.UserRepository.GetUserByUsername(_testUser.Username).Username);
+            _addedUser = true;
         }
 
         [Test]
-        public void ReplaceUserInDB()
+        public void ReplaceUserInDb_UserIsReplacedInDb()
         {
+            _uut.UserRepository.AddUser(_testUser);
             _testUser.GivenName = "Replaced";
             _uut.UserRepository.ReplaceUser(_testUser);
             Assert.That(_testUser.GivenName == _uut.UserRepository.GetUserByUsername(_testUser.Username).GivenName);
+            _addedUser = true;
         }
 
         [Test]
-        public async Task FindUserAsyncDB()
+        public void FindUserAsyncDB()
         {
-            var user = await _uut.UserRepository.GetUserByUsernameAsync(_testUser.Username);
-            Assert.That(user.Id == _testUser.Username);
+            _uut.UserRepository.AddUser(_testUser);
+            var user = _uut.UserRepository.GetUserByUsernameAsync(_testUser.Username);
+            user.Wait();
+            Assert.That(user.Result.Username == _testUser.Username);
+            _addedUser = true;
         }
 
         [Test]
         public void FindUserInDB()
         {
+            _uut.UserRepository.AddUser(_testUser);
             var user = _uut.UserRepository.GetUserByUsername(_testUser.Username);
             Assert.That(user.Username == _testUser.Username);
+            _addedUser = true;
         }
 
         [Test]
         public void DeleteUserInDB()
         {
+            _uut.UserRepository.AddUser(_testUser); // put it up again
             _uut.UserRepository.DeleteUserByUsername(_testUser.Username);
             Assert.That(_uut.UserRepository.GetUserByUsername(_testUser.Username), Is.Null);
-            _uut.UserRepository.AddUser(_testUser); // put it up again
+
         }
         
 
         [TearDown]
         public void TearDown()
         {
-            _uut.UserRepository.DeleteUserByUsername("ab@ab.dk");
+            if (_addedUser)
+            {
+                _uut.UserRepository.DeleteUserByUsername("1337User");
+            }
         }
 
     }

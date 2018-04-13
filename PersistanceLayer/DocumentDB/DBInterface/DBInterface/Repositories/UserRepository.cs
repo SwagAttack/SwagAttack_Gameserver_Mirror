@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Models.Interfaces;
+using Models.User;
 
 //https://github.com/Azure/azure-documentdb-dotnet/blob/f374cc601f4cf08d11c88f0c3fa7dcefaf7ecfe8/samples/code-samples/DocumentManagement/Program.cs#L198
 namespace DBInterface.Repositories
@@ -57,12 +58,14 @@ namespace DBInterface.Repositories
                 .AsEnumerable().FirstOrDefault();
         }
 
-        async Task<Document> IUserRepository.GetUserByUsernameAsync(string id)
+        async Task<Models.Interfaces.IUser> IUserRepository.GetUserByUsernameAsync(string id)
         {
             try
             {
-                Document document = await GetContext().UserClient.ReadDocumentAsync(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id));
-                return document;
+
+                var document = await GetContext().UserClient.ReadDocumentAsync<Models.User.User>(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id));
+                var user = (Models.User.User)(dynamic)document;
+                return user as Models.Interfaces.IUser;
             }
             catch (DocumentClientException e)
             {

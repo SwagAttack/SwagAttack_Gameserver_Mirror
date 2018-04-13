@@ -32,7 +32,7 @@ namespace DBInterface.Repositories
         /// <param name="thisUser">the updated user</param>
         void ReplaceUser(IUser thisUser);
 
-        Task<Document> GetUserByUsernameAsync(string id);
+        Task<Models.Interfaces.IUser> GetUserByUsernameAsync(string id);
 
     }
 }
