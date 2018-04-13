@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Application.Interfaces;
-using Models.Interfaces;
+using Domain.Interfaces;
 
 namespace Application.Managers
 {

@@ -3,7 +3,7 @@ using System.Linq;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Models.User;
+using Domain.Models;
 using Communication.Filters;
 using Microsoft.AspNetCore.Authorization;
 

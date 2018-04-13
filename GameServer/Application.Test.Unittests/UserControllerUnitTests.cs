@@ -1,7 +1,7 @@
 ﻿using Application.Controllers;
 using Application.Interfaces;
-using DBInterface.UnitOfWork;
-using Models.Interfaces;
+using Persistance.UnitOfWork;
+using Domain.Interfaces;
 using NSubstitute;
 using NUnit.Framework;
 

@@ -15,9 +15,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\netcoreapp2.0\Application.xml</DocumentationFile>
   </PropertyGroup>
-
+  
   <ItemGroup>
-    <PackageReference Include="SwagAttack_DBInterface" Version="1.0.1" />
+    <ProjectReference Include="..\Persistance\Persistance.csproj" />
   </ItemGroup>
 
 </Project>

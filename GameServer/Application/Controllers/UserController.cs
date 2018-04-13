@@ -1,6 +1,6 @@
 ﻿using Application.Interfaces;
-using DBInterface.UnitOfWork;
-using Models.Interfaces;
+using Domain.Interfaces;
+using Persistance.UnitOfWork;
 
 namespace Application.Controllers
 {

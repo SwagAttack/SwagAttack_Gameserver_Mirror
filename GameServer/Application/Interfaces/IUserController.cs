@@ -1,4 +1,4 @@
-﻿using Models.Interfaces;
+﻿using Domain.Interfaces;
 
 namespace Application.Interfaces
 {

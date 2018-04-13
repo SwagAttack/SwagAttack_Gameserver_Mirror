@@ -2,7 +2,7 @@
 using System.Threading;
 using Application.Interfaces;
 using Application.Managers;
-using Models.Interfaces;
+using Domain.Interfaces;
 using NSubstitute;
 using NUnit.Framework;
 

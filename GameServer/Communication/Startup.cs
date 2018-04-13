@@ -1,19 +1,12 @@
-using System;
-using System.Text;
-using Application.Controllers;
-using Application.Interfaces;
-using DBInterface;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using DBInterface.UnitOfWork;
+using Application.Controllers;
+using Application.Interfaces;
+using Persistance.UnitOfWork;
+using Persistance;
 using Communication.Filters;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Rewrite;
-using Microsoft.IdentityModel.Tokens;
-using Models.User;
 
 namespace Communication
 {
