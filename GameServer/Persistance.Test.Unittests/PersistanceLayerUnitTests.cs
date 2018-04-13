@@ -45,7 +45,7 @@ namespace Persistance.Test.Unittests
         }
 
         [Test]
-        public void FindUserAsyncDB()
+        public void FindUserInDbAsync_UserExists()
         {
             _uut.UserRepository.AddUser(_testUser);
             var user = _uut.UserRepository.GetUserByUsernameAsync(_testUser.Username);
@@ -55,7 +55,7 @@ namespace Persistance.Test.Unittests
         }
 
         [Test]
-        public void FindUserInDB()
+        public void FindUserInDb_UserExists()
         {
             _uut.UserRepository.AddUser(_testUser);
             var user = _uut.UserRepository.GetUserByUsername(_testUser.Username);
@@ -64,7 +64,7 @@ namespace Persistance.Test.Unittests
         }
 
         [Test]
-        public void DeleteUserInDB()
+        public void DeleteUserInDb_UserDoesNotExistPostExecution()
         {
             _uut.UserRepository.AddUser(_testUser); // put it up again
             _uut.UserRepository.DeleteUserByUsername(_testUser.Username);
