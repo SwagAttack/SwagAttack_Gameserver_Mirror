@@ -4,6 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Application.Controllers;
 using Application.Interfaces;
+using Application.Managers;
+using Application.Misc;
+using Communication.Authentication;
 using Persistance.UnitOfWork;
 using Persistance;
 using Communication.Filters;
@@ -24,7 +27,7 @@ namespace Communication
         {
             services.AddMvc(options =>
             {
-                options.Filters.Add(typeof(ValidateModelStateAttribute));
+                //options.Filters.Add(typeof(ValidateModelStateAttribute));
                 //options.Filters.Add(new RequireHttpsAttribute());
             });
 
@@ -50,6 +53,7 @@ namespace Communication
             //    });
            
             services.AddTransient<IUnitOfWork>(u => new UnitOfWork(new DbContext()));
+            services.AddSingleton<ILoginManager>(l => LoginManager.GetInstance(new CountDownTimer()));
             services.AddTransient<IUserController, UserController>();
         }
 
@@ -67,6 +71,7 @@ namespace Communication
 
             // app.UseAuthentication();
 
+            //app.UseMiddleware<ApiValidator>();
             app.UseMvc();
         }
     }
