@@ -69,7 +69,7 @@ namespace Persistance.Test.Unittests
         {
             _uut.UserRepository.AddUser(_testUser);
             var user = _uut.UserRepository.GetUserByUsername(_testUser.Username);
-            Assert.That(user.Username == _testUser.Username);
+            Assert.That(user.GivenName, Is.EqualTo(_testUser.GivenName));
             _addedUser = true;
         }
 
@@ -79,7 +79,7 @@ namespace Persistance.Test.Unittests
             _uut.UserRepository.AddUser(_testUser);
             var user = _uut.UserRepository.GetUserByUsernameAsync(_testUser.Username);
             user.Wait();
-            Assert.That(user.Result.Username == _testUser.Username);
+            Assert.That(user.Result.GivenName, Is.EqualTo(_testUser.GivenName));
             _addedUser = true;
         }
 
