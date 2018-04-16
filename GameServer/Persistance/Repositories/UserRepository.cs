@@ -1,8 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Domain.Interfaces;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 
 //https://github.com/Azure/azure-documentdb-dotnet/blob/f374cc601f4cf08d11c88f0c3fa7dcefaf7ecfe8/samples/code-samples/DocumentManagement/Program.cs#L198
 namespace Persistance.Repositories
@@ -78,5 +82,40 @@ namespace Persistance.Repositories
             }
         }
 
+        public async Task<IEnumerable<Domain.Interfaces.IUser>> GetUsersByUsernameAsync(Expression<Func<Domain.Interfaces.IUser, bool>> predicate)
+        {
+            IDocumentQuery<Domain.Interfaces.IUser> query = GetContext().UserClient.CreateDocumentQuery<Domain.Interfaces.IUser>(
+                    UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId),
+                    new FeedOptions { MaxItemCount = -1 })
+                .Where(predicate)
+                .AsDocumentQuery();
+
+            List<Domain.Interfaces.IUser> results = new List<Domain.Interfaces.IUser>();
+            while (query.HasMoreResults)
+            {
+                results.AddRange(await query.ExecuteNextAsync<Domain.Interfaces.IUser>());
+            }
+
+            return results;
+        }
+
+        public async Task<IUser> ReplaceUserAsync(string username, IUser user)
+        {
+            Document document = await GetContext().UserClient.ReplaceDocumentAsync(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, username), user);
+            var replacedUser = (Domain.Models.User) (dynamic) document;
+            return replacedUser as Domain.Interfaces.IUser;
+        }
+
+        public async Task<IUser> AddUserAsync(IUser user)
+        {
+            Document document = await GetContext().UserClient.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId), user);
+            var addedUser = (Domain.Models.User) (dynamic) document;
+            return addedUser as Domain.Interfaces.IUser;
+        }
+
+        public async Task DeleteUserByUsernameAsync(string username)
+        {
+            await GetContext().UserClient.DeleteDocumentAsync(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, username));
+        }
     }
 }
