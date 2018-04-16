@@ -35,12 +35,41 @@ namespace Persistance.Test.Unittests
         }
 
         [Test]
+        public void AddUserToDbAsync_UserIsAddedToDb()
+        {
+            var user = _uut.UserRepository.AddUserAsync(_testUser);
+            user.Wait();
+            Assert.That(user.Result.Username,Is.EqualTo(_testUser.Username));
+            _addedUser = true;
+        }
+
+        [Test]
         public void ReplaceUserInDb_UserIsReplacedInDb()
         {
             _uut.UserRepository.AddUser(_testUser);
             _testUser.GivenName = "Replaced";
             _uut.UserRepository.ReplaceUser(_testUser);
             Assert.That(_testUser.GivenName == _uut.UserRepository.GetUserByUsername(_testUser.Username).GivenName);
+            _addedUser = true;
+        }
+
+        [Test]
+        public void ReplaceUserInDbAsync_UserIsReplacedInDb()
+        {
+            _uut.UserRepository.AddUser(_testUser);
+            _testUser.GivenName = "Replaced";
+            var replacedUser = _uut.UserRepository.ReplaceUserAsync(_testUser.Username, _testUser);
+            replacedUser.Wait();
+            Assert.That(replacedUser.Result.GivenName,Is.EqualTo(_testUser.GivenName));
+            _addedUser = true;
+        }
+
+        [Test]
+        public void FindUserInDb_UserExists()
+        {
+            _uut.UserRepository.AddUser(_testUser);
+            var user = _uut.UserRepository.GetUserByUsername(_testUser.Username);
+            Assert.That(user.Username == _testUser.Username);
             _addedUser = true;
         }
 
@@ -55,21 +84,20 @@ namespace Persistance.Test.Unittests
         }
 
         [Test]
-        public void FindUserInDb_UserExists()
-        {
-            _uut.UserRepository.AddUser(_testUser);
-            var user = _uut.UserRepository.GetUserByUsername(_testUser.Username);
-            Assert.That(user.Username == _testUser.Username);
-            _addedUser = true;
-        }
-
-        [Test]
         public void DeleteUserInDb_UserDoesNotExistPostExecution()
         {
             _uut.UserRepository.AddUser(_testUser); // put it up again
             _uut.UserRepository.DeleteUserByUsername(_testUser.Username);
             Assert.That(_uut.UserRepository.GetUserByUsername(_testUser.Username), Is.Null);
 
+        }
+
+        [Test]
+        public void DeleteUserInDbAsync_UserDoesNotExistPostExecution()
+        {
+            _uut.UserRepository.AddUser(_testUser); // put it up again
+            _uut.UserRepository.DeleteUserByUsernameAsync(_testUser.Username).Wait();
+            Assert.That(_uut.UserRepository.GetUserByUsername(_testUser.Username), Is.Null);
         }
 
 
