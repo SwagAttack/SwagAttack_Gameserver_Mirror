@@ -1,6 +1,6 @@
 language: csharp
 solution: GameServer/GameServer.sln
-dotnet: 2.0.6
+dotnet: 2.0.0
 script:
  - dotnet restore
 install:
