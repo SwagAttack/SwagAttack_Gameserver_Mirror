@@ -1,5 +1,6 @@
 language: csharp
 solution: GameServer/GameServer.sln
+mono: none
 dotnet: 2.0.0
 script:
  - dotnet restore
@@ -7,5 +8,4 @@ install:
   - nuget restore GameServer/GameServer.sln
   - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
 script:
-  - xbuild /p:Configuration=Release GameServer/GameServer.sln
-  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe 
+  - dotnet build GameServer/GameServer.sln
