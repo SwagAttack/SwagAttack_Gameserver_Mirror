@@ -51,7 +51,7 @@ namespace Application.Controllers
 
             if (result != null)
             {
-                if (result.Password == password && _loginManager.CheckLoginStatus(username))
+                if (result.Password == password)
                 {
                     //result.Username = user.Username;
                     result.Password = user.Password;

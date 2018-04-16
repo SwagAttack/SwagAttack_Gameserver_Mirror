@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Application.Interfaces;
+using Application.Managers;
+using Application.Misc;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Domain.Models;
@@ -50,6 +52,7 @@ namespace Communication.RESTControllers
 
         }
 
+        [Authentication]
         [HttpPut("{username}/{password}")]
         public IActionResult Put(string username, string password, [FromBody] User user)
         {
