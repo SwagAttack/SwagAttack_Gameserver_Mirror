@@ -37,7 +37,7 @@ namespace Persistance.Repositories
         /// <returns>The user that was found</returns>
         Task<IUser> GetUserByUsernameAsync(string username);
         /// <summary>
-        /// Might not be needed
+        /// Returns IEnumereable of users.
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns>Users that were found to match the predicate expression</returns>
