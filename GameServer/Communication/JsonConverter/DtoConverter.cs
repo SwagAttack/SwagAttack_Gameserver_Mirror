@@ -48,7 +48,7 @@ namespace Communication.JsonConverter
         /// <summary>
         /// For converting the given object to a DTO object
         /// </summary>
-        /// <typeparam name="T"> Type to convert to DTO </typeparam>
+        /// <typeparam name="T"> BinderType to convert to DTO </typeparam>
         /// <param name="username"> Username authentication </param>
         /// <param name="password"> Password authentication </param>
         /// <param name="t"> Object to convert </param>

@@ -28,6 +28,7 @@ namespace Communication
             {
                 //options.Filters.Add(typeof(ValidateModelStateAttribute));
                 //options.Filters.Add(new RequireHttpsAttribute());
+                //options.ModelBinderProviders.Insert(0, new DtoToObjModelBinderProvider());
             });
            
             services.AddTransient<IUnitOfWork>(u => new UnitOfWork(new DbContext()));

@@ -16,7 +16,7 @@ using Newtonsoft.Json.Linq;
 namespace Communication.RESTControllers
 {
     // <summary>
-    // REST Api User Controller
+    // Http Api User Controller
     // </summary>
     [Produces("application/json")]
     [Route("api/User")]
@@ -29,25 +29,23 @@ namespace Communication.RESTControllers
             _userController = controller;
         }
 
-        [HttpPost("Login", Name = "GetUser")]
-        public IActionResult GetUser([FromBody] JObject rawUser)
+        public class LoginDto
         {
-            try
+            public string Username { get; set; }
+            public string Password { get; set; }
+        }
+
+        [HttpPost("Login", Name = "GetUser")]
+        [ValidateModelState]
+        public IActionResult GetUser([ModelBinder(typeof(FromDtoModelBinder))] LoginDto loginInfo)
+        {
+            if (loginInfo.Username != null && loginInfo.Password != null)
             {
-                var credentials = DtoConverter.GetAuthentication(rawUser);
-
-                var username = credentials["username"];
-                var password = credentials["password"];
-
-                var result = _userController.GetUser(username, password);
+                var result = _userController.GetUser(loginInfo.Username, loginInfo.Password);
 
                 // User is found and has been logged in
                 if (result != null)
                     return new ObjectResult(result);
-
-            }
-            catch (Exception)
-            {
 
             }
 
@@ -80,49 +78,30 @@ namespace Communication.RESTControllers
         //}
 
         [HttpPost]
-        [ValidateModelState(Pattern = typeof(User))]
-        public IActionResult CreateUser([FromBody] JObject rawUser)
+        [ValidateModelState]
+        public IActionResult CreateUser([ModelBinder(typeof(FromDtoModelBinder))] User rawUser)
         {
-            try
+
+            var result = _userController.CreateUser(rawUser);
+
+            if (result != null)
             {
-                IUser user = DtoConverter.ConvertToInstance<User>(rawUser);
-
-                var result = _userController.CreateUser(user);
-
-                if (result != null)
-                {
-                    return CreatedAtRoute("GetUser", result);
-                }
+                return CreatedAtRoute("GetUser", result);
             }
-            catch (Exception e)
-            {
-                return new BadRequestObjectResult(ExceptionReader.ReadInnerExceptions(e));
-            }
-
 
             return BadRequest("Username already exists");
-
         }
 
         [HttpPut]
-        [ValidateModelState]
-        [Authentication]
-        public IActionResult UpdateUser([FromBody] JObject rawUser)
+        [ValidateModelState(Order = 2)]
+        [Authentication(Order = 1)]
+        public IActionResult UpdateUser([ModelBinder(typeof(FromDtoModelBinder))] User user)
         {
-            try
-            {
-                IUser user = DtoConverter.ConvertToInstance<User>(rawUser);
+            var result = _userController.UpdateUser(user.Username, user);
 
-                var result = _userController.UpdateUser(user.Username, user.Password, user);
-
-                if (result != null)
-                {
-                    return CreatedAtRoute("GetUser", result);
-                }
-            }
-            catch (Exception e)
+            if (result != null)
             {
-                return new BadRequestObjectResult(ExceptionReader.ReadInnerExceptions(e));
+                return CreatedAtRoute("GetUser", result);
             }
 
             return BadRequest();
