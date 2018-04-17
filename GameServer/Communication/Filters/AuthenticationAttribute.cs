@@ -1,35 +1,47 @@
-﻿using Application.Interfaces;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Application.Interfaces;
 using Application.Managers;
 using Application.Misc;
+using Communication.JsonConverter;
+using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Newtonsoft.Json.Linq;
 
 namespace Communication.Filters
 {
     public class AuthenticationAttribute : ActionFilterAttribute
     {
-        private string _wrongUsername = null;
-        private string _wrongPassword = null; 
-        private readonly ILoginManager _manager;
-        public AuthenticationAttribute()
-        {
-
-             _manager = LoginManager.GetInstance(new CountDownTimer());
-        }
+        public ILoginManager LoginManager => Application.Managers.LoginManager.GetInstance();
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            var user = filterContext.RouteData.Values["username"] as string ?? _wrongUsername;
-            var pass = filterContext.RouteData.Values["password"] as string ?? _wrongPassword;
-
-            if (_manager.CheckLoginStatus(user))
+            try
             {
+                var msg = filterContext.ActionArguments.Values.ToList()[0] as JObject;
+
+                Dictionary<string, string> authentication;
+                if ((authentication = DtoConverter.GetAuthentication(msg)) != null)
+                {
+                    var user = authentication["username"];
+                    var pass = authentication["password"];
+
+                    if (LoginManager.CheckLoginStatus(user, pass))
+                    {
+                        return;
+                    }
+
+                }
 
             }
-            else
+            catch (Exception)
             {
-                filterContext.Result = new UnauthorizedResult();
+                
             }
+
+            filterContext.Result = new UnauthorizedResult();
         }
     }
 }

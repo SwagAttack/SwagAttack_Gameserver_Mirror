@@ -39,8 +39,8 @@ namespace Application.Test.Unittests
             // Assert
 
             Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username), Is.EqualTo(true)); 
-            Assert.That(_uut.LoggedInUsers[user.Username].CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
-            Assert.That(_uut.LoggedInUsers[user.Username].CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers[user.Username].Expiration.CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers[user.Username].Expiration.CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
         }
 
         [Test]
@@ -65,8 +65,8 @@ namespace Application.Test.Unittests
             // Assert
 
             Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username), Is.EqualTo(true));
-            Assert.That(_uut.LoggedInUsers[user.Username].CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
-            Assert.That(_uut.LoggedInUsers[user.Username].CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers[user.Username].Expiration.CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers[user.Username].Expiration.CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
         }
 
         [Test]
@@ -124,19 +124,21 @@ namespace Application.Test.Unittests
 
             var user = Substitute.For<IUser>();
             user.Username = "Username";
+            user.Password = "Password";
 
             // Act and assert
 
-            Assert.That(_uut.CheckLoginStatus(user.Username), Is.EqualTo(false));
+            Assert.That(_uut.CheckLoginStatus(user.Username, user.Password), Is.EqualTo(false));
         }
 
         [Test]
-        public void CheckLoginStatus_ContainsUser_ReturnsTrue()
+        public void CheckLoginStatus_ContainsUserCorrectPassword_ReturnsTrue()
         {
             // Arrange
 
             var user = Substitute.For<IUser>();
             user.Username = "Username";
+            user.Password = "Password";
 
             // Act
 
@@ -144,32 +146,51 @@ namespace Application.Test.Unittests
 
             // Assert
 
-            Assert.That(_uut.CheckLoginStatus(user.Username), Is.EqualTo(true));
+            Assert.That(_uut.CheckLoginStatus(user.Username, user.Password), Is.EqualTo(true));
         }
 
         [Test]
-        public void CheckLoginStatus_ContainsUser_UpdatesTimeStampCorrectly()
+        public void CheckLoginStatus_ContainsUserWrongPassword_ReturnsFalse()
         {
             // Arrange
 
             var user = Substitute.For<IUser>();
             user.Username = "Username";
+            user.Password = "Password";
 
             // Act
 
             _uut.Login(user);
 
-            Thread.Sleep(5);
+            // Assert
+
+            Assert.That(_uut.CheckLoginStatus(user.Username, "Wrong password"), Is.EqualTo(false));
+        }
+
+        [Test]
+        public void CheckLoginStatus_ContainsUserCorrectPassword_UpdatesTimeStampCorrectly()
+        {
+            // Arrange
+
+            var user = Substitute.For<IUser>();
+            user.Username = "Username";
+            user.Password = "Password";
 
             _uut.Login(user);
+
+            Thread.Sleep(5);
+
+            // Act
+
+            _uut.CheckLoginStatus(user.Username, user.Password);
 
             var fakeTime_littleMore = DateTime.Now.AddMinutes(20).AddSeconds(1);
             var fakeTime_littleLess = DateTime.Now.AddMinutes(20).AddSeconds(-1);
 
             // Assert
 
-            Assert.That(_uut.LoggedInUsers[user.Username].CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
-            Assert.That(_uut.LoggedInUsers[user.Username].CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers[user.Username].Expiration.CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers[user.Username].Expiration.CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
         }
 
         [TestCase("UsernameOne", "UsernameOne", true)] // Correct user

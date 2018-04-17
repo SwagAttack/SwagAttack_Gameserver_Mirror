@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Application.Interfaces;
@@ -7,7 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Domain.Models;
 using Communication.Filters;
+using Communication.JsonConverter;
+using Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json.Linq;
 
 namespace Communication.RESTControllers
 {
@@ -25,45 +29,103 @@ namespace Communication.RESTControllers
             _userController = controller;
         }
 
-        [HttpGet("{username}/{password}", Name = "GetUser")]
-        public IActionResult Get(string username, string password)
+        [HttpPost("Login", Name = "GetUser")]
+        public IActionResult GetUser([FromBody] JObject rawUser)
         {
-            var user = _userController.GetUser(username, password);
-
-            if (user == null)
+            try
             {
-                return Unauthorized();
+                var credentials = DtoConverter.GetAuthentication(rawUser);
+
+                var username = credentials["username"];
+                var password = credentials["password"];
+
+                var result = _userController.GetUser(username, password);
+
+                // User is found and has been logged in
+                if (result != null)
+                    return new ObjectResult(result);
+
+            }
+            catch (Exception)
+            {
+
             }
 
-            return new ObjectResult(user);
+            return new NotFoundResult();
         }
+        
+        //[HttpGet(Name = "GetUser")]
+        //public IActionResult Get([FromBody] JObject user)
+        //{
+
+        //    try
+        //    {
+        //        var credentials = DtoConverter.GetAuthentication(user);
+
+        //        var username = credentials["username"];
+        //        var password = credentials["password"];
+
+        //        var result = _userController.GetUser(username, password);
+
+        //        if(result != null)
+        //            return new ObjectResult(result);
+
+        //    }
+        //    catch (Exception)
+        //    {
+                
+        //    }
+
+        //    return new NotFoundResult();
+        //}
 
         [HttpPost]
-        public IActionResult Post([FromBody]User user)
+        [ValidateModelState(Pattern = typeof(User))]
+        public IActionResult CreateUser([FromBody] JObject rawUser)
         {
-            var result = _userController.CreateUser(user);
-
-            if (result != null)
+            try
             {
-                return CreatedAtRoute("GetUser", new { username = result.Username, password = result.Password }, result);
+                IUser user = DtoConverter.ConvertToInstance<User>(rawUser);
+
+                var result = _userController.CreateUser(user);
+
+                if (result != null)
+                {
+                    return CreatedAtRoute("GetUser", result);
+                }
             }
+            catch (Exception e)
+            {
+                return new BadRequestObjectResult(ExceptionReader.ReadInnerExceptions(e));
+            }
+
 
             return BadRequest("Username already exists");
 
         }
 
+        [HttpPut]
+        [ValidateModelState]
         [Authentication]
-        [HttpPut("{username}/{password}")]
-        public IActionResult Put(string username, string password, [FromBody] User user)
+        public IActionResult UpdateUser([FromBody] JObject rawUser)
         {
-            var result = _userController.UpdateUser(username, password, user);
-
-            if (result != null)
+            try
             {
-                return CreatedAtRoute("GetUser", new { username = result.Username, password = result.Password }, result);
+                IUser user = DtoConverter.ConvertToInstance<User>(rawUser);
+
+                var result = _userController.UpdateUser(user.Username, user.Password, user);
+
+                if (result != null)
+                {
+                    return CreatedAtRoute("GetUser", result);
+                }
+            }
+            catch (Exception e)
+            {
+                return new BadRequestObjectResult(ExceptionReader.ReadInnerExceptions(e));
             }
 
-            return Unauthorized();
+            return BadRequest();
         }
 
     }

@@ -6,7 +6,6 @@ using Application.Controllers;
 using Application.Interfaces;
 using Application.Managers;
 using Application.Misc;
-using Communication.Authentication;
 using Persistance.UnitOfWork;
 using Persistance;
 using Communication.Filters;
@@ -30,27 +29,6 @@ namespace Communication
                 //options.Filters.Add(typeof(ValidateModelStateAttribute));
                 //options.Filters.Add(new RequireHttpsAttribute());
             });
-
-            //services.AddAuthentication(options => {
-            //        options.DefaultAuthenticateScheme = "JwtBearer";
-            //        options.DefaultChallengeScheme = "JwtBearer";
-            //    })
-            //    .AddJwtBearer("JwtBearer", jwtBearerOptions =>
-            //    {
-            //        jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
-            //        {
-            //            ValidateIssuerSigningKey = true,
-            //            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("My own test key yeah")),
-
-            //            ValidateAudience = false,
-            //            ValidateIssuer = false,
-                        
-
-            //            ValidateLifetime = true, //validate the expiration and not before values in the token
-
-            //            ClockSkew = TimeSpan.FromMinutes(5) //5 minute tolerance for the expiration date
-            //        };
-            //    });
            
             services.AddTransient<IUnitOfWork>(u => new UnitOfWork(new DbContext()));
             services.AddSingleton<ILoginManager>(l => LoginManager.GetInstance(new CountDownTimer()));
@@ -69,9 +47,6 @@ namespace Communication
 
             //app.UseRewriter(options);
 
-            // app.UseAuthentication();
-
-            //app.UseMiddleware<ApiValidator>();
             app.UseMvc();
         }
     }

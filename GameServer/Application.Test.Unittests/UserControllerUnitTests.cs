@@ -191,7 +191,7 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void UpdateUser_UserDoesntExist_ReturnsNull()
+        public void UpdateUser_UserDoesNotExist_ReturnsNull()
         {
             // Arrange
 
@@ -201,10 +201,11 @@ namespace Application.Test.Unittests
                 .Returns(returnedUser);
 
             var replacingUser = Substitute.For<IUser>();
+            replacingUser.Username = "username";
 
             // Act
 
-            var result = _uut.UpdateUser("username", "password", replacingUser);
+            var result = _uut.UpdateUser("username", replacingUser);
 
             // Assert
 
@@ -212,103 +213,75 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void UpdateUser_UserExistsPasswordInvalid_ReturnsNull()
+        public void UpdateUser_UserExistsUsernameDoesNotMatchPassedUser_ReturnsNull()
         {
             // Arrange
 
             IUser returnedUser = Substitute.For<IUser>();
             returnedUser.Username = "username";
-            returnedUser.Password = "password";
 
             _fakeUnitOfWork.UserRepository.GetUserByUsername(Arg.Is("username"))
                 .Returns(returnedUser);
 
             var replacingUser = Substitute.For<IUser>();
+            replacingUser.Username = "wrongUsername";
 
             // Act
 
-            var result = _uut.UpdateUser("username", "wrongPassword", replacingUser);
+            var result = _uut.UpdateUser("username", replacingUser);
 
             // Assert
 
             Assert.That(result == null, Is.EqualTo(true));
         }
-
+        
         [Test]
-        public void UpdateUser_UserExistsPassWordCorrectNotLoggedIn_ReturnsNull()
+        public void UpdateUser_UserExistsUsernameMatchesPassedUser_ReturnsUpdatedUser()
         {
             // Arrange
 
             IUser returnedUser = Substitute.For<IUser>();
             returnedUser.Username = "username";
-            returnedUser.Password = "password";
-
-            _fakeUnitOfWork.UserRepository.GetUserByUsername(Arg.Is("username"))
-                .Returns(returnedUser);
-
-            _fakeLoginManager.CheckLoginStatus(Arg.Any<string>()).Returns(false);
-
-            var replacingUser = Substitute.For<IUser>();
-
-            // Act
-
-            var result = _uut.UpdateUser("username", "password", replacingUser);
-
-            // Assert
-
-            Assert.That(result == null, Is.EqualTo(true));
-        }
-
-        [Test]
-        public void UpdateUser_UserExistsPassWordCorrectLoggedIn_ReturnsUpdatedUser()
-        {
-            // Arrange
-
-            IUser returnedUser = Substitute.For<IUser>();
-            returnedUser.Username = "username";
-            returnedUser.Password = "password";
             returnedUser.Email = "anEmail";
             
             _fakeUnitOfWork.UserRepository.GetUserByUsername(Arg.Is("username"))
                 .Returns(returnedUser);
 
-            _fakeLoginManager.CheckLoginStatus(Arg.Any<string>()).Returns(true);
-
             var replacingUser = Substitute.For<IUser>();
+            replacingUser.Username = "username";
             replacingUser.Email = "ReplacedEmail";
 
             // Act
 
-            var result = _uut.UpdateUser("username", "password", replacingUser);
+            var result = _uut.UpdateUser("username", replacingUser);
 
             // Assert
 
-            Assert.That(returnedUser.Email == replacingUser.Email, Is.EqualTo(true));
+            Assert.That(result.Email == replacingUser.Email, Is.EqualTo(true));
         }
 
         [Test]
-        public void UpdateUser_UserExistsPassWordCorrectLoggedIn_UpdatesTheUserInTheRepository()
+        public void UpdateUser_UserExistsUsernameMatchesPassedUser_UpdatesTheUserInTheRepository()
         {
             // Arrange
 
             IUser returnedUser = Substitute.For<IUser>();
             returnedUser.Username = "username";
-            returnedUser.Password = "password";
 
             _fakeUnitOfWork.UserRepository.GetUserByUsername(Arg.Is("username"))
                 .Returns(returnedUser);
 
-            _fakeLoginManager.CheckLoginStatus(Arg.Any<string>()).Returns(true);
-
             var replacingUser = Substitute.For<IUser>();
+            replacingUser.Username = "username";
+            replacingUser.Email = "ReplacedEmail";
 
             // Act
 
-            var result = _uut.UpdateUser("username", "password", replacingUser);
+            var result = _uut.UpdateUser("username", replacingUser);
 
             // Assert
 
-            _fakeUnitOfWork.UserRepository.Received().ReplaceUser(returnedUser);
+            _fakeUnitOfWork.UserRepository.Received().ReplaceUser(replacingUser);
         }
 
     }

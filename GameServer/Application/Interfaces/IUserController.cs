@@ -23,9 +23,8 @@ namespace Application.Interfaces
         /// Updates the user as given by username and password. Will return null if unsuccesfull
         /// </summary>
         /// <param name="username">Username of user to be updated</param>
-        /// <param name="password">Password of user to be updated</param>
         /// <param name="user">User object containing updated information</param>
         /// <returns></returns>
-        IUser UpdateUser(string username, string password, IUser user);
+        IUser UpdateUser(string username, IUser user);
     }
 }

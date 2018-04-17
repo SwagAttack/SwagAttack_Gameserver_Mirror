@@ -3,15 +3,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Application.Interfaces;
+using Application.Misc;
 using Domain.Interfaces;
 
 namespace Application.Managers
 {
     public class LoginManager : ILoginManager
     {
+        public class LoggedInUser
+        {
+            private string _username;
+            private string _password;
+            private DateTime _expiring;
+
+            public LoggedInUser(string username, string password, DateTime expiring)
+            {
+                _username = username;
+                _password = password;
+                _expiring = expiring;
+            }
+
+            public string Username => _username;
+            public string Password => _password;
+            public DateTime Expiration => _expiring;
+
+            public void Update(string password = null)
+            {
+                if (password != null)
+                    _password = password;
+
+                _expiring = DateTime.Now.AddMinutes(20);
+            }
+
+        }
+
         private static ILoginManager _instance = null;
 
-        public IReadOnlyDictionary<string, DateTime> LoggedInUsers
+        public IReadOnlyDictionary<string, LoggedInUser> LoggedInUsers
         {
             get
             {
@@ -22,14 +50,15 @@ namespace Application.Managers
             }
         }
 
-        private readonly Dictionary<string, DateTime> _loggedInUsers;
+        private readonly Dictionary<string, LoggedInUser> _loggedInUsers;
         private readonly Dictionary<string, HashSet<UserLoggedOutHandle>> _listeners;
 
         private readonly ITimer _timeoutTimer;
 
-        public static ILoginManager GetInstance(ITimer timer)
+        public static ILoginManager GetInstance(ITimer timer = null)
         {
-            return _instance ?? (_instance = new LoginManager(timer));
+
+            return _instance ?? (_instance = new LoginManager(timer ?? new CountDownTimer()));
         }
 
         public void Login(IUser user, DateTime timeout)
@@ -38,12 +67,16 @@ namespace Application.Managers
             {
                 if (!_loggedInUsers.ContainsKey(user.Username))
                 {
-                    _loggedInUsers[user.Username] = timeout;
+                    var loggedInUser = new LoggedInUser(
+                        username: user.Username,
+                        password: user.Password,
+                        expiring: timeout);
+
+                    _loggedInUsers[user.Username] = loggedInUser;
                 }
                 else
                 {
-                    // Reset timeout
-                    _loggedInUsers[user.Username] = DateTime.Now.AddMinutes(20);
+                    _loggedInUsers[user.Username].Update(user.Password);
                 }
             }
         }
@@ -53,17 +86,20 @@ namespace Application.Managers
             Login(user, DateTime.Now.AddMinutes(20));
         }
 
-        public bool CheckLoginStatus(string username)
+        public bool CheckLoginStatus(string username, string password)
         {
-            lock (_loggedInUsers)
+            lock(_loggedInUsers)
             {
                 if (_loggedInUsers.ContainsKey(username))
                 {
-                    /* Reset timeout */
-                    _loggedInUsers[username] = DateTime.Now.AddMinutes(20);
-                    return true;
+                    var loggedInUser = _loggedInUsers[username];
+                    if (password == loggedInUser.Password)
+                    {
+                        loggedInUser.Update();
+                        return true;
+                    }
                 }
-                   
+
                 return false;
             }
         }
@@ -89,12 +125,6 @@ namespace Application.Managers
 
         public bool UnsubscribeOnLogOut(string username, UserLoggedOutHandle handle)
         {
-            lock (_loggedInUsers)
-            {
-                if (!_loggedInUsers.ContainsKey(username))
-                    return false;
-            }
-
             lock (_listeners)
             {
                 if (!_listeners.ContainsKey(username))
@@ -106,8 +136,8 @@ namespace Application.Managers
 
         public LoginManager(ITimer timeoutTimer)
         {
-            _loggedInUsers = new Dictionary<string, DateTime>();
             _listeners = new Dictionary<string, HashSet<UserLoggedOutHandle>>();
+            _loggedInUsers = new Dictionary<string, LoggedInUser>();
             _timeoutTimer = timeoutTimer;
 
             _timeoutTimer.ExpiredEvent += TimeoutTimerOnExpiredEvent;
@@ -123,28 +153,28 @@ namespace Application.Managers
 
             lock (_loggedInUsers)
             {
-                foreach (var loggedInUser in _loggedInUsers.Keys.ToList())
+                foreach (var username in _loggedInUsers.Keys.ToList())
                 {
-                    // Get the timeout
-                    var timeout = _loggedInUsers[loggedInUser];
+                    // Get the user
+                    var loggedInUser = _loggedInUsers[username];
                     // User expired
-                    if (timeout.CompareTo(now) < 0)
+                    if (loggedInUser.Expiration.CompareTo(now) < 0)
                     {
-                        loggedOutUsers.Add(loggedInUser);
-                        _loggedInUsers.Remove(loggedInUser);                      
+                        loggedOutUsers.Add(username);
+                        _loggedInUsers.Remove(username);                      
                     }
                 }
             }
 
             lock (_listeners)
             {
-                foreach (var loggedOutUser in loggedOutUsers)
+                foreach (var username in loggedOutUsers)
                 {
-                    if (_listeners.ContainsKey(loggedOutUser))
+                    if (_listeners.ContainsKey(username))
                     {
-                        foreach (var handler in _listeners[loggedOutUser].ToList())
+                        foreach (var handler in _listeners[username].ToList())
                         {
-                            handler.Invoke(this, loggedOutUser);
+                            handler.Invoke(this, username);
                         }
                     }
                 }
@@ -153,4 +183,5 @@ namespace Application.Managers
             timer.StartWithSeconds(60);
         }
     }
+
 }

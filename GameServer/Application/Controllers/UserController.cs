@@ -45,24 +45,18 @@ namespace Application.Controllers
             return null;
         }
 
-        public IUser UpdateUser(string username, string password, IUser user)
+        public IUser UpdateUser(string username, IUser user)
         {
             var result = _unitOfWork.UserRepository.GetUserByUsername(username);
 
             if (result != null)
             {
-                if (result.Password == password)
+                if (username == user.Username)
                 {
-                    //result.Username = user.Username;
-                    result.Password = user.Password;
-                    result.Email = user.Email;
-                    result.GivenName = user.GivenName;
-                    result.LastName = user.LastName;
-
-                    _unitOfWork.UserRepository.ReplaceUser(result);
-
-                    return result;
+                    _unitOfWork.UserRepository.ReplaceUser(user);
+                    return user;
                 }
+
             }
 
             return null;

@@ -22,7 +22,7 @@ namespace Application.Interfaces
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
-        bool CheckLoginStatus(string username);
+        bool CheckLoginStatus(string username, string password);
         /// <summary>
         /// Subscribe to the username with the given handler.
         /// If the user is logged out the handler will get called.
