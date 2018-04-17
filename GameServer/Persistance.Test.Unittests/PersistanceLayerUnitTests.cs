@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using User = Domain.Models.User;
 
-namespace Persistance.Test.Unittests
+namespace Persistance.Test.Unittests_Local
 {
     [TestFixture]
     public class Test
