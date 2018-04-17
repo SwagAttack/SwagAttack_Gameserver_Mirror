@@ -113,7 +113,7 @@ namespace Communication.RESTControllers
             {
                 IUser user = DtoConverter.ConvertToInstance<User>(rawUser);
 
-                var result = _userController.UpdateUser(user.Username, user.Password, user);
+                var result = _userController.UpdateUser(user.Username, user);
 
                 if (result != null)
                 {
