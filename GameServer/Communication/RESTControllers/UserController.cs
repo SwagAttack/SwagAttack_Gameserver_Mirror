@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Domain.Models;
 using Communication.Filters;
 using Communication.JsonConverter;
+using Communication.ModelBinders;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json.Linq;
@@ -23,6 +24,11 @@ namespace Communication.RESTControllers
     public class UserController : Controller
     {
         private readonly IUserController _userController;
+
+        /// <summary>
+        /// Auhentication dictionary
+        /// </summary>
+        public Dictionary<string, string> AuthToken { get; set; } = new Dictionary<string, string>();
 
         public UserController(IUserController controller)
         {
@@ -61,51 +67,21 @@ namespace Communication.RESTControllers
 
         [HttpPost("Login", Name = "GetUser")]
         [ValidateModelState]
-        public IActionResult GetUser([ModelBinder(typeof(FromDtoModelBinder))] LoginDto loginInfo)
+        public IActionResult GetUser([ModelBinder(typeof(FromDto))] LoginDto loginInfo)
         {
-            if (loginInfo.Username != null && loginInfo.Password != null)
-            {
-                var result = _userController.GetUser(loginInfo.Username, loginInfo.Password);
+            var result = _userController.GetUser(loginInfo.Username, loginInfo.Password);
 
-                // User is found and has been logged in
-                if (result != null)
-                    return new ObjectResult(result);
-
-            }
+            // User is found and has been logged in
+            if (result != null)
+                return new ObjectResult(result);
 
             return new NotFoundResult();
-        }
-        
-        //[HttpGet(Name = "GetUser")]
-        //public IActionResult Get([FromBody] JObject user)
-        //{
-
-        //    try
-        //    {
-        //        var credentials = DtoConverter.GetAuthentication(user);
-
-        //        var username = credentials["username"];
-        //        var password = credentials["password"];
-
-        //        var result = _userController.GetUser(username, password);
-
-        //        if(result != null)
-        //            return new ObjectResult(result);
-
-        //    }
-        //    catch (Exception)
-        //    {
-                
-        //    }
-
-        //    return new NotFoundResult();
-        //}
+        }       
 
         [HttpPost]
         [ValidateModelState]
-        public IActionResult CreateUser([ModelBinder(typeof(FromDtoModelBinder))] User rawUser)
+        public IActionResult CreateUser([ModelBinder(typeof(FromDto))] User rawUser)
         {
-
             var result = _userController.CreateUser(rawUser);
 
             if (result != null)
@@ -117,17 +93,19 @@ namespace Communication.RESTControllers
         }
 
         [HttpPut]
-        [ValidateModelState(Order = 2)]
-        [Authentication(Order = 1)]
-        public IActionResult UpdateUser([ModelBinder(typeof(FromDtoModelBinder))] User user)
+        [ValidateModelState(Order = 1)]
+        [Authentication(Order = 2)]
+        public IActionResult UpdateUser([ModelBinder(typeof(FromDto))] User user)
         {
-            var result = _userController.UpdateUser(user.Username, user);
-
-            if (result != null)
+            if (AuthToken.Count == 2 && AuthToken.ContainsKey("username"))
             {
-                return CreatedAtRoute("GetUser", result);
-            }
+                var result = _userController.UpdateUser(AuthToken["username"], user);
 
+                if (result != null)
+                {
+                    return CreatedAtRoute("GetUser", result);
+                }
+            }
             return BadRequest();
         }
 

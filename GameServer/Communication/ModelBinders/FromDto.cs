@@ -1,33 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
-using Domain.Interfaces;
-using Domain.Models;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
-using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace Communication.Filters
+namespace Communication.ModelBinders
 {
     /// <summary>
     /// Dto to Model converter and binder. The model will bind to the "value" part of a
     /// "auth"/"val" request as in accordance with SwagAttack Standards
     /// </summary>
-    public class FromDtoModelBinder : IModelBinder
+    public class FromDto : IModelBinder
     {
-        public Type BinderType;
+        private Type _binderType;
 
-        private string _authenticationDelimeter = "auth";
-        private string _valueDelimeter = "val";
+        private const string AuthenticationDelimeter = "auth";
+        private const string ValueDelimeter = "val";
 
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
@@ -38,30 +31,42 @@ namespace Communication.Filters
             var modelState = bindingContext.ModelState;
 
             // If the request doesnt contain a value
-            if (!provider.ContainsPrefix(_valueDelimeter))
+            if (!provider.ContainsPrefix(ValueDelimeter))
             {
-                modelState.AddModelError(_valueDelimeter, "Not a valid format");
+                modelState.AddModelError(ValueDelimeter, "Not a valid format");
                 return Task.CompletedTask;
             }
-                
-            BinderType = bindingContext.ModelType;
+
+            _binderType = bindingContext.ModelType;
 
             // Add authenticantion to action-descriptor if request contains one
-            if (provider.ContainsPrefix(_authenticationDelimeter))
+            if (provider.ContainsPrefix(AuthenticationDelimeter))
             {
                 // The token is raw json format containing authentication information
-                var authenticationToken = provider.GetValue(_authenticationDelimeter).FirstValue;
-                if (!bindingContext.ActionContext.ActionDescriptor.Properties.ContainsKey(_authenticationDelimeter))
+                var authenticationToken = provider.GetValue(AuthenticationDelimeter).FirstValue;
+
+                bool error = false;
+                var authenticationDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(
+                    authenticationToken, new JsonSerializerSettings
+                    {
+                        Error = (s, a) =>
+                        {
+                            error = true;
+                            a.ErrorContext.Handled = true;
+                        }
+                    });
+
+                if (!error)
                 {
-                    bindingContext.ActionContext.ActionDescriptor.Properties.Add(_authenticationDelimeter, authenticationToken);
-                }                                      
+                    bindingContext.ActionContext.ActionDescriptor.Properties.Add(AuthenticationDelimeter, authenticationDictionary);
+                }
             }
-            
+
             // Get value as raw json format
-            var value = provider.GetValue(_valueDelimeter).FirstValue;
+            var value = provider.GetValue(ValueDelimeter).FirstValue;
 
             // Construct object
-            var result = JsonConvert.DeserializeObject(value, BinderType, new JsonSerializerSettings
+            var result = JsonConvert.DeserializeObject(value, _binderType, new JsonSerializerSettings
             {
                 Error = (s, a) =>
                 {
@@ -70,14 +75,14 @@ namespace Communication.Filters
                     bindingContext.ModelState.AddModelError(memberInfo, errorMsg);
                     a.ErrorContext.Handled = true;
                 }
-            });        
+            });
 
             // No errors == succes
-            if(bindingContext.ModelState.ErrorCount == 0)
+            if (bindingContext.ModelState.ErrorCount == 0)
                 bindingContext.Result = ModelBindingResult.Success(result);
-           
+
             return Task.CompletedTask;
-        }       
+        }
     }
 
     public class JObjectValueProvider : IValueProvider
@@ -86,7 +91,7 @@ namespace Communication.Filters
 
         public JObjectValueProvider(ActionContext context)
         {
-            if(context == null)
+            if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
             _values = new Dictionary<string, string>();
@@ -110,7 +115,7 @@ namespace Communication.Filters
             }
             catch (Exception)
             {
-                
+
             }
         }
         public bool ContainsPrefix(string prefix)
