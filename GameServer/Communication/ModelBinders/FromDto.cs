@@ -23,7 +23,7 @@ namespace Communication.ModelBinders
         private const string AuthenticationDelimeter = "auth";
         private const string ValueDelimeter = "val";
 
-        public Task BindModelAsync(ModelBindingContext bindingContext)
+        public async Task BindModelAsync(ModelBindingContext bindingContext)
         {
             bindingContext.ValueProvider = new JObjectValueProvider(bindingContext.ActionContext);
             bindingContext.ActionContext.ActionDescriptor.Properties.Clear();
@@ -35,12 +35,12 @@ namespace Communication.ModelBinders
             if (!provider.ContainsPrefix(ValueDelimeter))
             {
                 modelState.AddModelError(ValueDelimeter, "Not a valid format");
-                return Task.CompletedTask;
+                return;
             }
 
             _binderType = bindingContext.ModelType;
 
-            var resultTask = Task.Run(delegate
+            var resultTask =  Task.Run(delegate
             {
                 // Get value as raw json format
                 var value = provider.GetValue(ValueDelimeter).FirstValue;
@@ -83,13 +83,12 @@ namespace Communication.ModelBinders
                 }
             }
 
-            var convertedResult = resultTask.Result;
+            var convertedResult =  await resultTask;
 
             // No errors == succes
             if (bindingContext.ModelState.ErrorCount == 0)
                 bindingContext.Result = ModelBindingResult.Success(convertedResult);
 
-            return Task.CompletedTask;
         }
     }
 
