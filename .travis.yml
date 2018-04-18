@@ -1,11 +1,20 @@
 language: csharp
-solution: GameServer/GameServer.sln
 mono: latest
 dotnet: 2.0.0
 script:
 - dotnet restore
+before_install:
+- sudo apt install nunit-console
 install:
-- nuget restore GameServer/GameServer.sln
-- nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
+- nuget restore GUI/GUI.sln
 script:
 - dotnet build GameServer/GameServer.sln
+- dotnet test **/*.test/bin/Debug/netcoreapp2.0/*Tests.dll --ListTests --logger:"trx;LogFileName=testresults.trx" --ResultsDirectory:./TestRetults
+- dotnet test **/*Tests/bin/Debug/netcoreapp2.0/*Tests.dll --ListTests --logger:"trx;LogFileName=testresultz.trx" --ResultsDirectory:./TestRetults
+#deploy:
+#  provider: releases
+#  api_key: "mfadtiInujG8BQjk45kQBA"
+#  file: ./TestRetults/testresults.trx
+#  skip_cleanup: true
+#  on:
+#    tags: true
