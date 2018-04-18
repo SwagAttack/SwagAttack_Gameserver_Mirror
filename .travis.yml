@@ -9,8 +9,8 @@ install:
 - nuget restore GameServer/GameServer.sln
 script:
 - dotnet build GameServer/GameServer.sln
-- dotnet test **/*.test/bin/Debug/netcoreapp2.0/*Tests.dll #--ListTests --logger:"trx;LogFileName=testresults.trx" --ResultsDirectory:./TestRetults
-- dotnet test **/*tests/bin/Debug/netcoreapp2.0/*tests.dll #--ListTests --logger:"trx;LogFileName=testresultz.trx" --ResultsDirectory:./TestRetults
+- dotnet vstest **/*.test/bin/Debug/netcoreapp2.0/*Tests.dll --ListTests --logger:"trx;LogFileName=testresults.trx" --ResultsDirectory:./TestRetults
+- dotnet vstest **/*tests/bin/Debug/netcoreapp2.0/*tests.dll --ListTests --logger:"trx;LogFileName=testresultz.trx" --ResultsDirectory:./TestRetults
 #deploy:
 #  provider: releases
 #  api_key: "mfadtiInujG8BQjk45kQBA"
