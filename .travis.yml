@@ -1,0 +1,11 @@
+language: csharp
+solution: GameServer/GameServer.sln
+mono: latest
+dotnet: 2.0.0
+script:
+- dotnet restore
+install:
+- nuget restore GameServer/GameServer.sln
+- nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
+script:
+- dotnet build GameServer/GameServer.sln
