@@ -25,6 +25,9 @@ namespace Communication.RESTControllers
     {
         private readonly IUserController _userController;
 
+        /// <summary>
+        /// Auhentication dictionary
+        /// </summary>
         public Dictionary<string, string> AuthToken { get; set; } = new Dictionary<string, string>();
 
         public UserController(IUserController controller)
@@ -66,15 +69,11 @@ namespace Communication.RESTControllers
         [ValidateModelState]
         public IActionResult GetUser([ModelBinder(typeof(FromDto))] LoginDto loginInfo)
         {
-            if (loginInfo.Username != null && loginInfo.Password != null)
-            {
-                var result = _userController.GetUser(loginInfo.Username, loginInfo.Password);
+            var result = _userController.GetUser(loginInfo.Username, loginInfo.Password);
 
-                // User is found and has been logged in
-                if (result != null)
-                    return new ObjectResult(result);
-
-            }
+            // User is found and has been logged in
+            if (result != null)
+                return new ObjectResult(result);
 
             return new NotFoundResult();
         }       
@@ -83,7 +82,6 @@ namespace Communication.RESTControllers
         [ValidateModelState]
         public IActionResult CreateUser([ModelBinder(typeof(FromDto))] User rawUser)
         {
-
             var result = _userController.CreateUser(rawUser);
 
             if (result != null)
@@ -95,8 +93,8 @@ namespace Communication.RESTControllers
         }
 
         [HttpPut]
-        [ValidateModelState(Order = 2)]
-        [Authentication(Order = 1)]
+        [ValidateModelState(Order = 1)]
+        [Authentication(Order = 2)]
         public IActionResult UpdateUser([ModelBinder(typeof(FromDto))] User user)
         {
             if (AuthToken.Count == 2 && AuthToken.ContainsKey("username"))

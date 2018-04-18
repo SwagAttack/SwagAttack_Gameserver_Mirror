@@ -19,8 +19,8 @@ namespace Communication.ModelBinders
     {
         private Type _binderType;
 
-        private string _authenticationDelimeter = "auth";
-        private string _valueDelimeter = "val";
+        private const string AuthenticationDelimeter = "auth";
+        private const string ValueDelimeter = "val";
 
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
@@ -31,19 +31,19 @@ namespace Communication.ModelBinders
             var modelState = bindingContext.ModelState;
 
             // If the request doesnt contain a value
-            if (!provider.ContainsPrefix(_valueDelimeter))
+            if (!provider.ContainsPrefix(ValueDelimeter))
             {
-                modelState.AddModelError(_valueDelimeter, "Not a valid format");
+                modelState.AddModelError(ValueDelimeter, "Not a valid format");
                 return Task.CompletedTask;
             }
 
             _binderType = bindingContext.ModelType;
 
             // Add authenticantion to action-descriptor if request contains one
-            if (provider.ContainsPrefix(_authenticationDelimeter))
+            if (provider.ContainsPrefix(AuthenticationDelimeter))
             {
                 // The token is raw json format containing authentication information
-                var authenticationToken = provider.GetValue(_authenticationDelimeter).FirstValue;
+                var authenticationToken = provider.GetValue(AuthenticationDelimeter).FirstValue;
 
                 bool error = false;
                 var authenticationDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(
@@ -58,12 +58,12 @@ namespace Communication.ModelBinders
 
                 if (!error)
                 {
-                    bindingContext.ActionContext.ActionDescriptor.Properties.Add(_authenticationDelimeter, authenticationDictionary);
+                    bindingContext.ActionContext.ActionDescriptor.Properties.Add(AuthenticationDelimeter, authenticationDictionary);
                 }
             }
 
             // Get value as raw json format
-            var value = provider.GetValue(_valueDelimeter).FirstValue;
+            var value = provider.GetValue(ValueDelimeter).FirstValue;
 
             // Construct object
             var result = JsonConvert.DeserializeObject(value, _binderType, new JsonSerializerSettings

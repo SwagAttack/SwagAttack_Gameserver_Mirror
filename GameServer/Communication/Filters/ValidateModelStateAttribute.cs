@@ -11,7 +11,6 @@ namespace Communication.Filters
 {
     public class ValidateModelStateAttribute : ActionFilterAttribute
     {
-        public Type Pattern = null;
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             if (!context.ModelState.IsValid)

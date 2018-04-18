@@ -23,30 +23,30 @@ namespace Communication.Filters
     {
         public ILoginManager LoginManager => Application.Managers.LoginManager.GetInstance();
 
-        private readonly string _authenticationDelimeter = "auth";
+        private const string AuthenticationDelimeter = "auth";
 
         /// <summary>
         /// Property name that controllers can use to fetch authentication token
         /// </summary>
-        private readonly string _controllerAuthToken = "authtoken"; 
+        private const string ControllerAuthToken = "authtoken"; 
                                     
-        private readonly string _userCredentials = "username";
-        private readonly string _keyCredentials = "password";
+        private const string UserCredentials = "username";
+        private const string KeyCredentials = "password";
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             try
             {
                 // Check if actionsDescriptions contains authentication
-                var containsAuthentication = filterContext.ActionDescriptor.Properties.ContainsKey(_authenticationDelimeter);
+                var containsAuthentication = filterContext.ActionDescriptor.Properties.ContainsKey(AuthenticationDelimeter);
 
                 if (containsAuthentication)
                 {
-                    var msg = filterContext.ActionDescriptor.Properties[_authenticationDelimeter] as Dictionary<string, string>;
+                    var msg = filterContext.ActionDescriptor.Properties[AuthenticationDelimeter] as Dictionary<string, string>;
 
                     // Fetch username and password
-                    var user = msg[_userCredentials];
-                    var pass = msg[_keyCredentials];
+                    var user = msg[UserCredentials];
+                    var pass = msg[KeyCredentials];
 
                     // If value type was a user compare username to passed username to make sure it's the same user
                     if (LoginManager.CheckLoginStatus(user, pass))
@@ -65,18 +65,13 @@ namespace Communication.Filters
             filterContext.Result = new UnauthorizedResult();
         }
 
-        private void SetController(object controller, Dictionary<string, string> auth)
+        private static void SetController(object controller, Dictionary<string, string> auth)
         {
             var controllerProperties = controller.GetType().GetProperties();
-            PropertyInfo targetProp = null;
-            foreach (var prop in controllerProperties)
-            {
-                if (prop.Name.ToLower().Contains(_controllerAuthToken) && prop.PropertyType == auth.GetType())
-                {
-                    targetProp = prop;
-                    break;
-                }                   
-            }
+
+            var targetProp = controllerProperties.
+                FirstOrDefault(prop => prop.Name.ToLower().Contains(ControllerAuthToken) && prop.PropertyType == auth.GetType());
+
             if (targetProp != null)
             {
                 targetProp.SetValue(controller, auth);
