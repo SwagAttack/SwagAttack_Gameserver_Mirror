@@ -31,8 +31,32 @@ namespace Communication.RESTControllers
 
         public class LoginDto
         {
-            public string Username { get; set; }
-            public string Password { get; set; }
+            private string _username;
+            private string _password;
+
+            public string Username
+            {
+                get => _username;
+                set
+                {
+                    if (string.IsNullOrEmpty(value))
+                        throw new ArgumentException("Username must be set");
+
+                    _username = value;
+                }
+            }
+
+            public string Password
+            {
+                get => _password;
+                set
+                {
+                    if(string.IsNullOrEmpty(value))
+                        throw new ArgumentException("Password must be set");
+
+                    _password = value;
+                }
+            }
         }
 
         [HttpPost("Login", Name = "GetUser")]

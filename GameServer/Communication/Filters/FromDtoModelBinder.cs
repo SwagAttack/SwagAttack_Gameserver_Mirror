@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Newtonsoft.Json;
 
 namespace Communication.Filters
 {
@@ -34,12 +35,12 @@ namespace Communication.Filters
             bindingContext.ActionContext.ActionDescriptor.Properties.Clear();
 
             var provider = bindingContext.ValueProvider;
-            var moddelState = bindingContext.ModelState;
+            var modelState = bindingContext.ModelState;
 
             // If the request doesnt contain a value
             if (!provider.ContainsPrefix(_valueDelimeter))
             {
-                moddelState.AddModelError(_valueDelimeter, "Not a valid format");
+                modelState.AddModelError(_valueDelimeter, "Not a valid format");
                 return Task.CompletedTask;
             }
                 
@@ -58,43 +59,22 @@ namespace Communication.Filters
             
             // Get value as raw json format
             var value = provider.GetValue(_valueDelimeter).FirstValue;
-            // More manageable
-            var valueObj = JObject.Parse(value);
 
-            // Create object according to parameter type
-            var instance = Activator.CreateInstance(BinderType);
-            // Get class properties
-            IList<PropertyInfo> properties = new List<PropertyInfo>(instance.GetType().GetProperties());
-          
-            // Construct the object
-            foreach (var prop in properties)
+            // Construct object
+            var result = JsonConvert.DeserializeObject(value, BinderType, new JsonSerializerSettings
             {
-                try
+                Error = (s, a) =>
                 {
-                    string name = prop.Name;
-                    
-                    if (!valueObj.ContainsKey(name.ToLower()))
-                    {
-                        // Set the value to null
-                        prop.SetValue(instance, null);
-                    }
-                    else
-                    {
-                        // Set the property in accordance with received value object
-                        var add = valueObj[name.ToLower()].ToString();
-                        prop.SetValue(instance, add);
-                    }
+                    var memberInfo = a.ErrorContext.Member.ToString();
+                    var errorMsg = a.ErrorContext.Error.GetBaseException().Message;
+                    bindingContext.ModelState.AddModelError(memberInfo, errorMsg);
+                    a.ErrorContext.Handled = true;
                 }
-                catch (Exception e)
-                {
-                    // In case of errors add these to modelstate
-                    bindingContext.ModelState.AddModelError(prop.Name, e.GetBaseException().Message);
-                }
-            }
+            });        
 
             // No errors == succes
             if(bindingContext.ModelState.ErrorCount == 0)
-                bindingContext.Result = ModelBindingResult.Success(instance);
+                bindingContext.Result = ModelBindingResult.Success(result);
            
             return Task.CompletedTask;
         }       
