@@ -12,7 +12,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.Test.Unittests", "Application.Test.Unittests\Application.Test.Unittests.csproj", "{EA1FE62A-1A88-4DDA-AAAA-6269EE060F39}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistance.Test.Unittests", "Persistance.Test.Unittests_Local\Persistance.Test.Unittests.csproj", "{087A2972-8DEB-4E0A-8658-7851C074152C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistance.Test.Unittests.Local", "Persistance.Test.Unittests_Local\Persistance.Test.Unittests.Local.csproj", "{087A2972-8DEB-4E0A-8658-7851C074152C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
