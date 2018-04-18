@@ -4,6 +4,9 @@ using Newtonsoft.Json.Linq;
 
 namespace Communication.JsonConverter
 {
+    /// <summary>
+    /// Unnecessary class. Is more valueble client side.
+    /// </summary>
     public class DtoConverter
     {
         /// <summary>
