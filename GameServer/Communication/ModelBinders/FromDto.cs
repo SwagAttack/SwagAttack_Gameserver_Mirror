@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace Communication.ModelBinders
         private const string AuthenticationDelimeter = "auth";
         private const string ValueDelimeter = "val";
 
-        public Task BindModelAsync(ModelBindingContext bindingContext)
+        public async Task BindModelAsync(ModelBindingContext bindingContext)
         {
             bindingContext.ValueProvider = new JObjectValueProvider(bindingContext.ActionContext);
             bindingContext.ActionContext.ActionDescriptor.Properties.Clear();
@@ -34,10 +35,30 @@ namespace Communication.ModelBinders
             if (!provider.ContainsPrefix(ValueDelimeter))
             {
                 modelState.AddModelError(ValueDelimeter, "Not a valid format");
-                return Task.CompletedTask;
+                return;
             }
 
             _binderType = bindingContext.ModelType;
+
+            var resultTask =  Task.Run(delegate
+            {
+                // Get value as raw json format
+                var value = provider.GetValue(ValueDelimeter).FirstValue;
+
+                // Construct object
+                var result = JsonConvert.DeserializeObject(value, _binderType, new JsonSerializerSettings
+                {
+                    Error = (s, a) =>
+                    {
+                        var memberInfo = a.ErrorContext.Member.ToString();
+                        var errorMsg = a.ErrorContext.Error.GetBaseException().Message;
+                        bindingContext.ModelState.AddModelError(memberInfo, errorMsg);
+                        a.ErrorContext.Handled = true;
+                    }
+                });
+
+                return result;
+            });
 
             // Add authenticantion to action-descriptor if request contains one
             if (provider.ContainsPrefix(AuthenticationDelimeter))
@@ -62,26 +83,12 @@ namespace Communication.ModelBinders
                 }
             }
 
-            // Get value as raw json format
-            var value = provider.GetValue(ValueDelimeter).FirstValue;
-
-            // Construct object
-            var result = JsonConvert.DeserializeObject(value, _binderType, new JsonSerializerSettings
-            {
-                Error = (s, a) =>
-                {
-                    var memberInfo = a.ErrorContext.Member.ToString();
-                    var errorMsg = a.ErrorContext.Error.GetBaseException().Message;
-                    bindingContext.ModelState.AddModelError(memberInfo, errorMsg);
-                    a.ErrorContext.Handled = true;
-                }
-            });
+            var convertedResult =  await resultTask;
 
             // No errors == succes
             if (bindingContext.ModelState.ErrorCount == 0)
-                bindingContext.Result = ModelBindingResult.Success(result);
+                bindingContext.Result = ModelBindingResult.Success(convertedResult);
 
-            return Task.CompletedTask;
         }
     }
 
