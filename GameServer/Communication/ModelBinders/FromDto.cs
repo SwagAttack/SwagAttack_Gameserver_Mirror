@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -39,6 +40,26 @@ namespace Communication.ModelBinders
 
             _binderType = bindingContext.ModelType;
 
+            var resultTask = Task.Run(delegate
+            {
+                // Get value as raw json format
+                var value = provider.GetValue(ValueDelimeter).FirstValue;
+
+                // Construct object
+                var result = JsonConvert.DeserializeObject(value, _binderType, new JsonSerializerSettings
+                {
+                    Error = (s, a) =>
+                    {
+                        var memberInfo = a.ErrorContext.Member.ToString();
+                        var errorMsg = a.ErrorContext.Error.GetBaseException().Message;
+                        bindingContext.ModelState.AddModelError(memberInfo, errorMsg);
+                        a.ErrorContext.Handled = true;
+                    }
+                });
+
+                return result;
+            });
+
             // Add authenticantion to action-descriptor if request contains one
             if (provider.ContainsPrefix(AuthenticationDelimeter))
             {
@@ -62,24 +83,11 @@ namespace Communication.ModelBinders
                 }
             }
 
-            // Get value as raw json format
-            var value = provider.GetValue(ValueDelimeter).FirstValue;
-
-            // Construct object
-            var result = JsonConvert.DeserializeObject(value, _binderType, new JsonSerializerSettings
-            {
-                Error = (s, a) =>
-                {
-                    var memberInfo = a.ErrorContext.Member.ToString();
-                    var errorMsg = a.ErrorContext.Error.GetBaseException().Message;
-                    bindingContext.ModelState.AddModelError(memberInfo, errorMsg);
-                    a.ErrorContext.Handled = true;
-                }
-            });
+            var convertedResult = resultTask.Result;
 
             // No errors == succes
             if (bindingContext.ModelState.ErrorCount == 0)
-                bindingContext.Result = ModelBindingResult.Success(result);
+                bindingContext.Result = ModelBindingResult.Success(convertedResult);
 
             return Task.CompletedTask;
         }
