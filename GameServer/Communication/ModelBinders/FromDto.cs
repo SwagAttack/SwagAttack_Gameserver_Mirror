@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
-using Communication.JsonSerializerExtensions;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 
@@ -18,11 +14,9 @@ namespace Communication.ModelBinders
     {
         private const string AuthenticationDelimeter = "auth";
         private const string ValueDelimeter = "val";
-        private Type _binderType;
 
         public async Task BindModelAsync(ModelBindingContext bindingContext)
         {
-            bindingContext.ValueProvider = new JObjectValueProvider(bindingContext.ActionContext);
             bindingContext.ActionContext.ActionDescriptor.Properties.Clear();
 
             var provider = bindingContext.ValueProvider;
@@ -35,15 +29,13 @@ namespace Communication.ModelBinders
                 return;
             }
 
-            _binderType = bindingContext.ModelType;
-
             var resultTask = Task.Run(() =>
             {
                 // Get value as raw json format
                 var value = provider.GetValue(ValueDelimeter).FirstValue;
 
                 // Construct object
-                var result = JsonConvert.DeserializeObject(value, _binderType, new JsonSerializerSettings
+                var result = JsonConvert.DeserializeObject(value, bindingContext.ModelType, new JsonSerializerSettings
                 {
                     Error = (s, a) =>
                     {
@@ -85,40 +77,6 @@ namespace Communication.ModelBinders
             // No errors == succes
             if (bindingContext.ModelState.ErrorCount == 0)
                 bindingContext.Result = ModelBindingResult.Success(convertedResult);
-        }
-    }
-
-    public class JObjectValueProvider : IValueProvider
-    {
-        private readonly Dictionary<string, object> _values;
-
-        public JObjectValueProvider(ActionContext context)
-        {
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
-
-            var inputStream = context.HttpContext.Request.Body;
-
-            try
-            {
-                _values = Utility.DeserializeStream<Dictionary<string, object>>(inputStream);
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        public bool ContainsPrefix(string prefix)
-        {
-            return _values != null && _values.Keys.Contains(prefix);
-        }
-
-        public ValueProviderResult GetValue(string key)
-        {
-            if (_values.TryGetValue(key, out var value))
-                return new ValueProviderResult(value.ToString(), CultureInfo.InvariantCulture);
-
-            return new ValueProviderResult(value.ToString(), CultureInfo.InvariantCulture);
         }
     }
 }

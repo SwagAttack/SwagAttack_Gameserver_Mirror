@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Application.Interfaces;
 using Communication.ModelBinders;
@@ -23,22 +22,20 @@ namespace Communication.Filters
 
         private const string UserCredentials = "username";
         private const string KeyCredentials = "password";
+
         public ILoginManager LoginManager => Application.Managers.LoginManager.GetInstance();
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            try
-            {
-                // Check if actionsDescriptions contains authentication
-                var containsAuthentication =
-                    filterContext.ActionDescriptor.Properties.ContainsKey(AuthenticationDelimeter);
+            // Check if actionsDescriptions contains authentication
+            var containsAuthentication =
+                filterContext.ActionDescriptor.Properties.ContainsKey(AuthenticationDelimeter);
 
-                if (containsAuthentication)
+            if (containsAuthentication)
+                if (
+                    filterContext.ActionDescriptor.Properties[AuthenticationDelimeter] is Dictionary<string, string>
+                        msg && msg.ContainsKey(UserCredentials) && msg.ContainsKey(KeyCredentials))
                 {
-                    var msg =
-                        filterContext.ActionDescriptor
-                            .Properties[AuthenticationDelimeter] as Dictionary<string, string>;
-
                     // Fetch username and password
                     var user = msg[UserCredentials];
                     var pass = msg[KeyCredentials];
@@ -50,10 +47,6 @@ namespace Communication.Filters
                         return;
                     }
                 }
-            }
-            catch (Exception)
-            {
-            }
 
             /* If we reach this point the request is unauthorized */
             filterContext.Result = new UnauthorizedResult();

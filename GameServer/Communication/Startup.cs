@@ -9,6 +9,7 @@ using Application.Misc;
 using Persistance.UnitOfWork;
 using Persistance;
 using Communication.Filters;
+using Communication.ModelBinders.ValueProviders;
 
 namespace Communication
 {
@@ -28,6 +29,7 @@ namespace Communication
             {
                 //options.Filters.Add(typeof(ValidateModelStateAttribute));
                 //options.Filters.Add(new RequireHttpsAttribute());
+                options.ValueProviderFactories.Insert(0, new FromDtoValueProviderFactory());
             });
            
             services.AddTransient<IUnitOfWork>(u => new UnitOfWork(new DbContext()));
