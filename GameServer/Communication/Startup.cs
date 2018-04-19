@@ -31,7 +31,7 @@ namespace Communication
             });
            
             services.AddTransient<IUnitOfWork>(u => new UnitOfWork(new DbContext()));
-            services.AddSingleton<ILoginManager>(l => LoginManager.GetInstance(new CountDownTimer()));
+            services.AddSingleton(l => LoginManager.GetInstance());
             services.AddTransient<IUserController, UserController>();
         }
 
