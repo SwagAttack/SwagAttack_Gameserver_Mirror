@@ -38,7 +38,7 @@ namespace Persistance.Test.Unittests.Local
         {
             _uut.UserRepository.AddUser(_testUser);
             Assert.That(_testUser.Username == _uut.UserRepository.GetUserByUsername(_testUser.Username).Username);
-            _addedUser = true;
+            //_addedUser = true;
         }
 
         [Test]
