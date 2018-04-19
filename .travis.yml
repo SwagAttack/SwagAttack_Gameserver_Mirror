@@ -9,7 +9,7 @@ install:
 - nuget restore GameServer/GameServer.sln
 script:
 - dotnet build GameServer/GameServer.sln
-- dotnet vstest **/*tests/bin/Debug/netcoreapp2.0/*tests.dll --ListTests --logger:"trx;LogFileName=testresultz.trx" --ResultsDirectory:./TestRetults
+- travis_wait dotnet vstest **/*tests/bin/Debug/netcoreapp2.0/*tests.dll #--ListTests --logger:"trx;LogFileName=testresultz.trx" --ResultsDirectory:./TestRetults
 #deploy:
 #  provider: releases
 #  api_key: "mfadtiInujG8BQjk45kQBA"
