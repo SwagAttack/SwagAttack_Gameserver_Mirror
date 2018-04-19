@@ -1,16 +1,12 @@
 ﻿using Domain.Interfaces;
+using Domain.Models;
 using NUnit.Framework;
-using User = Domain.Models.User;
 
 namespace Persistance.Test.Unittests.Local
 {
     [TestFixture]
     public class Test
     {
-        private UnitOfWork.UnitOfWork _uut;
-        private IUser _testUser;
-        private bool _addedUser;
-
         [SetUp]
         public void Setup()
         {
@@ -26,6 +22,17 @@ namespace Persistance.Test.Unittests.Local
             };
         }
 
+
+        [TearDown]
+        public void TearDown()
+        {
+            if (_addedUser) _uut.UserRepository.DeleteUserByUsername("1337User");
+        }
+
+        private UnitOfWork.UnitOfWork _uut;
+        private IUser _testUser;
+        private bool _addedUser;
+
         [Test]
         public void AddUserToDb_UserIsAddedToDb()
         {
@@ -39,29 +46,24 @@ namespace Persistance.Test.Unittests.Local
         {
             var user = _uut.UserRepository.AddUserAsync(_testUser);
             user.Wait();
-            Assert.That(user.Result.Username,Is.EqualTo(_testUser.Username));
+            Assert.That(user.Result.Username, Is.EqualTo(_testUser.Username));
             _addedUser = true;
         }
 
         [Test]
-        public void ReplaceUserInDb_UserIsReplacedInDb()
+        public void DeleteUserInDb_UserDoesNotExistPostExecution()
         {
-            _uut.UserRepository.AddUser(_testUser);
-            _testUser.GivenName = "Replaced";
-            _uut.UserRepository.ReplaceUser(_testUser);
-            Assert.That(_testUser.GivenName == _uut.UserRepository.GetUserByUsername(_testUser.Username).GivenName);
-            _addedUser = true;
+            _uut.UserRepository.AddUser(_testUser); // put it up again
+            _uut.UserRepository.DeleteUserByUsername(_testUser.Username);
+            Assert.That(_uut.UserRepository.GetUserByUsername(_testUser.Username), Is.Null);
         }
 
         [Test]
-        public void ReplaceUserInDbAsync_UserIsReplacedInDb()
+        public void DeleteUserInDbAsync_UserDoesNotExistPostExecution()
         {
-            _uut.UserRepository.AddUser(_testUser);
-            _testUser.GivenName = "Replaced";
-            var replacedUser = _uut.UserRepository.ReplaceUserAsync(_testUser.Username, _testUser);
-            replacedUser.Wait();
-            Assert.That(replacedUser.Result.GivenName,Is.EqualTo(_testUser.GivenName));
-            _addedUser = true;
+            _uut.UserRepository.AddUser(_testUser); // put it up again
+            _uut.UserRepository.DeleteUserByUsernameAsync(_testUser.Username).Wait();
+            Assert.That(_uut.UserRepository.GetUserByUsername(_testUser.Username), Is.Null);
         }
 
         [Test]
@@ -84,31 +86,24 @@ namespace Persistance.Test.Unittests.Local
         }
 
         [Test]
-        public void DeleteUserInDb_UserDoesNotExistPostExecution()
+        public void ReplaceUserInDb_UserIsReplacedInDb()
         {
-            _uut.UserRepository.AddUser(_testUser); // put it up again
-            _uut.UserRepository.DeleteUserByUsername(_testUser.Username);
-            Assert.That(_uut.UserRepository.GetUserByUsername(_testUser.Username), Is.Null);
-
+            _uut.UserRepository.AddUser(_testUser);
+            _testUser.GivenName = "Replaced";
+            _uut.UserRepository.ReplaceUser(_testUser);
+            Assert.That(_testUser.GivenName == _uut.UserRepository.GetUserByUsername(_testUser.Username).GivenName);
+            _addedUser = true;
         }
 
         [Test]
-        public void DeleteUserInDbAsync_UserDoesNotExistPostExecution()
+        public void ReplaceUserInDbAsync_UserIsReplacedInDb()
         {
-            _uut.UserRepository.AddUser(_testUser); // put it up again
-            _uut.UserRepository.DeleteUserByUsernameAsync(_testUser.Username).Wait();
-            Assert.That(_uut.UserRepository.GetUserByUsername(_testUser.Username), Is.Null);
+            _uut.UserRepository.AddUser(_testUser);
+            _testUser.GivenName = "Replaced";
+            var replacedUser = _uut.UserRepository.ReplaceUserAsync(_testUser.Username, _testUser);
+            replacedUser.Wait();
+            Assert.That(replacedUser.Result.GivenName, Is.EqualTo(_testUser.GivenName));
+            _addedUser = true;
         }
-
-
-        [TearDown]
-        public void TearDown()
-        {
-            if (_addedUser)
-            {
-                _uut.UserRepository.DeleteUserByUsername("1337User");
-            }
-        }
-
     }
 }
