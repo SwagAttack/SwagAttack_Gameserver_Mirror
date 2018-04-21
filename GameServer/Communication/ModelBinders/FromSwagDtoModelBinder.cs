@@ -10,7 +10,7 @@ namespace Communication.ModelBinders
     ///     Dto to Model converter and binder. The model will bind to the "value" part of a
     ///     "auth"/"val" request as in accordance with SwagAttack Standards
     /// </summary>
-    public class FromDto : IModelBinder
+    public class FromSwagDtoModelBinder : IModelBinder
     {
         private const string AuthenticationDelimeter = "auth";
         private const string ValueDelimeter = "val";

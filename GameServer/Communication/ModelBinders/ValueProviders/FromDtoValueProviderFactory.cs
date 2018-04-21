@@ -19,7 +19,7 @@ namespace Communication.ModelBinders.ValueProviders
         private static Task AddValueProviderAsync(ValueProviderFactoryContext context)
         {
             var req = context.ActionContext.HttpContext.Request;
-
+            
             object body = null;
 
             try
@@ -31,6 +31,7 @@ namespace Communication.ModelBinders.ValueProviders
                 return Task.CompletedTask;
             }
 
+            
             var valueProvider = new FromDtoValueProvider(body, BindingSource.Form);
             context.ValueProviders.Add(valueProvider);
             return Task.CompletedTask;

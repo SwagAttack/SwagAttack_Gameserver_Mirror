@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Application.Interfaces;
 using Communication.Filters;
 using Communication.ModelBinders;
+using Communication.ModelBinders.Attributes;
 using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,7 +30,7 @@ namespace Communication.RESTControllers
 
         [HttpPost("Login", Name = "GetUser")]
         [ValidateModelState]
-        public IActionResult GetUser([ModelBinder(typeof(FromDto))] LoginDto loginInfo)
+        public IActionResult GetUser([FromSwagDto] LoginDto loginInfo)
         {
             var result = _userController.GetUser(loginInfo.Username, loginInfo.Password);
 
@@ -42,7 +43,7 @@ namespace Communication.RESTControllers
 
         [HttpPost]
         [ValidateModelState]
-        public IActionResult CreateUser([ModelBinder(typeof(FromDto))] User rawUser)
+        public IActionResult CreateUser([FromSwagDto] User rawUser)
         {
             var result = _userController.CreateUser(rawUser);
 
@@ -54,13 +55,16 @@ namespace Communication.RESTControllers
         [HttpPut]
         [ValidateModelState(Order = 1)]
         [Authentication(Order = 2)]
-        public IActionResult UpdateUser([ModelBinder(typeof(FromDto))] User user)
+        public IActionResult UpdateUser([FromSwagDto] User user)
         {
             if (AuthToken.Count == 2 && AuthToken.ContainsKey("username"))
             {
                 var result = _userController.UpdateUser(AuthToken["username"], user);
 
+                AuthToken.Clear();
+
                 if (result != null) return CreatedAtRoute("GetUser", result);
+                
             }
 
             return BadRequest();

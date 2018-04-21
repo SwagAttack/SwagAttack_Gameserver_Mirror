@@ -9,7 +9,7 @@ namespace Communication.Filters
 {
     /// <summary>
     ///     Provides authentication for requests.
-    ///     Note that this requires <see cref="FromDto" /> as the model binder
+    ///     Note that this requires <see cref="FromSwagDtoModelBinder" /> as the model binder
     /// </summary>
     public class AuthenticationAttribute : ActionFilterAttribute
     {
