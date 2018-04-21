@@ -28,7 +28,6 @@ namespace Domain.Models
         /// </summary>
         public string Id { get; set; }
 
-
         /// <summary>
         /// Constructor setups lobby, sets AdminUsername, initiates _usernames and adds a user to the list.
         /// </summary>
