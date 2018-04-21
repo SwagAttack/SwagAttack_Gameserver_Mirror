@@ -8,7 +8,8 @@ using Application.Managers;
 using Application.Misc;
 using Persistance.UnitOfWork;
 using Persistance;
-using Communication.Filters;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace Communication
 {
@@ -26,12 +27,11 @@ namespace Communication
         {
             services.AddMvc(options =>
             {
-                //options.Filters.Add(typeof(ValidateModelStateAttribute));
-                //options.Filters.Add(new RequireHttpsAttribute());
+                options.Filters.Add(new RequireHttpsAttribute());
             });
            
             services.AddTransient<IUnitOfWork>(u => new UnitOfWork(new DbContext()));
-            services.AddSingleton<ILoginManager>(l => LoginManager.GetInstance(new CountDownTimer()));
+            services.AddSingleton(l => LoginManager.GetInstance());
             services.AddTransient<IUserController, UserController>();
         }
 
@@ -43,8 +43,8 @@ namespace Communication
                 app.UseDeveloperExceptionPage();
             }
 
-            //var options = new RewriteOptions().AddRedirectToHttps();
-            //app.UseRewriter(options);
+            var options = new RewriteOptions().AddRedirectToHttps();
+            app.UseRewriter(options);
 
             app.UseMvc();
         }

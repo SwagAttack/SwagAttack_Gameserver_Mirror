@@ -2,6 +2,7 @@
 
 namespace Application.Interfaces
 {
+    /* Timer utiliy class */
     public interface ITimer
     {
         event EventHandler TickEvent;

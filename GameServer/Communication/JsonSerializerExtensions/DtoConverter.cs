@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-namespace Communication.JsonConverter
+namespace Communication.JsonSerializerExtensions
 {
     /// <summary>
     /// Unnecessary class. Is more valueble client side.
