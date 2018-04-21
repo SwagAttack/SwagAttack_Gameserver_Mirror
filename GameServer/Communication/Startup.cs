@@ -1,16 +1,13 @@
+using Application.Controllers;
+using Application.Interfaces;
+using Application.Managers;
+using Communication.Formatters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Application.Controllers;
-using Application.Interfaces;
-using Application.Managers;
-using Application.Misc;
-using Persistance.UnitOfWork;
 using Persistance;
-using Communication.Filters;
-using Communication.ModelBinders;
-using Communication.ModelBinders.ValueProviders;
+using Persistance.UnitOfWork;
 
 namespace Communication
 {
@@ -30,21 +27,18 @@ namespace Communication
             {
                 //options.Filters.Add(typeof(ValidateModelStateAttribute));
                 //options.Filters.Add(new RequireHttpsAttribute());
-                options.ValueProviderFactories.Insert(0, new FromDtoValueProviderFactory());
+                options.InputFormatters.Insert(0, new JsonInputFormatter());
             });
-           
+
             services.AddTransient<IUnitOfWork>(u => new UnitOfWork(new DbContext()));
-            services.AddSingleton<ILoginManager>(l => LoginManager.GetInstance(new CountDownTimer()));
+            services.AddSingleton(l => LoginManager.GetInstance());
             services.AddTransient<IUserController, UserController>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
             //var options = new RewriteOptions().AddRedirectToHttps();
             //app.UseRewriter(options);

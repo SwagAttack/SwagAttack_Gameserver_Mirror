@@ -2,6 +2,6 @@
 {
     public interface IFromSwagDtoAttribute
     {
-        
+        string Name { get; set; }
     }
 }

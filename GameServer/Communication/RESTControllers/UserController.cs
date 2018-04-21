@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
 using Application.Interfaces;
 using Communication.Filters;
-using Communication.ModelBinders;
-using Communication.ModelBinders.Attributes;
 using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,14 +20,9 @@ namespace Communication.RESTControllers
             _userController = controller;
         }
 
-        /// <summary>
-        ///     Auhentication dictionary
-        /// </summary>
-        public Dictionary<string, string> AuthToken { get; set; } = new Dictionary<string, string>();
-
         [HttpPost("Login", Name = "GetUser")]
         [ValidateModelState]
-        public IActionResult GetUser([FromSwagDto] LoginDto loginInfo)
+        public IActionResult GetUser([FromBody] LoginDto loginInfo)
         {
             var result = _userController.GetUser(loginInfo.Username, loginInfo.Password);
 
@@ -43,7 +35,7 @@ namespace Communication.RESTControllers
 
         [HttpPost]
         [ValidateModelState]
-        public IActionResult CreateUser([FromSwagDto] User rawUser)
+        public IActionResult CreateUser([FromBody] User rawUser)
         {
             var result = _userController.CreateUser(rawUser);
 
@@ -53,18 +45,15 @@ namespace Communication.RESTControllers
         }
 
         [HttpPut]
-        [ValidateModelState(Order = 1)]
-        [Authentication(Order = 2)]
-        public IActionResult UpdateUser([FromSwagDto] User user)
+        [ValidateModelState]
+        [AuthorizationSwag]
+        public IActionResult UpdateUser([FromHeader] string username, [FromBody] User user)
         {
-            if (AuthToken.Count == 2 && AuthToken.ContainsKey("username"))
+            if (username != null)
             {
-                var result = _userController.UpdateUser(AuthToken["username"], user);
-
-                AuthToken.Clear();
+                var result = _userController.UpdateUser(username, user);
 
                 if (result != null) return CreatedAtRoute("GetUser", result);
-                
             }
 
             return BadRequest();
