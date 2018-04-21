@@ -20,11 +20,11 @@ namespace Communication.RESTControllers
             _userController = controller;
         }
 
-        [HttpPost("Login", Name = "GetUser")]
+        [HttpGet("Login", Name = "GetUser")]
         [ValidateModelState]
-        public IActionResult GetUser([FromBody] LoginDto loginInfo)
+        public IActionResult GetUser([FromHeader] string username, [FromHeader] string password)
         {
-            var result = _userController.GetUser(loginInfo.Username, loginInfo.Password);
+            var result = _userController.GetUser(username, password);
 
             // User is found and has been logged in
             if (result != null)
