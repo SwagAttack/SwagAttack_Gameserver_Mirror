@@ -58,35 +58,5 @@ namespace Communication.RESTControllers
 
             return BadRequest();
         }
-
-        public class LoginDto
-        {
-            private string _password;
-            private string _username;
-
-            public string Username
-            {
-                get => _username;
-                set
-                {
-                    if (string.IsNullOrEmpty(value))
-                        throw new ArgumentException("Username must be set");
-
-                    _username = value;
-                }
-            }
-
-            public string Password
-            {
-                get => _password;
-                set
-                {
-                    if (string.IsNullOrEmpty(value))
-                        throw new ArgumentException("Password must be set");
-
-                    _password = value;
-                }
-            }
-        }
     }
 }
