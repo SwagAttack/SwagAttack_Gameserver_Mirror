@@ -14,20 +14,20 @@ namespace Domain.Misc
         /// <param name="value">the setters value</param>
         public void Validate(string value)
         {
-            throwArgumentIf(string.IsNullOrEmpty(value), "value cannot be empty!");
-            validateMore(value);
+            ThrowArgumentIf(string.IsNullOrEmpty(value), "value cannot be empty!");
+            ValidateMore(value);
         }
         /// <summary>
         /// this method is the one to overide in derived classes, use this to specify specific throws
         /// </summary>
         /// <param name="value">value from setter</param>
-        protected abstract void validateMore(string value);
+        protected abstract void ValidateMore(string value);
         /// <summary>
         /// A helper method
         /// </summary>
         /// <param name="condition">when to throw a message</param>
         /// <param name="message">The message to throw</param>
-        protected void throwArgumentIf(bool condition, string message)
+        protected void ThrowArgumentIf(bool condition, string message)
         {
             if (condition)
                 throw new ArgumentException(message);
@@ -37,38 +37,38 @@ namespace Domain.Misc
     public class UsernameThrow : BaseThrow
     {
 
-        protected override void validateMore(string value)
+        protected override void ValidateMore(string value)
         {
-            throwArgumentIf(value.Length < 8, "value cannot be less than 8 characters");
-            throwArgumentIf(value.Length > 20, "value cannot be more than 20 characters");
-            throwArgumentIf(value.Any(x => !Char.IsLetterOrDigit(x)), "value only be letters from a to z or numbers");
+            ThrowArgumentIf(value.Length < 8, "value cannot be less than 8 characters");
+            ThrowArgumentIf(value.Length > 20, "value cannot be more than 20 characters");
+            ThrowArgumentIf(value.Any(x => !Char.IsLetterOrDigit(x)), "value only be letters from a to z or numbers");
         }
 
     }
 
     public class PasswordThrow : BaseThrow
     {
-        protected override void validateMore(string value)
+        protected override void ValidateMore(string value)
         {
-            throwArgumentIf(value.Length < 8, "value cannot be less than 8 characters");
+            ThrowArgumentIf(value.Length < 8, "value cannot be less than 8 characters");
         }
     }
 
     public class EmailThrow : BaseThrow
     {
-        protected override void validateMore(string value)
+        protected override void ValidateMore(string value)
         {
-            throwArgumentIf(value.Length < 5, "value cannot be less than 5 characters");
-            throwArgumentIf(!(value.Contains("@") && value.Contains(".")), "Not a valid Email");
+            ThrowArgumentIf(value.Length < 5, "value cannot be less than 5 characters");
+            ThrowArgumentIf(!(value.Contains("@") && value.Contains(".")), "Not a valid Email");
         }
     }
 
     public class NameThrow : BaseThrow
     {
-        protected override void validateMore(string value)
+        protected override void ValidateMore(string value)
         {
-            throwArgumentIf((value.Contains(".") || value.Length < 2), "Initials is not allowed");
-            throwArgumentIf(value.Any(x => !Char.IsLetter(x)), "Name can only contain letters");
+            ThrowArgumentIf((value.Contains(".") || value.Length < 2), "Initials is not allowed");
+            ThrowArgumentIf(value.Any(x => !Char.IsLetter(x)), "Name can only contain letters");
         }
     }
 
