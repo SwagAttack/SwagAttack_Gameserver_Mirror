@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2036
+VisualStudioVersion = 15.0.27130.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Communication", "Communication\Communication.csproj", "{AF0297C5-B069-4F31-BCD3-12721124108A}"
 EndProject
@@ -15,6 +15,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistance.Test.Unittests.Local", "Persistance.Test.Unittests_Local\Persistance.Test.Unittests.Local.csproj", "{087A2972-8DEB-4E0A-8658-7851C074152C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Model.Unit.Test", "Model.Unit.Test\Model.Unit.Test.csproj", "{FFE3A725-A9D9-47D6-A1C2-427A481AD896}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT_Core", "ITTestCore\IT_Core.csproj", "{3ECFA83F-3488-4BF9-9857-63D00AD21097}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +52,10 @@ Global
 		{FFE3A725-A9D9-47D6-A1C2-427A481AD896}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFE3A725-A9D9-47D6-A1C2-427A481AD896}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFE3A725-A9D9-47D6-A1C2-427A481AD896}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3ECFA83F-3488-4BF9-9857-63D00AD21097}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3ECFA83F-3488-4BF9-9857-63D00AD21097}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3ECFA83F-3488-4BF9-9857-63D00AD21097}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3ECFA83F-3488-4BF9-9857-63D00AD21097}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
