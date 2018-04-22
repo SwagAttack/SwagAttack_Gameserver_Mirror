@@ -174,9 +174,9 @@ namespace Application.Managers
             {
                 foreach (var username in loggedOutUsers)
                 {
-                    if (_listeners.ContainsKey(username))
+                    if (_listeners.ContainsKey(username.ToLower()))
                     {
-                        foreach (var handler in _listeners[username].ToList())
+                        foreach (var handler in _listeners[username.ToLower()].ToList())
                         {
                             handler.Invoke(this, username);
                         }
