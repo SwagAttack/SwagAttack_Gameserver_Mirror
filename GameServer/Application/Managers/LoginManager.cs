@@ -159,15 +159,13 @@ namespace Application.Managers
 
             lock (_loggedInUsers)
             {
-                foreach (var username in _loggedInUsers.Keys.ToList())
+                foreach (var user in _loggedInUsers.Values.ToList())
                 {
-                    // Get the user
-                    var loggedInUser = _loggedInUsers[username];
                     // User expired
-                    if (loggedInUser.Expiration.CompareTo(now) < 0)
+                    if (user.Expiration.CompareTo(now) < 0)
                     {
-                        loggedOutUsers.Add(username);
-                        _loggedInUsers.Remove(username);                      
+                        loggedOutUsers.Add(user.Username);
+                        _loggedInUsers.Remove(user.Username.ToLower());                      
                     }
                 }
             }

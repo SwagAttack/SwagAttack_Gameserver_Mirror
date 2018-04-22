@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using Application.Interfaces;
 using Application.Managers;
+using Domain.Interfaces;
 using Microsoft.Azure.Documents.Spatial;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
@@ -12,13 +14,15 @@ namespace Application.Test.Unittests
     public class LobbyManagerUnitTests
     {
         private ILoginManager _fakeLoginManager;
+        private ILobbyPool _fakeLobbyPool;
         private LobbyManager _uut;
 
         [SetUp]
         public void SetUp()
         {
             _fakeLoginManager = Substitute.For<ILoginManager>();
-            _uut = new LobbyManager(_fakeLoginManager);
+            _fakeLobbyPool = Substitute.For<ILobbyPool>();
+            _uut = new LobbyManager(_fakeLoginManager, _fakeLobbyPool);
         }
 
         [Test]
@@ -28,6 +32,9 @@ namespace Application.Test.Unittests
             _fakeLoginManager.
                 SubscribeOnLogOut(Arg.Any<string>(), Arg.Any<UserLoggedOutHandle>()).
                 Returns(true);
+
+            _fakeLobbyPool.Contains(Arg.Any<string>()).Returns(false);
+            _fakeLobbyPool.AddLobby(Arg.Any<ILobby>()).Returns(true);
 
             var username = "Username";
             var lobbyId = "MyLobbyId";
@@ -46,6 +53,9 @@ namespace Application.Test.Unittests
             _fakeLoginManager.
                 SubscribeOnLogOut(Arg.Any<string>(), Arg.Any<UserLoggedOutHandle>()).
                 Returns(true);
+
+            _fakeLobbyPool.Contains(Arg.Any<string>()).Returns(false);
+            _fakeLobbyPool.AddLobby(Arg.Any<ILobby>()).Returns(true);
 
             var username = "Username";
             var lobbyId = "MyLobbyId";
@@ -70,6 +80,9 @@ namespace Application.Test.Unittests
                 SubscribeOnLogOut(Arg.Is(username), Arg.Any<UserLoggedOutHandle>()).
                 Returns(false);
 
+            _fakeLobbyPool.Contains(Arg.Any<string>()).Returns(false);
+            _fakeLobbyPool.AddLobby(Arg.Any<ILobby>()).Returns(true);
+
             // Act
             var lobby = _uut.CreateLobby(lobbyId, username);
 
@@ -86,22 +99,18 @@ namespace Application.Test.Unittests
             var username = "Username";
             var lobbyId = "MyLobbyId";
 
-            // Second lobby
-
-            var anotherUsername = "AnotherUsername";
-            var sameLobbyId = "MyLobbyId";
-
             _fakeLoginManager.
                 SubscribeOnLogOut(Arg.Any<string>(), Arg.Any<UserLoggedOutHandle>()).
                 Returns(true);
 
+            _fakeLobbyPool.Contains(Arg.Any<string>()).Returns(true);
+            _fakeLobbyPool.AddLobby(Arg.Any<ILobby>()).Returns(true);
+
             // Act
             var lobby = _uut.CreateLobby(lobbyId, username);
-            var anotherLobby = _uut.CreateLobby(sameLobbyId, anotherUsername);
 
             // Assert
-            Assert.That(lobby == null, Is.EqualTo(false));
-            Assert.That(anotherLobby == null, Is.EqualTo(true));
+            Assert.That(lobby == null, Is.EqualTo(true));
         }
 
         [Test]
@@ -112,11 +121,7 @@ namespace Application.Test.Unittests
             var username = "Username";
             var lobbyId = "MyLobbyId";
 
-            _fakeLoginManager.
-                SubscribeOnLogOut(Arg.Any<string>(), Arg.Any<UserLoggedOutHandle>()).
-                Returns(true);
-
-            _uut.CreateLobby(lobbyId, username);
+            _fakeLobbyPool.GetLobby(Arg.Any<string>()).Returns(Substitute.For<ILobby>());
 
             // Act
             var lobby = _uut.GetLobby(lobbyId);
@@ -131,6 +136,8 @@ namespace Application.Test.Unittests
             // Arrange
 
             var lobbyId = "MyLobbyId";
+
+            _fakeLobbyPool.GetLobby(Arg.Any<string>()).ReturnsNull();
 
             // Act
             var lobby = _uut.GetLobby(lobbyId);
@@ -160,9 +167,7 @@ namespace Application.Test.Unittests
                 SubscribeOnLogOut(Arg.Any<string>(), Arg.Any<UserLoggedOutHandle>()).
                 Returns(true);
 
-            _uut.CreateLobby(lobbyId1, username1);
-            _uut.CreateLobby(lobbyId2, username2);
-            _uut.CreateLobby(lobbyId3, username3);
+            _fakeLobbyPool.LobbiesCollection.Returns(new List<string> {lobbyId1, lobbyId2, lobbyId3});
 
             // Act
 
@@ -175,7 +180,7 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void AddUserToLobby_NotSubscribedToUsername_ReturnsTrueAndLobbyContainsUser()
+        public void AddUserToLobby_NotSubscribedToUsername_ReturnsTrue()
         {
             // Arrange
 
@@ -193,7 +198,6 @@ namespace Application.Test.Unittests
             var added = _uut.AddUserToLobby(lobbyId, usernameToJoin);
             // Assert
             Assert.That(added);
-            Assert.That(_uut.ExistingLobbies[lobbyId.ToLower()].Usernames.Count == 2, Is.EqualTo(true));
         }
 
         [Test]
@@ -229,38 +233,14 @@ namespace Application.Test.Unittests
                 SubscribeOnLogOut(Arg.Any<string>(), Arg.Any<UserLoggedOutHandle>()).
                 Returns(true);
 
+            _fakeLobbyPool.GetLobby(Arg.Any<string>()).ReturnsNull();
+
             // Act (adding user to lobby id that does not exist)
             var added = _uut.AddUserToLobby(lobbyId, usernameToJoin);
             // Assert
             Assert.That(added == false);
         }
     
-        [Test]
-        public void RemoveUserFromLobby_UserAttached_ReturnsTrueRemovesUser()
-        {
-            // Arrange
-
-            var usernameToJoin = "Username";
-            var lobbyId = "MyLobbyId";
-
-            _fakeLoginManager.
-                UnsubscribeOnLogOut(Arg.Any<string>(), Arg.Any<UserLoggedOutHandle>()).
-                Returns(true);
-
-            _fakeLoginManager.
-                SubscribeOnLogOut(Arg.Any<string>(), Arg.Any<UserLoggedOutHandle>()).
-                Returns(true);
-
-            _uut.CreateLobby(lobbyId, usernameToJoin);
-
-
-            // Act
-            var removed = _uut.RemoveUserFromLobby(lobbyId, usernameToJoin);
-
-            // Assert
-            Assert.That(removed == true, Is.EqualTo(true));
-            Assert.That(_uut.);
-        }
 
     }
 }

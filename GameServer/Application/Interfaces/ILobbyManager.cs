@@ -10,6 +10,6 @@ namespace Application.Interfaces
         ICollection<string> CurrentLobbyCollection { get; }
         bool AddUserToLobby(string lobbyId, string username);
         bool RemoveUserFromLobby(string lobbyId, string username);
-        bool UpdateLobby(string lobbyId, string adminUsername, ILobby lobby);
+        bool UpdateLobby(string lobbyId, ILobby lobby);
     }
 }
