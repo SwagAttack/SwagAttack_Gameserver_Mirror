@@ -38,9 +38,9 @@ namespace Application.Test.Unittests
 
             // Assert
 
-            Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username), Is.EqualTo(true)); 
-            Assert.That(_uut.LoggedInUsers[user.Username].Expiration.CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
-            Assert.That(_uut.LoggedInUsers[user.Username].Expiration.CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username.ToLower()), Is.EqualTo(true)); 
+            Assert.That(_uut.LoggedInUsers[user.Username.ToLower()].Expiration.CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers[user.Username.ToLower()].Expiration.CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
         }
 
         [Test]
@@ -64,9 +64,9 @@ namespace Application.Test.Unittests
 
             // Assert
 
-            Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username), Is.EqualTo(true));
-            Assert.That(_uut.LoggedInUsers[user.Username].Expiration.CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
-            Assert.That(_uut.LoggedInUsers[user.Username].Expiration.CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username.ToLower()), Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers[user.Username.ToLower()].Expiration.CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers[user.Username.ToLower()].Expiration.CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
         }
 
         [Test]
@@ -95,7 +95,7 @@ namespace Application.Test.Unittests
 
             // Assert
 
-            Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username), Is.EqualTo(false));
+            Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username.ToLower()), Is.EqualTo(false));
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace Application.Test.Unittests
 
             // Assert
 
-            Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username), Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username.ToLower()), Is.EqualTo(true));
         }
 
         [Test]
@@ -189,8 +189,8 @@ namespace Application.Test.Unittests
 
             // Assert
 
-            Assert.That(_uut.LoggedInUsers[user.Username].Expiration.CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
-            Assert.That(_uut.LoggedInUsers[user.Username].Expiration.CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers[user.Username.ToLower()].Expiration.CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
+            Assert.That(_uut.LoggedInUsers[user.Username.ToLower()].Expiration.CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
         }
 
         [TestCase("UsernameOne", "UsernameOne", true)] // Correct user

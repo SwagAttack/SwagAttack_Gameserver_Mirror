@@ -54,6 +54,7 @@ namespace Application.Controllers
                 if (username == user.Username)
                 {
                     _unitOfWork.UserRepository.ReplaceUser(user);
+                    _loginManager.Login(user);
                     return user;
                 }
 
