@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
@@ -63,7 +64,7 @@ namespace Domain.Models
         public void UpdateAdmin()
         {
             _usernames.Remove(AdminUserName);
-            AdminUserName = Usernames.GetEnumerator().Current;
+            AdminUserName = Usernames.ElementAt(0);
         }
     }
 }
