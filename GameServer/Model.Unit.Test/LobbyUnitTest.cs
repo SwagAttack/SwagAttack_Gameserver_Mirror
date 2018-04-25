@@ -21,7 +21,7 @@ namespace Model.Unit.Test
         {
             _adminUser = Substitute.For<IUser>();
             _adminUser.Username = "MacroMan";
-            _uut = new Lobby(_adminUser);
+            _uut = new Lobby(_adminUser.Username);
         }
 
         [Test]
@@ -32,7 +32,7 @@ namespace Model.Unit.Test
             fakeUser1.Username = "IAmATestUser1";
 
             //act
-            _uut.AddUser(fakeUser1);
+            _uut.AddUser(fakeUser1.Username);
             var result = _uut.Usernames;
 
             //assert
@@ -50,8 +50,8 @@ namespace Model.Unit.Test
             fakeUser2.Username = "IAmATestUser2";
 
             //act
-            _uut.AddUser(fakeUser1);
-            _uut.AddUser(fakeUser2);
+            _uut.AddUser(fakeUser1.Username);
+            _uut.AddUser(fakeUser2.Username);
             var result = _uut.Usernames;
             
 
@@ -80,11 +80,11 @@ namespace Model.Unit.Test
             fakeUser5.Username = "IAmATestUser5";
 
             //act
-            _uut.AddUser(fakeUser1);
-            _uut.AddUser(fakeUser2);
-            _uut.AddUser(fakeUser3);
-            _uut.AddUser(fakeUser4);
-            _uut.AddUser(fakeUser5);
+            _uut.AddUser(fakeUser1.Username);
+            _uut.AddUser(fakeUser2.Username);
+            _uut.AddUser(fakeUser3.Username);
+            _uut.AddUser(fakeUser4.Username);
+            _uut.AddUser(fakeUser5.Username);
             var result = _uut.Usernames;
 
             //assert
@@ -101,7 +101,7 @@ namespace Model.Unit.Test
             fakeUser1.Username = "IAmATestUser1";
 
             //act
-            _uut.AddUser(fakeUser1);
+            _uut.AddUser(fakeUser1.Username);
             var result = _uut.Usernames.ElementAt(1);
             //assert
             Assert.That(result, Is.EqualTo(fakeUser1.Username));
@@ -119,9 +119,9 @@ namespace Model.Unit.Test
             fakeUser2.Username = "IAmATestUser2";
 
             //act
-            _uut.AddUser(fakeUser1);
-            _uut.AddUser(fakeUser2);
-            _uut.RemoveUser(fakeUser1);
+            _uut.AddUser(fakeUser1.Username);
+            _uut.AddUser(fakeUser2.Username);
+            _uut.RemoveUser(fakeUser1.Username);
             var result = _uut.Usernames;
 
 
@@ -150,15 +150,15 @@ namespace Model.Unit.Test
             fakeUser5.Username = "IAmATestUser5";
 
             //act
-            _uut.AddUser(fakeUser1);
-            _uut.AddUser(fakeUser2);
-            _uut.AddUser(fakeUser3);
-            _uut.AddUser(fakeUser4);
-            _uut.AddUser(fakeUser5);
-            _uut.RemoveUser(fakeUser5);
-            _uut.RemoveUser(fakeUser4);
-            _uut.RemoveUser(fakeUser3);
-            _uut.RemoveUser(fakeUser2);
+            _uut.AddUser(fakeUser1.Username);
+            _uut.AddUser(fakeUser2.Username);
+            _uut.AddUser(fakeUser3.Username);
+            _uut.AddUser(fakeUser4.Username);
+            _uut.AddUser(fakeUser5.Username);
+            _uut.RemoveUser(fakeUser5.Username);
+            _uut.RemoveUser(fakeUser4.Username);
+            _uut.RemoveUser(fakeUser3.Username);
+            _uut.RemoveUser(fakeUser2.Username);
             var result = _uut.Usernames;
 
             //assert
@@ -176,8 +176,8 @@ namespace Model.Unit.Test
             fakeUser2.Username = "IAmATestUser2";
 
             //act
-            _uut.AddUser(fakeUser1);
-            _uut.AddUser(fakeUser2);
+            _uut.AddUser(fakeUser1.Username);
+            _uut.AddUser(fakeUser2.Username);
             _uut.UpdateAdmin();
             var result = _uut.Usernames;
 
@@ -198,8 +198,8 @@ namespace Model.Unit.Test
             fakeUser2.Username = "IAmATestUser2";
 
             //act
-            _uut.AddUser(fakeUser1);
-            _uut.AddUser(fakeUser2);
+            _uut.AddUser(fakeUser1.Username);
+            _uut.AddUser(fakeUser2.Username);
             _uut.UpdateAdmin();
             var result = _uut.AdminUserName;
 

@@ -8,8 +8,8 @@ namespace Domain.Interfaces
         string AdminUserName { get; set; }
         string Id { get; set; }
 
-        void AddUser(IUser user);
-        void RemoveUser(IUser user);
+        void AddUser(string username);
+        void RemoveUser(string username);
         void UpdateAdmin();
     }
 }

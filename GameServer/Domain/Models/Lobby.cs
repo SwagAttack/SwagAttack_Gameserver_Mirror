@@ -33,29 +33,29 @@ namespace Domain.Models
         /// Constructor setups lobby, sets AdminUsername, initiates _usernames and adds a user to the list.
         /// </summary>
         /// <param name="user"></param>
-        public Lobby(IUser user)
+        public Lobby(string adminUsername)
         {
-            AdminUserName = user.Username;
+            AdminUserName = adminUsername;
             _usernames = new Collection<string>();
-            AddUser(user);
+            AddUser(adminUsername);
         }
 
         /// <summary>
         /// Adds a user to the private collection of usernames.
         /// </summary>
         /// <param name="user"></param>
-        public void AddUser(IUser user)
+        public void AddUser(string username)
         {
-            _usernames.Add(user.Username);
+            _usernames.Add(username);
         }
 
         /// <summary>
         /// Removes a user from the private collection of usernames.
         /// </summary>
         /// <param name="user"></param>
-        public void RemoveUser(IUser user)
+        public void RemoveUser(string username)
         {
-            _usernames.Remove(user.Username);
+            _usernames.Remove(username);
         }
 
         /// <summary>
