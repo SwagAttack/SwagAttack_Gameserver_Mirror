@@ -1,15 +1,13 @@
+using Application.Controllers;
+using Application.Interfaces;
+using Application.Managers;
+using Communication.Formatters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Application.Controllers;
-using Application.Interfaces;
-using Application.Managers;
-using Application.Misc;
-using Persistance.UnitOfWork;
 using Persistance;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Rewrite;
+using Persistance.UnitOfWork;
 
 namespace Communication
 {
@@ -27,9 +25,11 @@ namespace Communication
         {
             services.AddMvc(options =>
             {
-                options.Filters.Add(new RequireHttpsAttribute());
+                //options.Filters.Add(typeof(ValidateModelStateAttribute));
+                //options.Filters.Add(new RequireHttpsAttribute());
+                options.InputFormatters.Insert(0, new JsonInputFormatter());
             });
-           
+
             services.AddTransient<IUnitOfWork>(u => new UnitOfWork(new DbContext()));
             services.AddSingleton(l => LoginManager.GetInstance());
             services.AddTransient<IUserController, UserController>();
@@ -38,13 +38,10 @@ namespace Communication
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
-            var options = new RewriteOptions().AddRedirectToHttps();
-            app.UseRewriter(options);
+            //var options = new RewriteOptions().AddRedirectToHttps();
+            //app.UseRewriter(options);
 
             app.UseMvc();
         }

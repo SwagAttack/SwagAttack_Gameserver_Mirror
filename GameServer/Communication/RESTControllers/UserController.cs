@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using Application.Interfaces;
 using Communication.Filters;
-using Communication.ModelBinders;
 using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,16 +20,11 @@ namespace Communication.RESTControllers
             _userController = controller;
         }
 
-        /// <summary>
-        ///     Auhentication dictionary
-        /// </summary>
-        public Dictionary<string, string> AuthToken { get; set; } = new Dictionary<string, string>();
-
-        [HttpPost("Login", Name = "GetUser")]
+        [HttpGet("Login", Name = "GetUser")]
         [ValidateModelState]
-        public IActionResult GetUser([ModelBinder(typeof(FromDto))] LoginDto loginInfo)
+        public IActionResult GetUser([FromHeader] string username, [FromHeader] string password)
         {
-            var result = _userController.GetUser(loginInfo.Username, loginInfo.Password);
+            var result = _userController.GetUser(username, password);
 
             // User is found and has been logged in
             if (result != null)
@@ -42,7 +35,7 @@ namespace Communication.RESTControllers
 
         [HttpPost]
         [ValidateModelState]
-        public IActionResult CreateUser([ModelBinder(typeof(FromDto))] User rawUser)
+        public IActionResult CreateUser([FromBody] User rawUser)
         {
             var result = _userController.CreateUser(rawUser);
 
@@ -52,48 +45,18 @@ namespace Communication.RESTControllers
         }
 
         [HttpPut]
-        [ValidateModelState(Order = 1)]
-        [Authentication(Order = 2)]
-        public IActionResult UpdateUser([ModelBinder(typeof(FromDto))] User user)
+        [ValidateModelState]
+        [AuthorizationSwag]
+        public IActionResult UpdateUser([FromHeader] string username, [FromBody] User user)
         {
-            if (AuthToken.Count == 2 && AuthToken.ContainsKey("username"))
+            if (username != null)
             {
-                var result = _userController.UpdateUser(AuthToken["username"], user);
+                var result = _userController.UpdateUser(username, user);
 
                 if (result != null) return CreatedAtRoute("GetUser", result);
             }
 
             return BadRequest();
-        }
-
-        public class LoginDto
-        {
-            private string _password;
-            private string _username;
-
-            public string Username
-            {
-                get => _username;
-                set
-                {
-                    if (string.IsNullOrEmpty(value))
-                        throw new ArgumentException("Username must be set");
-
-                    _username = value;
-                }
-            }
-
-            public string Password
-            {
-                get => _password;
-                set
-                {
-                    if (string.IsNullOrEmpty(value))
-                        throw new ArgumentException("Password must be set");
-
-                    _password = value;
-                }
-            }
         }
     }
 }

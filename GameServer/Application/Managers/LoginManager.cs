@@ -65,18 +65,18 @@ namespace Application.Managers
         {
             lock (_loggedInUsers)
             {
-                if (!_loggedInUsers.ContainsKey(user.Username))
+                if (!_loggedInUsers.ContainsKey(user.Username.ToLower()))
                 {
                     var loggedInUser = new LoggedInUser(
                         username: user.Username,
                         password: user.Password,
                         expiring: timeout);
 
-                    _loggedInUsers[user.Username] = loggedInUser;
+                    _loggedInUsers[user.Username.ToLower()] = loggedInUser;
                 }
                 else
                 {
-                    _loggedInUsers[user.Username].Update(user.Password);
+                    _loggedInUsers[user.Username.ToLower()].Update(user.Password);
                 }
             }
         }
@@ -90,9 +90,9 @@ namespace Application.Managers
         {
             lock(_loggedInUsers)
             {
-                if (_loggedInUsers.ContainsKey(username))
+                if (_loggedInUsers.ContainsKey(username.ToLower()))
                 {
-                    var loggedInUser = _loggedInUsers[username];
+                    var loggedInUser = _loggedInUsers[username.ToLower()];
                     if (password == loggedInUser.Password)
                     {
                         loggedInUser.Update();
@@ -108,18 +108,18 @@ namespace Application.Managers
         {
             lock (_loggedInUsers)
             {
-                if (!_loggedInUsers.ContainsKey(username))
+                if (!_loggedInUsers.ContainsKey(username.ToLower()))
                     return false;
             }
 
             lock (_listeners)
             {
-                if (!_listeners.ContainsKey(username))
+                if (!_listeners.ContainsKey(username.ToLower()))
                 {
-                    _listeners.Add(username, new HashSet<UserLoggedOutHandle>());
+                    _listeners.Add(username.ToLower(), new HashSet<UserLoggedOutHandle>());
                 }
 
-                return _listeners[username].Add(handle);
+                return _listeners[username.ToLower()].Add(handle);
             }
         }
 
@@ -127,10 +127,16 @@ namespace Application.Managers
         {
             lock (_listeners)
             {
-                if (!_listeners.ContainsKey(username))
+                if (!_listeners.ContainsKey(username.ToLower()))
                     return false;
 
-                return _listeners[username].Remove(handle);
+                if (!_listeners[username.ToLower()].Remove(handle))
+                    return false;
+
+                if (_listeners[username.ToLower()].Count == 0)
+                    _listeners.Remove(username.ToLower());
+
+                return true;
             }
         }
 
@@ -153,15 +159,13 @@ namespace Application.Managers
 
             lock (_loggedInUsers)
             {
-                foreach (var username in _loggedInUsers.Keys.ToList())
+                foreach (var user in _loggedInUsers.Values.ToList())
                 {
-                    // Get the user
-                    var loggedInUser = _loggedInUsers[username];
                     // User expired
-                    if (loggedInUser.Expiration.CompareTo(now) < 0)
+                    if (user.Expiration.CompareTo(now) < 0)
                     {
-                        loggedOutUsers.Add(username);
-                        _loggedInUsers.Remove(username);                      
+                        loggedOutUsers.Add(user.Username);
+                        _loggedInUsers.Remove(user.Username.ToLower());                      
                     }
                 }
             }
@@ -170,9 +174,9 @@ namespace Application.Managers
             {
                 foreach (var username in loggedOutUsers)
                 {
-                    if (_listeners.ContainsKey(username))
+                    if (_listeners.ContainsKey(username.ToLower()))
                     {
-                        foreach (var handler in _listeners[username].ToList())
+                        foreach (var handler in _listeners[username.ToLower()].ToList())
                         {
                             handler.Invoke(this, username);
                         }
