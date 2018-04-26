@@ -9,7 +9,7 @@ using Persistance.UnitOfWork;
 namespace IT_Core
 {
 
-    [TestFixture]
+    //[TestFixture] <--- Er blevet udkommenteret, da en textFixture uden tests får Travis til at fejle
     public class IT_Test
     {
 
