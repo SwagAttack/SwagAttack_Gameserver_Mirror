@@ -1,4 +1,5 @@
-﻿using Communication.Filters;
+﻿using System.Threading.Tasks;
+using Communication.Filters;
 using Communication.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,7 +11,7 @@ namespace Communication.RESTControllers
     [Produces("application/json")]
     [Route("api/Lobby")]
     [AuthorizationSwag]
-    public class LobbyController : Controller, ILobbyController
+    public class LobbyController : Controller
     {
         private readonly Application.Interfaces.ILobbyController _lobbyController;
         public LobbyController(Application.Interfaces.ILobbyController lobbyController)
@@ -19,42 +20,42 @@ namespace Communication.RESTControllers
         }
 
         [HttpGet("{lobbyId}", Name = "GetLobby")]
-        public IActionResult GetLobby(string lobbyId)
+        public async Task<IActionResult> GetLobbyAsync(string lobbyId)
         {
-            var lobby = _lobbyController.GetLobbyById(lobbyId);
+            var lobby = await _lobbyController.GetLobbyByIdAsync(lobbyId);
             if (lobby == null)
                 return NotFound();
             return new ObjectResult(lobby);
         }
 
         [HttpGet]
-        public IActionResult GetAllLobbies()
+        public async Task<IActionResult> GetAllLobbiesAsync()
         {
-            return new ObjectResult(_lobbyController.GetAllLobbies());
+            return new ObjectResult(await _lobbyController.GetAllLobbiesAsync());
         }
 
-        [HttpPost("Join/{lobbyId}")]
-        public IActionResult JoinLobby(string lobbyId, [FromHeader] string username)
+        [HttpPost("Join")]
+        public async Task<IActionResult> JoinLobbyAsync(string lobbyId, [FromHeader] string username)
         {
-            var lobby = _lobbyController.JoinLobby(lobbyId, username);
+            var lobby = await _lobbyController.JoinLobbyAsync(lobbyId, username);
             if (lobby == null)
                 return BadRequest();
             return CreatedAtRoute("GetLobby", new { lobbyId = lobby.Id}, lobby);
         }
 
-        [HttpPost("Leave/{lobbyId}")]
-        public IActionResult LeaveLobby(string lobbyId, [FromHeader] string username)
+        [HttpPost("Leave")]
+        public async Task<IActionResult> LeaveLobbyAsync(string lobbyId, [FromHeader] string username)
         {
-            var result = _lobbyController.LeaveLobby(lobbyId, username);
+            var result = await _lobbyController.LeaveLobbyAsync(lobbyId, username);
             if (!result)
                 return BadRequest();
             return Ok();
         }
 
-        [HttpPost("Create/{lobbyId}")]
-        public IActionResult CreateLobby(string lobbyId, [FromHeader] string username)
+        [HttpPost("Create")]
+        public async Task<IActionResult> CreateLobbyAsync(string lobbyId, [FromHeader] string username)
         {
-            var lobby = _lobbyController.CreateLobby(lobbyId, username);
+            var lobby = await _lobbyController.CreateLobbyAsync(lobbyId, username);
             if (lobby == null)
                 return BadRequest();
             return CreatedAtRoute("GetLobby", new { lobbyId = lobby.Id }, lobby);
