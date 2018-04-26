@@ -77,10 +77,6 @@ namespace Communication.RESTControllers
 				return Ok(_lobbyManager.RemoveUserFromLobby(LobbyId, username));
 			}
 		    return BadRequest();
-			//return user in lobby
-			List<string> returnList = new List<string>();
-
-		    return Ok(returnList);
 	    }
 	}
 }
