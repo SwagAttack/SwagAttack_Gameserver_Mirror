@@ -14,7 +14,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.Test.Unittests"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistance.Test.Unittests.Local", "Persistance.Test.Unittests_Local\Persistance.Test.Unittests.Local.csproj", "{087A2972-8DEB-4E0A-8658-7851C074152C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Model.Unit.Test", "Model.Unit.Test\Model.Unit.Test.csproj", "{FFE3A725-A9D9-47D6-A1C2-427A481AD896}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain.Test.Unittests", "Domain.Test.Unittests\Domain.Test.Unittests.csproj", "{FFE3A725-A9D9-47D6-A1C2-427A481AD896}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT_Core", "ITTestCore\IT_Core.csproj", "{3ECFA83F-3488-4BF9-9857-63D00AD21097}"
 EndProject

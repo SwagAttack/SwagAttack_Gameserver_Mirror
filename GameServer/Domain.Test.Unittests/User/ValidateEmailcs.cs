@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Domain.Interfaces;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
-namespace Model.Unit.Test.User
+namespace Domain.Test.Unittests.User
 {   
     [TestFixture]
     class ValidateEmailcs

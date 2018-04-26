@@ -1,9 +1,8 @@
 ﻿using System;
 using Domain.Interfaces;
-
 using NUnit.Framework;
 
-namespace Model.Unit.Test.User
+namespace Domain.Test.Unittests.User
 {
     [TestFixture]
     internal class ValidateUsername

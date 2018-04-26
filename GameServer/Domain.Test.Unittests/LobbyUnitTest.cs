@@ -1,13 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Linq;
 using Domain.Interfaces;
 using Domain.Models;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace Model.Unit.Test
+namespace Domain.Test.Unittests
 {
     [TestFixture]
     public class LobbyUnitTest
