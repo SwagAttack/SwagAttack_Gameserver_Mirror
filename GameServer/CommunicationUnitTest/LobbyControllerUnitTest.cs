@@ -13,14 +13,14 @@ namespace CommunicationUnitTest
 	public class LobbyControllerUnitTest
 	{
 		private ILobbyController _uut;
-		private ILobbyManager _fakelobbyManager;
+		//private ILobbyManager _fakelobbyManager;
 	//	private RestClient _client;
 
 		[SetUp]
 		public void setup()
 		{
-			_fakelobbyManager = Substitute.For<ILobbyManager>();
-			_uut = new LobbyController(_fakelobbyManager);
+			//_fakelobbyManager = Substitute.For<ILobbyManager>();
+			//_uut = new LobbyController(_fakelobbyManager);
 			//_client = new RestClient("http://localhost");
 		}
 

@@ -9,13 +9,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Communication.RESTControllers
 {
-    public class LobbyController : Controller, ILobbyController
+   /* public class LobbyController : Controller , ILobbyController
 	{
 	    private readonly ILobbyManager _lobbyManager;
 
 	    public LobbyController(ILobbyManager lobbyController)
 	    {
-		    _lobbyManager = lobbyController;
+		   // _lobbyManager = lobbyController;
 
 	    }
 
@@ -78,5 +78,5 @@ namespace Communication.RESTControllers
 			}
 		    return BadRequest();
 	    }
-	}
+	}*/
 }
