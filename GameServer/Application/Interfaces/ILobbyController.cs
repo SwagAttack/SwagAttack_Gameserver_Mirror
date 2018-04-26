@@ -15,6 +15,7 @@ namespace Application.Interfaces
         ILobby CreateLobby(string lobbyId, string adminUsername);
         ILobby JoinLobby(string lobbyId, string username);
         bool LeaveLobby(string lobbyId, string username);
+        ILobby GetLobbyById(string lobbyId);
 
         /// <summary>
         /// Might not be useful. Is meant to update a lobby in scenarios where the admin user wishes
@@ -31,5 +32,7 @@ namespace Application.Interfaces
         Task<bool> LeaveLobbyAsync(string lobbyid, string username);
         Task<ILobby> UpdateLobbyAsync(string adminUsername, ILobby lobby);
         Task<ICollection<string>> GetAllLobbiesAsync();
+
+        Task<ILobby> GetLobbyByIdAsync(string lobbyId);
     }
 }

@@ -1,82 +1,63 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Web.Http;
-using System.Web.Http.Description;
-using Application.Interfaces;
 using Communication.Filters;
-using Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Communication.RESTControllers
 {
-   /* public class LobbyController : Controller , ILobbyController
-	{
-	    private readonly ILobbyManager _lobbyManager;
+    // <summary>
+    // Http Api Lobby Controller
+    // </summary>
+    [Produces("application/json")]
+    [Route("api/Lobby")]
+    [AuthorizationSwag]
+    public class LobbyController : Controller, ILobbyController
+    {
+        private readonly Application.Interfaces.ILobbyController _lobbyController;
+        public LobbyController(Application.Interfaces.ILobbyController lobbyController)
+        {
+            _lobbyController = lobbyController;
+        }
 
-	    public LobbyController(ILobbyManager lobbyController)
-	    {
-		   // _lobbyManager = lobbyController;
+        [HttpGet("{lobbyId}", Name = "GetLobby")]
+        public IActionResult GetLobby(string lobbyId)
+        {
+            var lobby = _lobbyController.GetLobbyById(lobbyId);
+            if (lobby == null)
+                return NotFound();
+            return new ObjectResult(lobby);
+        }
 
-	    }
+        [HttpGet]
+        public IActionResult GetAllLobbies()
+        {
+            return new ObjectResult(_lobbyController.GetAllLobbies());
+        }
 
-	    [ResponseType(typeof(List<ILobby>))]
-		[Microsoft.AspNetCore.Mvc.HttpGet]
-		[AuthorizationSwag]
-		public IActionResult GetAllLobby([FromHeader] string username)
-		{
-			if (username != null)
-			{
-				return Ok(_lobbyManager.CurrentLobbyCollection);
-			}
-			return BadRequest();
-		}
+        [HttpPost("Join/{lobbyId}")]
+        public IActionResult JoinLobby(string lobbyId, [FromHeader] string username)
+        {
+            var lobby = _lobbyController.JoinLobby(lobbyId, username);
+            if (lobby == null)
+                return BadRequest();
+            return CreatedAtRoute("GetLobby", new { lobbyId = lobby.Id}, lobby);
+        }
 
-	    [Microsoft.AspNetCore.Mvc.HttpGet]
-	    [AuthorizationSwag]
-	    public IActionResult GetLobbyById([FromHeader] string username,[FromHeader] string LobbyId)
-	    {
-		    if (username != null)
-		    {
-			    return Ok(_lobbyManager.GetLobby(LobbyId));
-		    }
-		    return BadRequest();
-	    }
+        [HttpPost("Leave/{lobbyId}")]
+        public IActionResult LeaveLobby(string lobbyId, [FromHeader] string username)
+        {
+            var result = _lobbyController.LeaveLobby(lobbyId, username);
+            if (!result)
+                return BadRequest();
+            return Ok();
+        }
 
-	    [ResponseType(typeof(List<string>))]
-	    [Microsoft.AspNetCore.Mvc.HttpPut("Join", Name = "PutUserIn")]
-	    [AuthorizationSwag]
-		public IActionResult PutUserIn([FromHeader] string username, [FromUri]string LobbyId)
-	    {
-
-		    if (username != null)
-		    {
-			    return Ok(_lobbyManager.AddUserToLobby(LobbyId, username));
-		    }
-		    return BadRequest();
-		}
-
-		[Microsoft.AspNetCore.Mvc.HttpPut("Create", Name = "PostCreateLobby")]
-		[AuthorizationSwag]
-		public IActionResult PostCreateLobby([FromHeader]string username, [FromUri]string LobbyId)
-		{
-			if (username != null)
-			{
-				return Ok(_lobbyManager.CreateLobby(LobbyId, username));
-			}
-			return BadRequest();
-		}
-
-		[ResponseType(typeof(List<string>))]
-	    [Microsoft.AspNetCore.Mvc.HttpPut("Leave", Name = "PutRemoveUser")]
-		[AuthorizationSwag]
-		public IActionResult PutRemoveUser([FromHeader] string username, [FromUri]string LobbyId)
-	    {
-
-		    if (username != null)
-		    {
-				return Ok(_lobbyManager.RemoveUserFromLobby(LobbyId, username));
-			}
-		    return BadRequest();
-	    }
-	}*/
+        [HttpPost("Create/{lobbyId}")]
+        public IActionResult CreateLobby(string lobbyId, [FromHeader] string username)
+        {
+            var lobby = _lobbyController.CreateLobby(lobbyId, username);
+            if (lobby == null)
+                return BadRequest();
+            return CreatedAtRoute("GetLobby", new { lobbyId = lobby.Id }, lobby);
+        }
+    }
 }

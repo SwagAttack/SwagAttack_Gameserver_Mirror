@@ -97,6 +97,11 @@ namespace Application.Controllers
             return LeaveLobbyAsync(lobbyId, username).Result;
         }
 
+        public ILobby GetLobbyById(string lobbyId)
+        {
+            return GetLobbyByIdAsync(lobbyId).Result;
+        }
+
         public ILobby UpdateLobby(string adminUsername, ILobby lobby)
         {
             throw new NotImplementedException();
@@ -182,6 +187,18 @@ namespace Application.Controllers
             using (await _smartLock.LockAsync())
             {
                 return _lobbyDictionary.Keys.ToList();
+            }
+        }
+
+        public async Task<ILobby> GetLobbyByIdAsync(string lobbyId)
+        {
+            using (await _smartLock.LockAsync())
+            {
+                if (_lobbyDictionary.TryGetValue(lobbyId, out var lobby))
+                {
+                    return lobby;
+                }
+                return null;
             }
         }
 

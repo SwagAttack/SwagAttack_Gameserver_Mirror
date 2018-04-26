@@ -13,7 +13,7 @@ namespace IT_Core
     public class IT_Test
     {
 
-        UserController.LoginDto LoginInfo = new UserController.LoginDto();
+        //UserController.LoginDto LoginInfo = new UserController.LoginDto();
         string user = "Username";
         string pass = "Pass";
         
@@ -29,7 +29,7 @@ namespace IT_Core
         public void Setup()
         {
 
-            UserController.LoginDto LoginInfo = new UserController.LoginDto();
+            //UserController.LoginDto LoginInfo = new UserController.LoginDto();
             string user = "UsernameIT";
             string givename = "GivennameIT";
             string last = "LastNameIT";
