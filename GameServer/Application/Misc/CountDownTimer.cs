@@ -10,14 +10,14 @@ namespace Application.Misc
         public event EventHandler TickEvent;
         public event EventHandler ExpiredEvent;
 
-        private readonly System.Timers.Timer _timeoutTimer;
+        private readonly Timer _timeoutTimer;
         private int _timeRemainingInSeconds;
 
         public CountDownTimer()
         {
-            _timeoutTimer = new System.Timers.Timer();
+            _timeoutTimer = new Timer();
 
-            _timeoutTimer.Elapsed += new ElapsedEventHandler(OnTimerEvent);
+            _timeoutTimer.Elapsed += OnTimerEvent;
             _timeoutTimer.Interval = 1000;
             _timeoutTimer.AutoReset = true;
         }

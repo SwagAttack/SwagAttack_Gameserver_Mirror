@@ -195,7 +195,7 @@ namespace Application.Test.Unittests
         #region LeaveLobbyAsync
 
         [Test]
-        public void LeaveLobbyAsync_LobbyExistsWithMoreThanOneUserAndContainsUser_UserIsRemoved()
+        public void LeaveLobbyAsync_LobbyExistsWithMoreThanOneUserAndContainsUser_UserIsRemovedReturnsTrue()
         {
             // Arrange
 
@@ -212,16 +212,17 @@ namespace Application.Test.Unittests
 
             // Act
 
-            _uut.LeaveLobbyAsync(LOBBY_ID, ANOTHER_USERNAME).Wait();
+            var result = _uut.LeaveLobbyAsync(LOBBY_ID, ANOTHER_USERNAME).Result;
 
             // Assert
 
+            Assert.That(result);
             Assert.That(_uut.LobbyDictionary[LOBBY_ID].Usernames.Count, Is.EqualTo(1));
             Assert.That(_uut.LobbyDictionary[LOBBY_ID].Usernames.Contains(ANOTHER_USERNAME), Is.EqualTo(false));
         }
 
         [Test]
-        public void LeaveLobbyAsync_LobbyExistAndContainsOnlyUser_LobbyIsRemoved()
+        public void LeaveLobbyAsync_LobbyExistAndContainsOnlyUser_LobbyIsRemovedReturnsTrue()
         {
             // Arrange
 
@@ -235,10 +236,11 @@ namespace Application.Test.Unittests
 
             // Act
 
-            _uut.LeaveLobbyAsync(LOBBY_ID, USERNAME).Wait();
+            var result = _uut.LeaveLobbyAsync(LOBBY_ID, USERNAME).Result;
 
             // Assert
 
+            Assert.That(result);
             Assert.That(!_uut.LobbyDictionary.ContainsKey(LOBBY_ID));
         }
 
@@ -265,7 +267,7 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void LeaveLobbyAsync_LobbyExistsAndDoesntContainUser_DoesntUnsubscribeToUsername()
+        public void LeaveLobbyAsync_LobbyExistsAndDoesntContainUser_DoesntUnsubscribeToUsernameReturnsFalse()
         {
             // Arrange
 
@@ -280,10 +282,11 @@ namespace Application.Test.Unittests
 
             // Act
 
-            _uut.LeaveLobbyAsync(LOBBY_ID, ANOTHER_USERNAME).Wait();
+            var result = _uut.LeaveLobbyAsync(LOBBY_ID, ANOTHER_USERNAME).Result;
 
             // Assert
 
+            Assert.That(!result);
             _fakeLoginManager.DidNotReceive().UnsubscribeOnLogOut(Arg.Any<string>(), Arg.Any<UserLoggedOutHandle>());
         }
 

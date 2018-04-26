@@ -14,7 +14,7 @@ namespace Application.Interfaces
         /// <returns name="ILobby">Returns a new lobby with the passed information if the lobby id isen't taken and if the user is not currently attached to another lobby. Else null.</returns>
         ILobby CreateLobby(string lobbyId, string adminUsername);
         ILobby JoinLobby(string lobbyId, string username);
-        void LeaveLobby(string lobbyId, string username);
+        bool LeaveLobby(string lobbyId, string username);
 
         /// <summary>
         /// Might not be useful. Is meant to update a lobby in scenarios where the admin user wishes
@@ -28,7 +28,7 @@ namespace Application.Interfaces
 
         Task<ILobby> CreateLobbyAsync(string lobbyId, string adminUsername);
         Task<ILobby> JoinLobbyAsync(string lobbyId, string username);
-        Task LeaveLobbyAsync(string lobbyid, string username);
+        Task<bool> LeaveLobbyAsync(string lobbyid, string username);
         Task<ILobby> UpdateLobbyAsync(string adminUsername, ILobby lobby);
         Task<ICollection<string>> GetAllLobbiesAsync();
     }
