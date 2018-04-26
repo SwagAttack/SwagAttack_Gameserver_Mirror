@@ -1,7 +1,6 @@
-﻿using System.Web.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Communication.RESTControllers
+namespace Communication.Interfaces
 {
 	public interface ILobbyController
 	{

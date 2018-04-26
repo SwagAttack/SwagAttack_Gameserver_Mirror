@@ -1,5 +1,5 @@
-﻿using System;
-using Communication.Filters;
+﻿using Communication.Filters;
+using Communication.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Communication.RESTControllers
