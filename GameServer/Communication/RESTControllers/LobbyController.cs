@@ -49,8 +49,8 @@ namespace Communication.RESTControllers
             var result = await _lobbyController.LeaveLobbyAsync(lobbyId, username);
             if (!result)
                 return BadRequest();
-            var test = lobbyId;
-            return RedirectToRoute("GetLobby", new { lobbyId = test });
+            var parameter = lobbyId;
+            return RedirectToRoute("GetLobby", new { lobbyId = parameter });
         }
 
         [HttpPost("Create")]
