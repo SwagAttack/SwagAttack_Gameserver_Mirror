@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using Domain.Interfaces;
+using Newtonsoft.Json;
 
 namespace Domain.Models
 {
@@ -38,6 +39,12 @@ namespace Domain.Models
             AdminUserName = adminUsername;
             _usernames = new Collection<string>();
             AddUser(adminUsername);
+        }
+
+        [JsonConstructor]
+        protected Lobby()
+        {
+
         }
 
         /// <summary>
