@@ -40,7 +40,7 @@ namespace Communication.RESTControllers
             var lobby = await _lobbyController.JoinLobbyAsync(lobbyId, username);
             if (lobby == null)
                 return BadRequest();
-            return CreatedAtRoute("GetLobby", new { lobbyId = lobby.Id}, lobby);
+            return CreatedAtRoute("GetLobby", new { lobbyId = lobby.Id }, lobby);
         }
 
         [HttpPost("Leave")]
@@ -49,7 +49,8 @@ namespace Communication.RESTControllers
             var result = await _lobbyController.LeaveLobbyAsync(lobbyId, username);
             if (!result)
                 return BadRequest();
-            return Ok();
+            var test = lobbyId;
+            return RedirectToRoute("GetLobby", new { lobbyId = test });
         }
 
         [HttpPost("Create")]

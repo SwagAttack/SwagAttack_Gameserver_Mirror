@@ -44,7 +44,7 @@ namespace Domain.Models
         [JsonConstructor]
         protected Lobby()
         {
-
+            _usernames = new Collection<string>();
         }
 
         /// <summary>
