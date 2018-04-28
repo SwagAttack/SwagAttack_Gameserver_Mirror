@@ -10,7 +10,6 @@ namespace Communication.RESTControllers
     // </summary>
     [Produces("application/json")]
     [Route("api/Lobby")]
-    [AuthorizationSwag]
     public class LobbyController : Controller
     {
         private readonly Application.Interfaces.ILobbyController _lobbyController;
@@ -19,6 +18,7 @@ namespace Communication.RESTControllers
             _lobbyController = lobbyController;
         }
 
+        // api/Lobby/{lobbyId}
         [HttpGet("{lobbyId}", Name = "GetLobby")]
         public async Task<IActionResult> GetLobbyAsync(string lobbyId)
         {
@@ -35,7 +35,8 @@ namespace Communication.RESTControllers
         }
 
         [HttpPost("Join")]
-        public async Task<IActionResult> JoinLobbyAsync(string lobbyId, [FromHeader] string username)
+        [AuthorizationSwag]
+        public async Task<IActionResult> JoinLobbyAsync([FromQuery]string lobbyId, [FromHeader] string username)
         {
             var lobby = await _lobbyController.JoinLobbyAsync(lobbyId, username);
             if (lobby == null)
@@ -44,7 +45,8 @@ namespace Communication.RESTControllers
         }
 
         [HttpPost("Leave")]
-        public async Task<IActionResult> LeaveLobbyAsync(string lobbyId, [FromHeader] string username)
+        [AuthorizationSwag]
+        public async Task<IActionResult> LeaveLobbyAsync([FromQuery]string lobbyId, [FromHeader] string username)
         {
             var result = await _lobbyController.LeaveLobbyAsync(lobbyId, username);
             if (!result)
@@ -54,7 +56,8 @@ namespace Communication.RESTControllers
         }
 
         [HttpPost("Create")]
-        public async Task<IActionResult> CreateLobbyAsync(string lobbyId, [FromHeader] string username)
+        [AuthorizationSwag]
+        public async Task<IActionResult> CreateLobbyAsync([FromQuery]string lobbyId, [FromHeader] string username)
         {
             var lobby = await _lobbyController.CreateLobbyAsync(lobbyId, username);
             if (lobby == null)

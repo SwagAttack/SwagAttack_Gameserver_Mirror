@@ -56,7 +56,13 @@ namespace Application.Controllers
                     if (targetLobby != null)
                     {
                         targetLobby.RemoveUser(username);
-                        if (targetLobby.Usernames.Count == 0) _lobbyDictionary.Remove(targetLobby.Id);
+                        if (targetLobby.Usernames.Count == 0)
+                        {
+                            _lobbyDictionary.Remove(targetLobby.Id);
+                        }else if (targetLobby.AdminUserName == username)
+                        {
+                            targetLobby.UpdateAdmin();
+                        }
                     }
                 }
 
@@ -166,7 +172,14 @@ namespace Application.Controllers
                     if (lobby.Usernames.Contains(username))
                     {
                         lobby.RemoveUser(username);
-                        if (lobby.Usernames.Count == 0) _lobbyDictionary.Remove(lobby.Id);
+                        if (lobby.Usernames.Count == 0)
+                        {
+                            _lobbyDictionary.Remove(lobby.Id);
+                        }
+                        else if (lobby.AdminUserName == username)
+                        {
+                            lobby.UpdateAdmin();
+                        }
                         result = true;
                     }
             }
