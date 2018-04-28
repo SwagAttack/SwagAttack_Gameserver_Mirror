@@ -3,10 +3,27 @@ mono: latest
 dotnet: 2.0.0
 script:
     - dotnet restore
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "a_UI4alBun_AvMoEQOFU_w"
+   
 before_install:
     - sudo apt install nunit-console
+    - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+addons:
+  coverity_scan:
+    project:
+      name: SwagAttack/SwagAttack_Gameserver_Mirror
+      description: "<Your project description here>"
+    notification_email: jonasna93@gmail.com
+    build_command_prepend: nuget restore GameServer/GameServer.sln
+    build_command: dotnet build GameServer/GameServer.sln
+    branch_pattern: master  
 install:
     - nuget restore GameServer/GameServer.sln
+
 script:
     - dotnet build GameServer/GameServer.sln
     - dotnet vstest **/*tests/bin/Debug/netcoreapp2.0/*tests.dll --ListTests #--logger:"trx;LogFileName=testresultz.trx" --ResultsDirectory:./TestRetults
