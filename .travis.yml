@@ -1,16 +1,31 @@
 language: csharp
 mono: latest
 dotnet: 2.0.0
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "D0v71HpqIkPO1urxxtFQokxGstsbl2yfyLbEt9k4G4cyfS5ITGs+zi2RoeRjBE1INpJYanXhB86iutnyZD4WSWFIXqNHPyhEwskGrcIlv64doQMdXyeq9yH5CNl+BOuGYAh0ZqtEj+iCBkO3aVN5RQyMpXarYTP27jNXUDB9IReZedgTj53tvebaltD0BHgWhP64i9F0Scls84XYihdcdSze1tG+Y/mjFm4D6F5EZh78+efVpIfxTqtzL3FO1TMYH0T7KI/0nOlEMhUaUXnGkSJx6gPg2CbbRFDdMRcrROTgtLTpNJqQ6/FjPpDe5lQIM3/1lLr3TTkyONmTZ+XzZlxdSodKIR9j44TTB3dyseuVuVdUZC3yxATjqYM0gkMX5mCC3o4pLUoSpmJzMJ3d2+4XKpdb01XkZZs7vr+hp+7Q514tFztHqM8FaF5MvI/EhQTGJOFJQdSFbcpAMYBL1zm8i7bdSrNHhA47xPXjrE8TV4wkWsX7MmbNnHu0oKnn8AizUmxuN++6WzlWZxjZAtACqRpFdihXqU5xPMm4eKhdscgbxygYd8jYtjC6oEkiVZriuJVf87lhmGyiaOPgVz8EnmPHsV/oK33PaeZDL8z45fv74XCLm8OK40UEPrXF3ntZd8bVhMc7F8XgPFgbB6biJoJjIOxukd+IS0oWXo0="
 script:
-- dotnet restore
+    - dotnet restore
 before_install:
-- sudo apt install nunit-console
+    - sudo apt install nunit-console
+    - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+addons:
+  coverity_scan:
+    project:
+      name: "SwagAttack/SwagAttack_Gameserver_Mirror"
+      description: "<Your project description here>"
+    notification_email: jonasna93@gmail.com
+    build_command_prepend: "nuget restore GameServer/GameServer.sln"
+    build_command: "dotnet build GameServer/GameServer.sln"
+    branch_pattern: master
 install:
-- nuget restore GameServer/GameServer.sln
+    - nuget restore GameServer/GameServer.sln
 script:
-- dotnet build GameServer/GameServer.sln
-- dotnet vstest **/*tests/bin/Debug/netcoreapp2.0/*tests.dll --ListTests #--logger:"trx;LogFileName=testresultz.trx" --ResultsDirectory:./TestRetults
-- travis_wait dotnet vstest **/*tests/bin/Debug/netcoreapp2.0/*tests.dll
+    - dotnet build GameServer/GameServer.sln
+    - dotnet vstest **/*tests/bin/Debug/netcoreapp2.0/*tests.dll --ListTests #--logger:"trx;LogFileName=testresultz.trx" --ResultsDirectory:./TestRetults
+    - travis_wait dotnet vstest **/*tests/bin/Debug/netcoreapp2.0/*tests.dll
 #deploy:
 #  provider: releases
 #  api_key: "mfadtiInujG8BQjk45kQBA"
