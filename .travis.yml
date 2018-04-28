@@ -7,7 +7,7 @@ env:
   global:
    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
    #   via the "travis encrypt" command using the project repo's public key
-   - secure: "a_UI4alBun_AvMoEQOFU_w"
+   - secure: a_UI4alBun_AvMoEQOFU_w
    
 before_install:
     - sudo apt install nunit-console
@@ -28,6 +28,7 @@ script:
     - dotnet build GameServer/GameServer.sln
     - dotnet vstest **/*tests/bin/Debug/netcoreapp2.0/*tests.dll --ListTests #--logger:"trx;LogFileName=testresultz.trx" --ResultsDirectory:./TestRetults
     - travis_wait dotnet vstest **/*tests/bin/Debug/netcoreapp2.0/*tests.dll
+    - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 #deploy:
 #  provider: releases
 #  api_key: "mfadtiInujG8BQjk45kQBA"
