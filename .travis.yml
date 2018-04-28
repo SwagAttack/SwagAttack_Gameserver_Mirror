@@ -14,7 +14,7 @@ before_install:
 addons:
   coverity_scan:
     project:
-      name: "SwagAttack/SwagAttack_Gameserver_Mirror"
+      name: "GameServer/GameServer"
       description: "<Your project description here>"
     notification_email: jonasna93@gmail.com
     build_command_prepend: "nuget restore GameServer/GameServer.sln"
@@ -24,6 +24,7 @@ install:
     - nuget restore GameServer/GameServer.sln
 script:
     - dotnet build GameServer/GameServer.sln
+    - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
     - dotnet vstest **/*tests/bin/Debug/netcoreapp2.0/*tests.dll --ListTests #--logger:"trx;LogFileName=testresultz.trx" --ResultsDirectory:./TestRetults
     - travis_wait dotnet vstest **/*tests/bin/Debug/netcoreapp2.0/*tests.dll
 #deploy:
