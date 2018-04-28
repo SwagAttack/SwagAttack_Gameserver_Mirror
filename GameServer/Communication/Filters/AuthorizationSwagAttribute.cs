@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using Application.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -22,17 +20,20 @@ namespace Communication.Filters
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var tokens = context.HttpContext.Request.Headers;
+
+            var confirmed = false;
+
             if (tokens.TryGetValue(UserCredentials, out var name) &&
                 tokens.TryGetValue(KeyCredentials, out var pass))
             {
                 var username = name.ToString();
                 var password = pass.ToString();
 
-                if (!LoginManager.CheckLoginStatus(username, password))
-                {
-                    context.Result = new UnauthorizedResult();
-                }
+                confirmed = LoginManager.CheckLoginStatus(username, password);
             }
+
+            if(!confirmed)
+                context.Result = new UnauthorizedResult();
         }
 
     }
