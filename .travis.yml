@@ -7,7 +7,7 @@ env:
   global:
    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
    #   via the "travis encrypt" command using the project repo's public key
-   - secure: a_UI4alBun_AvMoEQOFU_w
+   - secure: "CmbZ2mFFNi8Mi911CV23iaG5r+bCIwW9lMghaLLiLuMg+8NRThcp7h8RsqD8RuWpP5+REYswca9HjBGGYhORd86iHyc3QSxEDxihmi8iFgTYv11rES81pIqNJ68ih82E8vSoNIz21LUIahMuFUf+JBdw24ajb48mErh0FDMazsDwydwD1ngpe89oOTXeGEnxz8pCRPYa7/FXUR0WOK7DXFPEKOoSmG88Jzaf6VjEbkpRjhYzGH4eW3o+6o6dcN9kQ1zFFYBInCQnWxk11SY+E50OrYYxQp7XwTrT82rSVvaEMM8b1XPHPHUMTNuMJd0aHeZ9BCS48bKQx5rLuI8KMmQ0qovXUHViEv5xgedvbxeohgNAzs3W+y6XOaSPvvAiLPOi7uNFSMDLeL1pF10kaAFNczKZfTN/V/DxDLZqzf+3CReXdkDonZS7ZEoAUQVHoXTdfYn3+rhErzjxMJHR/g+DD0NJYYmw4kWTAJ+qHqI9FH9dp+TrU96hnco71LmB0j2PNO0Hw8QUtakEpVyI1XCgxP0UyRx7DJOhVPFann1oQ0Caw0qIcZWrRkEf/vARdUFecoVcaXmLDvGUgCMYXrEaApm0KSaiV+J+TqJVK6zBwgsGF2gTvunUEnaI/oJFi7SZCnbSpyhd8BrmxeNAdtMlxcCRFQWOCOnIi9P2p/E="
    
 before_install:
     - sudo apt install nunit-console
