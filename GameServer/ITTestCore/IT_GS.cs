@@ -1,9 +1,13 @@
-﻿using Application.Interfaces;
+﻿using System.Security.Cryptography.X509Certificates;
+using Application.Interfaces;
 using Communication.RESTControllers;
 using Domain.Interfaces;
 using Domain.Models;
+using Microsoft.Azure.Documents.SystemFunctions;
 using Moq;
+using NSubstitute;
 using NUnit.Framework;
+using Persistance.Repositories;
 using Persistance.UnitOfWork;
 
 namespace IT_Core
@@ -16,20 +20,23 @@ namespace IT_Core
         //UserController.LoginDto LoginInfo = new UserController.LoginDto();
         string user = "Username";
         string pass = "Pass";
-        
-        private IUser pers = new User();
+
+        private User pers = new User();
         private Mock<IUnitOfWork> IU = new Mock<IUnitOfWork>();
         private Mock<ILoginManager> LM = new Mock<ILoginManager>();
         private Mock<IUserController> UC = new Mock<IUserController>();
+        private Mock<IUserRepository> UP = new Mock<IUserRepository>();
         Mock<UnitOfWork> UOW = new Mock<UnitOfWork>(null);
         Mock<Communication.RESTControllers.UserController> mock = new Mock<UserController>();
-        Mock<Application.Controllers.UserController> uc = new Mock<Application.Controllers.UserController>();
+        Mock<Application.Controllers.UserController> CTRL = new Mock<Application.Controllers.UserController>();
+        Mock<UserRepository> Urep = new Mock<UserRepository>();
+
 
         [SetUp]
+
         public void Setup()
         {
 
-            //UserController.LoginDto LoginInfo = new UserController.LoginDto();
             string user = "UsernameIT";
             string givename = "GivennameIT";
             string last = "LastNameIT";
@@ -42,52 +49,49 @@ namespace IT_Core
             pers.Password = pass;
             pers.Email = email;
 
+           
         }
 
-        // DOES NOT RUN DO NOT RUN TEST!!!!
 
+        //*************************Test Communication Layer***************************
 
+        //Test if we sent username and password to Usercontroller in communicationlayer, it gets received in usercontroler in applicationLayer
+        [Test]
+        public void IT_1_GS_LoginUser()
+        {
+            UserController UC1 = new UserController(UC.Object);
+            UC1.GetUser(pers.Username, pers.Password);
+            UC.Verify(x => x.GetUser(pers.Username, pers.Password));
 
-        //[Test]
-        //public void IT_1_GS_PassesInfo()
-        //{
-        //    var commtest = mock;
-        //    var res = uc;
+        }
 
-        //    LoginInfo.Password = pass;
-        //    LoginInfo.Username = user;
-        //    commtest.Setup(m => m.GetUser(LoginInfo)).Verifiable();
+        //Test if Createuser with pers as userobj, gets received in AppLayer CreateUser
+        [Test]
+        public void IT_2_GS_CreateUser()
+        {
+            UserController UC2 = new UserController(UC.Object);
+            UC2.CreateUser(pers);
+            UC.Verify(x => x.CreateUser(pers));
 
-        //    res.Setup(m => m.GetUser(pass, user));
+        }
+        //Test if Update with pers as userobj, gets received in AppLayer UpdateUser
+        [Test]
+        public void IT_3_GS_UpdateUser()
+        {
+            UserController UC2 = new UserController(UC.Object);
+            UC2.UpdateUser(pers.Username, pers);
+            UC.Verify(x => x.UpdateUser(pers.Username, pers));
 
-        //    commtest.Verify(m => m.GetUser(LoginInfo));
-
-        //}
-
-
-        //[Test]
-        //public void IT_2_GS_AppCreate()
-        //{
-     
-        //    var UserCtrl = new Application.Controllers.UserController(IU.Object, LM.Object);
-
-        //   // var SetsDB = UserCtrl.GetUser(user, pass).Returns(pers);
-
-        //    var SetMethod = UserCtrl.CreateUser(pers);
-
-        //    Assert.That(SetMethod, Is.EqualTo(pers));
-
-        //}
-
-        //[Test]
-        //public void IT_3_GS_AppCreate()
-        //{
-        //    var A = new Mock<Application.Controllers.UserController>(IU,LM);
-        //    A.Object.GetUser(user, pass);
-        //    UOW.Verify(x => x.UserRepository.GetUserByUsername(It.IsAny<string>()),Times.Exactly(1));
-
-        //}
-
+        }
+        //*************************Application Layer***************************
+        // Test from app layer to persistance layer Login
+        [Test]
+        public void IT_4_GS_LoginUser()
+        {
+            Application.Controllers.UserController UC3 = new Application.Controllers.UserController(UOW.Object,LM.Object);
+            UC3.GetUser(pers.Username, pers.Password);
+            UP.Verify(x => x.GetUserByUsername(pers.Username));
+        }
 
 
 
