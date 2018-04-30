@@ -28,12 +28,12 @@ namespace IT_Core
         string user = "Username";
         string pass = "Pass";
 
-        private IUser pers = new User();
-        private Mock<IUser> userObj;
-        private IUserController uut;
-        private  IUnitOfWork OUW = new UnitOfWork(new DbContext());
-        private  ILoginManager LM = new LoginManager(new CountDownTimer());
-        private Mock <UnitOfWork> _UOW = new Mock<UnitOfWork>(new DbContext()); 
+        private User pers = new User();
+        private Mock<IUnitOfWork> OUW = new Mock<IUnitOfWork>();
+        private IUnitOfWork pOUW;
+        private ILoginManager pLM;
+        private Mock<ILoginManager> LM = new Mock<ILoginManager>();
+        private Mock<UnitOfWork> OUWM = new Mock<UnitOfWork>();
         private Application.Controllers.UserController _uut;
 
 
@@ -44,7 +44,7 @@ namespace IT_Core
 
         public void Setup()
         {
-            _uut = new Application.Controllers.UserController(OUW,LM);
+            _uut = new UserController(pOUW,pLM);
             string user = "UsernameIT";
             string givename = "GivennameIT";
             string last = "LastNameIT";
@@ -58,32 +58,30 @@ namespace IT_Core
             pers.Email = email;
 
 
-
         }
 
 
-        //*************************Test Communication Layer***************************
+        //*************************Test App Layer***************************
 
-        //Test if we sent username and password to Usercontroller in communicationlayer, it gets received in usercontroler in applicationLayer
+        //Test if we send usercontroler in applicationLayer gets received in persistance Layer
         [Test]
         public void IT_1_GS_LoginUser()
         {
-            var command = Substitute.For<IUserRepository>();
-            _uut.GetUser(pers.Username, pers.Password);
-            command.Received().GetUserByUsername(pers.Username);
+           // _uut = new Application.Controllers.UserController(pOUW, pLM).GetUser(pers.Username,pers.Password);
+        //    _uut.GetUser(pers.Username, pers.Password);
+            Assert.That(pOUW.UserRepository.GetUserByUsername(pers.Username) == new Application.Controllers.UserController(pOUW, pLM).GetUser(pers.Username, pers.Password));
 
         }
 
-        //Test if Createuser with pers as userobj, gets received in AppLayer CreateUser
+        //Test if Createuser with pers as userobj, gets received in persistance Layer
         [Test]
         public void IT_2_GS_CreateUser()
         {
-            _uut.CreateUser(pers);
-          //  UC_mock.Verify(x => x.CreateUser(pers));
+            ;
 
         }
 
-        //Test if Update with pers as userobj, gets received in AppLayer UpdateUser
+        //Test if Update with pers as userobj, gets received in persistance Layer
         [Test]
         public void IT_3_GS_UpdateUser()
         {

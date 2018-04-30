@@ -20,7 +20,7 @@ namespace IT_Core
 {
 
     //[TestFixture] <--- Er blevet udkommenteret, da en textFixture uden tests får Travis til at fejle
-    public class IT_CommLayer
+    public class IT_Test
     {
 
         //UserController.LoginDto LoginInfo = new UserController.LoginDto();
@@ -62,8 +62,9 @@ namespace IT_Core
         [Test]
         public void IT_1_GS_LoginUser()
         {
+            UserController _uut = new UserController(UC_mock.Object);
             _uut.GetUser(pers.Username,pers.Password);
-            UC_mock.Verify(x => x.GetUser(pers.Username,pers.Password));
+            UC_mock.Verify(x => x.CreateUser(pers));
 
         }
 
