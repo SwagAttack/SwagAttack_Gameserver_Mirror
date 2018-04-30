@@ -32,10 +32,10 @@ namespace Domain.Models
         /// <summary>
         /// Constructor setups lobby, sets AdminUsername, initiates _usernames and adds a user to the list.
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="adminUserName"></param>
         public Lobby(string adminUserName)
         {
-            AdminUserName = adminUserName;
+            AdminUserName = adminUserName ?? throw new ArgumentNullException(nameof(adminUserName));
             _usernames = new Collection<string>();
             AddUser(adminUserName);
         }
@@ -43,18 +43,24 @@ namespace Domain.Models
         /// <summary>
         /// Adds a user to the private collection of usernames.
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="username"></param>
         public void AddUser(string username)
         {
+            username = username ?? throw new ArgumentNullException(nameof(username));
+
             _usernames.Add(username);
+
         }
 
         /// <summary>
         /// Removes a user from the private collection of usernames.
         /// </summary>
-        /// <param name="user"></param>
+        /// 
+        /// <param name="username"></param>
         public void RemoveUser(string username)
         {
+            username = username ?? throw new ArgumentNullException(nameof(username));
+
             _usernames.Remove(username);
         }
 
@@ -63,6 +69,8 @@ namespace Domain.Models
         /// </summary>
         public void UpdateAdmin(string username)
         {
+            username = username ?? throw new ArgumentNullException(nameof(username));
+
             if (username == AdminUserName)
             {
                 _usernames.Remove(AdminUserName);
