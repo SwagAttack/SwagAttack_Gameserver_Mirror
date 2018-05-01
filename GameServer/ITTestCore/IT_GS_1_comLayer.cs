@@ -1,13 +1,22 @@
-﻿using System.Net.Mail;
+﻿using System.Net.Http;
+using System.Net.Mail;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using Application.Interfaces;
 using Application.Managers;
 using Application.Misc;
+using Communication;
+using Communication.Formatters;
 using Communication.RESTControllers;
 using Domain.Interfaces;
 using Domain.Models;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Azure.Documents.SystemFunctions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using NSubstitute;
 using NUnit.Framework;
@@ -15,20 +24,24 @@ using NUnit.Framework.Interfaces;
 using Persistance;
 using Persistance.Repositories;
 using Persistance.UnitOfWork;
+using RestSharp;
+using LobbyController = Application.Controllers.LobbyController;
 
 namespace IT_Core
 {
-
+    
     //[TestFixture] <--- Er blevet udkommenteret, da en textFixture uden tests får Travis til at fejle
     public class IT_Test
     {
+        private static string _postmanUrl = "https://b594b385-5e55-41b2-8865-926a5168a42b.mock.pstmn.io";
+        private static TestServer _server;
+        private static HttpClient _client;
 
         //UserController.LoginDto LoginInfo = new UserController.LoginDto();
         string user = "Username";
         string pass = "Pass";
 
         private User pers = new User();
-        private Mock<IUserController> UC_mock = new Mock<IUserController>();
         private UserController _uut;
 
 
@@ -36,10 +49,8 @@ namespace IT_Core
 
 
         [SetUp]
-
         public void Setup()
         {
-            _uut = new UserController(UC_mock.Object);
             string user = "UsernameIT";
             string givename = "GivennameIT";
             string last = "LastNameIT";
@@ -52,7 +63,11 @@ namespace IT_Core
             pers.Password = pass;
             pers.Email = email;
 
-
+            // Arrange
+            _server = new TestServer(new WebHostBuilder()
+                .UseStartup<Startup>());
+            _client = _server.CreateClient();
+            
         }
 
 
@@ -62,9 +77,15 @@ namespace IT_Core
         [Test]
         public void IT_1_GS_LoginUser()
         {
-            UserController _uut = new UserController(UC_mock.Object);
-            _uut.GetUser(pers.Username,pers.Password);
-            UC_mock.Verify(x => x.CreateUser(pers));
+            
+            var client = new RestClient(_postmanUrl);
+            var request = new RestRequest(Method.GET);
+            request.AddHeader("Postman-Token", "c2217970-30d1-4ce2-849d-57097486dcb9");
+            request.AddHeader("Cache-Control", "no-cache");
+            IRestResponse response = client.Execute(request);
+
+            var tmp = response.Headers.Count;
+            //UC_mock.Verify(x => x.GetUser(pers.Username, pers.Password));
 
         }
 
@@ -73,7 +94,7 @@ namespace IT_Core
         public void IT_2_GS_CreateUser()
         {
             _uut.CreateUser(pers);
-            UC_mock.Verify(x => x.CreateUser(pers));
+            //UC_mock.Verify(x => x.CreateUser(pers));
 
         }
 
@@ -82,11 +103,12 @@ namespace IT_Core
         public void IT_3_GS_UpdateUser()
         {
             _uut.UpdateUser(pers.Username, pers);
-            UC_mock.Verify(x => x.UpdateUser(pers.Username, pers));
+            //UC_mock.Verify(x => x.UpdateUser(pers.Username, pers));
 
         }
 
 
     }
+    
 
 }
