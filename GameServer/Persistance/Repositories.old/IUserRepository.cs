@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Domain.Interfaces;
 
-namespace Persistance.Repositories
+namespace Persistance.Repositories.old
 {
     public interface IUserRepository
     {
