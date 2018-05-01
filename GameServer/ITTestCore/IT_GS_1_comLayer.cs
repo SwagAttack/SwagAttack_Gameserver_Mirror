@@ -41,6 +41,7 @@ namespace IT_Core
         string user = "Username";
         string pass = "Pass";
 
+        private IUserController fakeProvider;
         private User pers = new User();
         private UserController _uut;
 
@@ -65,9 +66,9 @@ namespace IT_Core
 
             // Arrange
             _server = new TestServer(new WebHostBuilder()
-                .UseStartup<Startup>());
+                .UseStartup<StartupIntegrationTest1>());
             _client = _server.CreateClient();
-            
+            fakeProvider = StartupIntegrationTest1.FakeProvider;
         }
 
 
@@ -84,8 +85,8 @@ namespace IT_Core
             request.AddHeader("Cache-Control", "no-cache");
             IRestResponse response = client.Execute(request);
 
-            var tmp = response.Headers.Count;
-            //UC_mock.Verify(x => x.GetUser(pers.Username, pers.Password));
+            fakeProvider.GetUser("Maximillian", "123456789").Received(1);
+            
 
         }
 
@@ -97,18 +98,26 @@ namespace IT_Core
             //UC_mock.Verify(x => x.CreateUser(pers));
 
         }
-
-        //Test if Update with pers as userobj, gets received in AppLayer UpdateUser
-        [Test]
-        public void IT_3_GS_UpdateUser()
-        {
-            _uut.UpdateUser(pers.Username, pers);
-            //UC_mock.Verify(x => x.UpdateUser(pers.Username, pers));
-
-        }
+        
 
 
     }
-    
+
+    public class StartupIntegrationTest1 : Startup
+    {
+        public static IUserController FakeProvider = Substitute.For<IUserController>();
+
+        public StartupIntegrationTest1(IConfiguration configuration) : base(configuration)
+        {
+
+        }
+
+        public void ConfigureTestServices(IServiceCollection services)
+        {
+            base.ConfigureServices(services);
+            
+            services.AddTransient<IUserController>(provider => FakeProvider);
+        }
+    }
 
 }
