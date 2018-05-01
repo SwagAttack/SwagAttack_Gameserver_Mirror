@@ -26,10 +26,11 @@ namespace Persistance.Repository
         }
         public async Task<IEnumerable<TInterface>> GetItemsAsync(Expression<Func<TInterface, bool>> predicate)
         {
-            var query = Context.DocumentClient.CreateDocumentQuery<TInterface>(
+            var test = (Expression<Func<TEntity, bool>>) Convert.ChangeType(predicate, predicate.Type);
+            var query = Context.DocumentClient.CreateDocumentQuery<TEntity>(
                     UriFactory.CreateDocumentCollectionUri(Context.DatabaseName, CollectionId),
                     new FeedOptions { MaxItemCount = -1 })
-                .Where(predicate)
+                .Where(test)
                 .AsDocumentQuery();
 
             var results = new List<TEntity>();
@@ -46,7 +47,7 @@ namespace Persistance.Repository
             try
             {
                 var result = await Context.DocumentClient.ReplaceDocumentAsync(UriFactory.CreateDocumentUri(Context.DatabaseName, CollectionId, id), item);
-                return (TEntity)(dynamic)result;
+                return (TEntity)(dynamic)result.Resource;
             }
             catch (DocumentClientException e)
             {
@@ -63,7 +64,7 @@ namespace Persistance.Repository
             {
                 var result = await Context.DocumentClient.CreateDocumentAsync(
                     UriFactory.CreateDocumentCollectionUri(Context.DatabaseName, CollectionId), item);
-                return (TEntity)(dynamic)result;
+                return (TEntity)(dynamic)result.Resource;
             }
             catch (DocumentClientException e)
             {
@@ -81,7 +82,7 @@ namespace Persistance.Repository
             try
             {
                 var result = await Context.DocumentClient.DeleteDocumentAsync(UriFactory.CreateDocumentUri(Context.DatabaseName, CollectionId, id));
-                return (TEntity)(dynamic)result;
+                return (TEntity)(dynamic)result.Resource;
             }
             catch (DocumentClientException e)
             {

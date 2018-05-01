@@ -24,8 +24,18 @@ namespace Application.Test.Unittests
                 };
 
                 var test = uut.CreateItemAsync(user).Result;
-                Assert.That(test != null);
+                Assert.That(test == null);
             }
+
+            [Test]
+            public void TestShit()
+            {
+                uut = new Persistance.Repository.TestRepo(new Persistance.Setup.DbContext(), "TestRepo");
+
+                var items = uut.GetItemsAsync(u => u.Username == "Myusername123").Result;
+                Assert.IsNotEmpty(items);
+            }
+
         }
+    }
     
-}
