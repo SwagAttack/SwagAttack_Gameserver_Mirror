@@ -1,4 +1,4 @@
-﻿namespace Persistance.Repositories
+﻿namespace Persistance.Repositories.old
 {
     public class Repository<T> : IRepository<T> where T : class
     {

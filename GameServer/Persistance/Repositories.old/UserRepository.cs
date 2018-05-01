@@ -9,7 +9,7 @@ using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 
 //https://github.com/Azure/azure-documentdb-dotnet/blob/f374cc601f4cf08d11c88f0c3fa7dcefaf7ecfe8/samples/code-samples/DocumentManagement/Program.cs#L198
-namespace Persistance.Repositories
+namespace Persistance.Repositories.old
 {
     public class UserRepository : Repository<IUser>, IUserRepository
     {
