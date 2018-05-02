@@ -1,6 +1,9 @@
-﻿using Domain.Interfaces;
+﻿using System.Threading.Tasks;
+using Domain.DbAccess;
+using Domain.Interfaces;
 using Domain.Models;
 using NUnit.Framework;
+using Persistance.Setup;
 
 namespace Persistance.Test.Unittests.Local
 {
@@ -12,7 +15,8 @@ namespace Persistance.Test.Unittests.Local
         public void Setup()
         {
             _addedUser = false;
-            _uut = new UnitOfWork.UnitOfWork(new DbContext());
+            _uut = new UserRepository(new DbContext("SwagTest"), "UserTest"); // DatabaseId Swagtest, DocumentId Usertest
+
             _testUser = new User
             {
                 Email = "ab@ab.dk",
@@ -27,83 +31,47 @@ namespace Persistance.Test.Unittests.Local
         [TearDown]
         public void TearDown()
         {
-            if (_addedUser) _uut.UserRepository.DeleteUserByUsername("1337User");
+            if (_addedUser) _uut.DeleteItemAsync(_testUser.Username).Wait();
         }
 
-        private UnitOfWork.UnitOfWork _uut;
+        private UserRepository _uut;
         private IUser _testUser;
         private bool _addedUser;
 
         [Test]
-        public void AddUserToDb_UserIsAddedToDb()
+        public async Task AddUserToDb_UserIsAddedToDb()
         {
-            _uut.UserRepository.AddUser(_testUser);
-            Assert.That(_testUser.Username == _uut.UserRepository.GetUserByUsername(_testUser.Username).Username);
+            var result = await _uut.CreateItemAsync(_testUser);
+            Assert.That(result.Username == _testUser.Username);
             _addedUser = true;
         }
 
+
         [Test]
-        public void AddUserToDbAsync_UserIsAddedToDb()
+        public async Task DeleteUserInDb_UserDoesNotExistPostExecution()
         {
-            var user = _uut.UserRepository.AddUserAsync(_testUser);
-            user.Wait();
-            Assert.That(user.Result.Username, Is.EqualTo(_testUser.Username));
-            _addedUser = true;
+            var result = await _uut.CreateItemAsync(_testUser); // put it up again
+            result = await _uut.DeleteItemAsync(result.Username);
+
+            Assert.That(await _uut.GetItemAsync(_testUser.Username), Is.Null);
         }
 
         [Test]
-        public void DeleteUserInDb_UserDoesNotExistPostExecution()
+        public async Task FindUserInDb_UserExists()
         {
-            _uut.UserRepository.AddUser(_testUser); // put it up again
-            _uut.UserRepository.DeleteUserByUsername(_testUser.Username);
-            Assert.That(_uut.UserRepository.GetUserByUsername(_testUser.Username), Is.Null);
-        }
-
-        [Test]
-        public void DeleteUserInDbAsync_UserDoesNotExistPostExecution()
-        {
-            _uut.UserRepository.AddUser(_testUser); // put it up again
-            _uut.UserRepository.DeleteUserByUsernameAsync(_testUser.Username).Wait();
-            Assert.That(_uut.UserRepository.GetUserByUsername(_testUser.Username), Is.Null);
-        }
-
-        [Test]
-        public void FindUserInDb_UserExists()
-        {
-            _uut.UserRepository.AddUser(_testUser);
-            var user = _uut.UserRepository.GetUserByUsername(_testUser.Username);
+            await _uut.CreateItemAsync(_testUser); // put it up again
+            var user = await _uut.GetItemAsync(_testUser.Username);
             Assert.That(user.GivenName, Is.EqualTo(_testUser.GivenName));
             _addedUser = true;
         }
 
         [Test]
-        public void FindUserInDbAsync_UserExists()
+        public async Task ReplaceUserInDb_UserIsReplacedInDb()
         {
-            _uut.UserRepository.AddUser(_testUser);
-            var user = _uut.UserRepository.GetUserByUsernameAsync(_testUser.Username);
-            user.Wait();
-            Assert.That(user.Result.GivenName, Is.EqualTo(_testUser.GivenName));
-            _addedUser = true;
-        }
-
-        [Test]
-        public void ReplaceUserInDb_UserIsReplacedInDb()
-        {
-            _uut.UserRepository.AddUser(_testUser);
+            await _uut.CreateItemAsync(_testUser); // put it up again
             _testUser.GivenName = "Replaced";
-            _uut.UserRepository.ReplaceUser(_testUser);
-            Assert.That(_testUser.GivenName == _uut.UserRepository.GetUserByUsername(_testUser.Username).GivenName);
-            _addedUser = true;
-        }
-
-        [Test]
-        public void ReplaceUserInDbAsync_UserIsReplacedInDb()
-        {
-            _uut.UserRepository.AddUser(_testUser);
-            _testUser.GivenName = "Replaced";
-            var replacedUser = _uut.UserRepository.ReplaceUserAsync(_testUser.Username, _testUser);
-            replacedUser.Wait();
-            Assert.That(replacedUser.Result.GivenName, Is.EqualTo(_testUser.GivenName));
+            await _uut.UpdateItemAsync(_testUser.Username, _testUser);
+            Assert.That(_testUser.GivenName == _uut.GetItemAsync(_testUser.Username).Result.GivenName);
             _addedUser = true;
         }
     }*/
