@@ -5,18 +5,18 @@ using NUnit.Framework;
 namespace Application.Test.Unittests
 {
 
-        //[TestFixture]
+        [TestFixture]
         public class TestRepoTests
         {
             private Persistance.Repository.TestRepo uut;
 
-           // [SetUp]
+            [SetUp]
             public void setup()
             {
                 uut = new Persistance.Repository.TestRepo(new Persistance.Setup.DbContext(), "TestRepo");
-             }
+            }
 
-            //[Test]
+            [Test]
             public void TestCreate()
             {
 
@@ -34,7 +34,7 @@ namespace Application.Test.Unittests
                 Assert.That(test == null);
             }
 
-            //[Test]
+            [Test]
             public void TestShit()
             {
 
