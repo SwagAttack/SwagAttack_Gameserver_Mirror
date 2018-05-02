@@ -22,8 +22,4 @@
     <Folder Include="Interfaces.old\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Domain\Domain.csproj" />
-  </ItemGroup>
-
 </Project>

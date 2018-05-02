@@ -49,12 +49,9 @@ namespace Communication.RESTControllers
         [AuthorizationSwag]
         public IActionResult UpdateUser([FromHeader] string username, [FromBody] User user)
         {
-            if (username != null)
-            {
-                var result = _userController.UpdateUser(username, user);
+            var result = _userController.UpdateUser(username, user);
 
-                if (result != null) return CreatedAtRoute("GetUser", result);
-            }
+            if (result != null) return CreatedAtRoute("GetUser", result);
 
             return BadRequest();
         }

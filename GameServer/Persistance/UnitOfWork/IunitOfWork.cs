@@ -1,10 +1,10 @@
-﻿using Persistance.Repositories;
-using Persistance.Repositories.old;
+﻿//using Persistance.Repositories;
+//using Persistance.Repositories.old;
 
-namespace Persistance.UnitOfWork
-{
-    public interface IUnitOfWork
-    {
-        IUserRepository UserRepository { get; }
-    }
-}
+//namespace Persistance.UnitOfWork
+//{
+//    public interface IUnitOfWork
+//    {
+//        IUserRepository UserRepository { get; }
+//    }
+//}
