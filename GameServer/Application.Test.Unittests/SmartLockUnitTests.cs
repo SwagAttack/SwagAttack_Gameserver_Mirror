@@ -23,46 +23,44 @@ namespace Application.Test.Unittests
             _testCounter = 0;
         }
         
-        [Test]
-        public void LockAsync_ThreadsIncrementTheSameVariable_CountIsCorrect()
+        [TestCase(10000, 30000)]
+        [TestCase(100000, 300000)]
+        [TestCase(1000000, 3000000)]
+        public void LockAsync_ThreeTasksIncrementTheSameVariable_CountIsCorrect(int countTo, int result)
         {
             // Arrange
 
-            void CounterFunc()
+            async Task CounterFunc()
             {
                 // Sleeps before running the loop
                 Thread.Sleep(500);
 
-                for (int i = 0; i < 10000; i++)
+                for (int i = 0; i < countTo; i++)
                 {
-                    using (_uut.LockAsync().Result)
+                    using(await _uut.LockAsync())
                     {
                         _testCounter++;
                     }
                 }
             }
 
-            _testThreadOne = new Thread(CounterFunc);
-            _testThreadTwo = new Thread(CounterFunc);
-            _testThreadThree = new Thread(CounterFunc);
-
             // Act
 
-            _testThreadOne.Start();
-            _testThreadTwo.Start();
-            _testThreadThree.Start();
+            var first = CounterFunc();
+            var second = CounterFunc();
+            var third = CounterFunc();
 
-            _testThreadOne.Join();
-            _testThreadTwo.Join();
-            _testThreadThree.Join();
+            Task.WaitAll(first, second, third);
 
             // Assert
 
-            Assert.That(_testCounter, Is.EqualTo(30000));
+            Assert.That(_testCounter, Is.EqualTo(result));
         }
 
-        [Test]
-        public void Lock_ThreadsIncrementTheSameVariable_CountIsCorrect()
+        [TestCase(10000, 30000)]
+        [TestCase(100000, 300000)]
+        [TestCase(1000000, 3000000)]
+        public void Lock_ThreeThreadsIncrementTheSameVariable_CountIsCorrect(int countTo, int result)
         {
             // Arrange
 
@@ -71,7 +69,7 @@ namespace Application.Test.Unittests
                 // Sleeps before running the loop
                 Thread.Sleep(500);
 
-                for (int i = 0; i < 10000; i++)
+                for (int i = 0; i < countTo; i++)
                 {
                     using (_uut.Lock())
                     {
@@ -96,7 +94,7 @@ namespace Application.Test.Unittests
 
             // Assert
 
-            Assert.That(_testCounter, Is.EqualTo(30000));
+            Assert.That(_testCounter, Is.EqualTo(result));
         }
 
     }
