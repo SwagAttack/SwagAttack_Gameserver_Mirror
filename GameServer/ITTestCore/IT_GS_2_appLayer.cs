@@ -65,30 +65,19 @@ namespace IT_Core
 
         //Test if we send usercontroler in applicationLayer gets received in persistance Layer
         [Test]
-        public void IT_1_GS_LoginUser()
+        public void IT_2_GS_LoginUser()
         {
-           // _uut = new Application.Controllers.UserController(pOUW, pLM).GetUser(pers.Username,pers.Password);
-        //    _uut.GetUser(pers.Username, pers.Password);
-            Assert.That(pOUW.UserRepository.GetUserByUsername(pers.Username) == new Application.Controllers.UserController(pOUW, pLM).GetUser(pers.Username, pers.Password));
-
+          
         }
 
         //Test if Createuser with pers as userobj, gets received in persistance Layer
         [Test]
         public void IT_2_GS_CreateUser()
         {
-            ;
+            
 
         }
 
-        //Test if Update with pers as userobj, gets received in persistance Layer
-        [Test]
-        public void IT_3_GS_UpdateUser()
-        {
-            _uut.UpdateUser(pers.Username, pers);
-          //  UC_mock.Verify(x => x.UpdateUser(pers.Username, pers));
-
-        }
 
 
     }

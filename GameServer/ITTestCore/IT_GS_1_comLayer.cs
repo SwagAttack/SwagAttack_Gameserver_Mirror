@@ -31,7 +31,7 @@ namespace IT_Core
 {
     
     //[TestFixture] <--- Er blevet udkommenteret, da en textFixture uden tests får Travis til at fejle
-    public class IT_Test
+    public class IT_Test1
     {
         private static string _postmanUrl = "https://b594b385-5e55-41b2-8865-926a5168a42b.mock.pstmn.io";
         private static TestServer _server;
@@ -52,11 +52,11 @@ namespace IT_Core
         [SetUp]
         public void Setup()
         {
-            string user = "UsernameIT";
-            string givename = "GivennameIT";
-            string last = "LastNameIT";
-            string pass = "PasswordIT";
-            string email = "dummy@dummy.dkIT";
+            string user = "Maximilian";
+            string givename = "Max";
+            string last = "Imilian";
+            string pass = "123456789";
+            string email = "123@123.com";
 
             pers.Username = user;
             pers.GivenName = givename;
@@ -92,10 +92,19 @@ namespace IT_Core
 
         //Test if Createuser with pers as userobj, gets received in AppLayer CreateUser
         [Test]
-        public void IT_2_GS_CreateUser()
+        public void IT_1_GS_CreateUser()
         {
-            _uut.CreateUser(pers);
-            //UC_mock.Verify(x => x.CreateUser(pers));
+            var client = new RestClient("http://localhost:50244/api/User");
+            var request = new RestRequest(Method.POST);
+            request.AddHeader("Postman-Token", "43d0097f-6144-41a2-9739-c4daba54ed3c");
+            request.AddHeader("Cache-Control", "no-cache");
+            request.AddHeader("Content-Type", "application/json");
+            request.AddHeader("password", "123456789");
+            request.AddHeader("username", "Maximillian");
+            request.AddParameter("undefined", "{\n\t\"id\" : \"Maximilian\",\n\t\"GivenName\" : \"Max\",\n\t\"LastName\" : \"Imilian\",\n\t\"Email\" : \"123@123.com\",\n\t\"Password\" : \"123456789\"\n}", ParameterType.RequestBody);
+            IRestResponse response = client.Execute(request);
+
+            fakeProvider.CreateUser(pers).Received(1);
 
         }
         
