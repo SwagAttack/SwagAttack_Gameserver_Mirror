@@ -1,16 +1,20 @@
 ﻿using System.Net.Http;
+using Application.Interfaces;
 using Communication;
 using Communication.RESTControllers;
 using Domain.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 using NUnit.Framework;
 using RestSharp;
 
 namespace IT_Core
 {
     
-    //[TestFixture] <--- Er blevet udkommenteret, da en textFixture uden tests får Travis til at fejle
+    [TestFixture] //<--- Er blevet udkommenteret, da en textFixture uden tests får Travis til at fejle
     public class IT_Test1
     {
         private static string _postmanUrl = "https://b594b385-5e55-41b2-8865-926a5168a42b.mock.pstmn.io";
