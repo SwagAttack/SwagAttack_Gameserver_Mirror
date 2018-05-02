@@ -13,6 +13,7 @@ using Domain.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -36,12 +37,30 @@ namespace IT_Core
 
         private IUserController fakeUserController;
         private ILobbyController fakeLobbyController;
+        private ILobby fakeLobby;
 
         private readonly User _pers = new User();
+
+        private readonly User _pers2 = new User()
+        {
+            Username = "PatrickPer",
+            GivenName = "Patrick",
+            LastName = "Per",
+            Password = "somethingU1",
+            Email = "123@123.com"
+        };
         
         [SetUp]
         public void Setup()
         {
+            Lobby testLobby = new Lobby("Maximillian");
+            testLobby.Id = "DenseLobby";
+            testLobby.AdminUserName = "Maximillian";
+
+            Lobby testLobby2 = testLobby;
+            testLobby2.AddUser(_pers2.Username);
+
+
             _pers.Username = user;
             _pers.GivenName = "Max";
             _pers.LastName = "Imilian";
@@ -56,7 +75,9 @@ namespace IT_Core
 
             _client = _server.CreateClient();
             StartupIntegrationTest1.FakeLoginManager.CheckLoginStatus(Arg.Any<string>(),Arg.Any<string>()).Returns(true);
-
+            StartupIntegrationTest1.FakeLobbyController.CreateLobbyAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(testLobby);
+            StartupIntegrationTest1.FakeLobbyController.JoinLobbyAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(testLobby2);
+            StartupIntegrationTest1.FakeLobbyController.LeaveLobbyAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
             fakeUserController = StartupIntegrationTest1.FakeUserController;
             fakeLobbyController = StartupIntegrationTest1.FakeLobbyController;
         }
@@ -115,7 +136,7 @@ namespace IT_Core
             await fakeLobbyController.Received(1).GetLobbyByIdAsync("DenseLobby");
         }
 
-        /*[Test]
+        [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_CreateLobby()
         {
             _client.DefaultRequestHeaders.Add("username", "Maximillian");
@@ -126,38 +147,124 @@ namespace IT_Core
 
             var loginResponse = await _client.GetAsync("api/User/Login");
 
-            var parameters = new Dictionary<string, string> { { "lobbyId", "DenseLobby" }};
-            var encodedContent = new FormUrlEncodedContent(parameters);
-            
-            HttpResponseMessage response = await _client.PostAsync("api/Lobby/Create",encodedContent);
+            var parameters = new Dictionary<string, string>()
+            {
+                {"lobbyId","DenseLobby" }
+            };
+            var requestUri = QueryHelpers.AddQueryString("api/Lobby/Create", parameters);
+
+            var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
 
 
 
-            await fakeLobbyController.Received(1).CreateLobbyAsync(Arg.Any<string>(),Arg.Any<string>());
+            HttpResponseMessage response = await _client.SendAsync(request);
+
+
+
+            await fakeLobbyController.Received(1).CreateLobbyAsync("DenseLobby", "Maximillian");
         }
 
         [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_JoinLobby()
         {
+            _client.DefaultRequestHeaders.Add("username", "Maximillian");
+            _client.DefaultRequestHeaders.Add("password", "123456789");
+            var stringContent1 =
+                new StringContent(JsonConvert.SerializeObject(_pers), Encoding.UTF8, "application/json");
+            var stringContent2 =
+                new StringContent(JsonConvert.SerializeObject(_pers2), Encoding.UTF8, "application/json");
 
+            //Create 2 users and login with first
 
-            //await fakeLobbyController.Received(1).JoinLobby("DenseLobby","Maximilian");
+            var responseCreateUser1 = await _client.PostAsync("api/User", stringContent1);
+            var responseCreateUser2 = await _client.PostAsync("api/User", stringContent2);
+            var loginResponseUser1 = await _client.GetAsync("api/User/Login");
+
+            //Create Lobby
+
+            var createLobbyParameters = new Dictionary<string, string>()
+            {
+                {"lobbyId", "DenseLobby"}
+            };
+            var createLobbyRequestUri = QueryHelpers.AddQueryString("api/Lobby/Create", createLobbyParameters);
+            var createLobbyRequest = new HttpRequestMessage(HttpMethod.Post, createLobbyRequestUri);
+
+            HttpResponseMessage createLobbyResponse = await _client.SendAsync(createLobbyRequest);
+
+            //Log in with second user
+            _client.DefaultRequestHeaders.Remove("username");
+            _client.DefaultRequestHeaders.Remove("password");
+            _client.DefaultRequestHeaders.Add("username", _pers2.Username);
+            _client.DefaultRequestHeaders.Add("password", _pers2.Password);
+            var loginResponseUser2 = await _client.GetAsync("api/User/Login");
+
+            //Join Lobby
+
+            var parameters = new Dictionary<string, string>()
+            {
+                {"lobbyId", "DenseLobby"}
+            };
+            var requestUri = QueryHelpers.AddQueryString("api/Lobby/Join", parameters);
+
+            var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
+            
+            HttpResponseMessage response = await _client.SendAsync(request);
+
+            await fakeLobbyController.Received(1).JoinLobbyAsync("DenseLobby", _pers2.Username);
         }
 
         [Test]
-        public void IntegrationTest1_GameServer_CommunicationLayer_LeaveLobby()
+        public async Task IntegrationTest1_GameServer_CommunicationLayer_LeaveLobby()
         {
-            var client = new RestClient("http://localhost:50244/api/Lobby/Leave?lobbyId=DenseLobby");
-            var request = new RestRequest(Method.POST);
-            request.AddHeader("Postman-Token", "b20e3f64-6af3-4302-859a-ed0015f1936a");
-            request.AddHeader("Cache-Control", "no-cache");
-            request.AddHeader("Content-Type", "application/json");
-            request.AddHeader("password", "123456789");
-            request.AddHeader("username", "MandatorySecond");
-            IRestResponse response = client.Execute(request);
+            _client.DefaultRequestHeaders.Add("username", "Maximillian");
+            _client.DefaultRequestHeaders.Add("password", "123456789");
+            var stringContent1 =
+                new StringContent(JsonConvert.SerializeObject(_pers), Encoding.UTF8, "application/json");
+            var stringContent2 =
+                new StringContent(JsonConvert.SerializeObject(_pers2), Encoding.UTF8, "application/json");
 
-            fakeLobbyController.Received(1).LeaveLobby("DenseLobby", "MandatorySecond");
-        }*/
+            //Create 2 users and login with first
+
+            var responseCreateUser1 = await _client.PostAsync("api/User", stringContent1);
+            var responseCreateUser2 = await _client.PostAsync("api/User", stringContent2);
+            var loginResponseUser1 = await _client.GetAsync("api/User/Login");
+
+            //Create Lobby
+
+            var createLobbyParameters = new Dictionary<string, string>()
+            {
+                {"lobbyId", "DenseLobby"}
+            };
+            var createLobbyRequestUri = QueryHelpers.AddQueryString("api/Lobby/Create", createLobbyParameters);
+            var createLobbyRequest = new HttpRequestMessage(HttpMethod.Post, createLobbyRequestUri);
+
+            HttpResponseMessage createLobbyResponse = await _client.SendAsync(createLobbyRequest);
+
+            //Log in with second user
+            _client.DefaultRequestHeaders.Remove("username");
+            _client.DefaultRequestHeaders.Remove("password");
+            _client.DefaultRequestHeaders.Add("username", _pers2.Username);
+            _client.DefaultRequestHeaders.Add("password", _pers2.Password);
+            var loginResponseUser2 = await _client.GetAsync("api/User/Login");
+
+            //Join Lobby
+
+            var joinLobbyParameters = new Dictionary<string, string>()
+            {
+                {"lobbyId", "DenseLobby"}
+            };
+            var joinLobbyRequestUri = QueryHelpers.AddQueryString("api/Lobby/Leave", joinLobbyParameters);
+
+            var joinLobbyRequest = new HttpRequestMessage(HttpMethod.Post, joinLobbyRequestUri);
+
+            HttpResponseMessage response = await _client.SendAsync(joinLobbyRequest);
+
+            //Leave Lobby
+
+
+
+            await fakeLobbyController.Received(1).LeaveLobbyAsync("DenseLobby", _pers2.Username);
+        }
 
 
     }
@@ -185,7 +292,7 @@ namespace IT_Core
                 options.InputFormatters.Insert(0, new JsonInputFormatter());
             });
 
-            //services.AddSingleton<ILoginManager>(provider => FakeLoginManager);
+            services.AddSingleton<ILoginManager>(provider => FakeLoginManager);
             services.AddTransient<IUserController>(provider => FakeUserController);
             services.AddTransient<ILobbyController>(provider => FakeLobbyController);
         }
