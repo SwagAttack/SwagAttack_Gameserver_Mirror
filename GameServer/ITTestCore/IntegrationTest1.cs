@@ -68,7 +68,6 @@ namespace IT_Core
 
             // Arrange
             _server = new TestServer(new WebHostBuilder()
-                .UseUrls("http://localhost:50244/")
                 .UseStartup<StartupIntegrationTest1>());
             _server.Host.Start();
 
