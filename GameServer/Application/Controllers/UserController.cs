@@ -34,13 +34,12 @@ namespace Application.Controllers
 
         public IUser CreateUser(IUser user)
         {
-
             var result = _userRepository.CreateItemAsync(user).Result;
 
             if (result != null)
             {
                 _loginManager.Login(result);
-                return user;
+                return result;
             }
 
             return null;
@@ -56,7 +55,7 @@ namespace Application.Controllers
             if (result != null)
             {
                 _loginManager.Login(result);
-                return user;
+                return result;
             }
 
             return null;

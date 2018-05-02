@@ -1,8 +1,8 @@
 ﻿using Application.Controllers;
 using Application.Interfaces;
-using Persistance.UnitOfWork;
 using Domain.Interfaces;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
 
 namespace Application.Test.Unittests
@@ -11,15 +11,15 @@ namespace Application.Test.Unittests
     public class UserControllerUnitTests
     {
         private ILoginManager _fakeLoginManager;
-        private IUnitOfWork _fakeUnitOfWork;
+        private IUserRepository _fakeRepository;
         private UserController _uut;
 
         [SetUp]
         public void SetUp()
         {
             _fakeLoginManager = Substitute.For<ILoginManager>();
-            _fakeUnitOfWork = Substitute.For<IUnitOfWork>();
-            _uut = new UserController(_fakeUnitOfWork, _fakeLoginManager);
+            _fakeRepository = Substitute.For<IUserRepository>();
+            _uut = new UserController(_fakeRepository, _fakeLoginManager);
         }
 
         [Test]
@@ -30,7 +30,7 @@ namespace Application.Test.Unittests
             var returnedUser = Substitute.For<IUser>();
             returnedUser.Password = "password";
 
-            _fakeUnitOfWork.UserRepository.GetUserByUsername(Arg.Any<string>())
+            _fakeRepository.GetItemAsync(Arg.Any<string>())
                 .Returns(returnedUser);
 
             // Act
@@ -49,7 +49,7 @@ namespace Application.Test.Unittests
 
             IUser returnedUser = null;
 
-            _fakeUnitOfWork.UserRepository.GetUserByUsername(Arg.Any<string>())
+            _fakeRepository.GetItemAsync(Arg.Any<string>())
                 .Returns(returnedUser);
 
             // Act
@@ -69,7 +69,7 @@ namespace Application.Test.Unittests
             var returnedUser = Substitute.For<IUser>();
             returnedUser.Password = "password";
 
-            _fakeUnitOfWork.UserRepository.GetUserByUsername(Arg.Is("username"))
+            _fakeRepository.GetItemAsync(Arg.Is("username"))
                 .Returns(returnedUser);
 
             // Act
@@ -89,7 +89,7 @@ namespace Application.Test.Unittests
             var returnedUser = Substitute.For<IUser>();
             returnedUser.Password = "password";
 
-            _fakeUnitOfWork.UserRepository.GetUserByUsername(Arg.Is("username"))
+            _fakeRepository.GetItemAsync(Arg.Is("username"))
                 .Returns(returnedUser);
 
             // Act
@@ -106,18 +106,14 @@ namespace Application.Test.Unittests
         {
             // Arrange
 
-            var returnedUser = Substitute.For<IUser>();
-            returnedUser.Password = "password";
+            _fakeRepository.CreateItemAsync(Arg.Any<IUser>()).ReturnsNull();
 
-            _fakeUnitOfWork.UserRepository.GetUserByUsername(Arg.Is("username"))
-                .Returns(returnedUser);
-
-            var anotherUser = Substitute.For<IUser>();
-            anotherUser.Username = "username";
+            var user = Substitute.For<IUser>();
+            user.Username = "username";
 
             // Act
 
-            var result = _uut.CreateUser(anotherUser);
+            var result = _uut.CreateUser(user);
 
             // Assert
 
@@ -129,43 +125,17 @@ namespace Application.Test.Unittests
         {
             // Arrange
 
-            IUser returnedUser = null;
+            var user = Substitute.For<IUser>();
 
-            _fakeUnitOfWork.UserRepository.GetUserByUsername(Arg.Is("username"))
-                .Returns(returnedUser);
-
-            var anotherUser = Substitute.For<IUser>();
-            anotherUser.Username = "username";
+            _fakeRepository.CreateItemAsync(Arg.Any<IUser>()).Returns(user);
 
             // Act
 
-            var result = _uut.CreateUser(anotherUser);
+            var result = _uut.CreateUser(user);
 
             // Assert
 
-            Assert.That(result == anotherUser, Is.EqualTo(true));
-        }
-
-        [Test]
-        public void CreateUser_UserDoesntExist_AddsUserToRepository()
-        {
-            // Arrange
-
-            IUser returnedUser = null;
-
-            _fakeUnitOfWork.UserRepository.GetUserByUsername(Arg.Is("username"))
-                .Returns(returnedUser);
-
-            var anotherUser = Substitute.For<IUser>();
-            anotherUser.Username = "username";
-
-            // Act
-
-            var result = _uut.CreateUser(anotherUser);
-
-            // Assert
-
-            _fakeUnitOfWork.UserRepository.Received().AddUser(result);
+            Assert.That(result == user, Is.EqualTo(true));
         }
 
         [Test]
@@ -173,17 +143,13 @@ namespace Application.Test.Unittests
         {
             // Arrange
 
-            IUser returnedUser = null;
+            var user = Substitute.For<IUser>();
 
-            _fakeUnitOfWork.UserRepository.GetUserByUsername(Arg.Is("username"))
-                .Returns(returnedUser);
-
-            var anotherUser = Substitute.For<IUser>();
-            anotherUser.Username = "username";
+            _fakeRepository.CreateItemAsync(Arg.Any<IUser>()).Returns(user);
 
             // Act
 
-            var result = _uut.CreateUser(anotherUser);
+            var result = _uut.CreateUser(user);
 
             // Assert
 
@@ -197,8 +163,7 @@ namespace Application.Test.Unittests
 
             IUser returnedUser = null;
 
-            _fakeUnitOfWork.UserRepository.GetUserByUsername(Arg.Is("username"))
-                .Returns(returnedUser);
+            _fakeRepository.UpdateItemAsync(Arg.Any<string>(), Arg.Any<IUser>()).Returns(returnedUser);
 
             var replacingUser = Substitute.For<IUser>();
             replacingUser.Username = "username";
@@ -213,22 +178,18 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void UpdateUser_UserExistsUsernameDoesNotMatchPassedUser_ReturnsNull()
+        public void UpdateUser_UsernameDoesNotMatchPassedUser_ReturnsNull()
         {
             // Arrange
 
-            IUser returnedUser = Substitute.For<IUser>();
-            returnedUser.Username = "username";
+            string username = null;
 
-            _fakeUnitOfWork.UserRepository.GetUserByUsername(Arg.Is("username"))
-                .Returns(returnedUser);
-
-            var replacingUser = Substitute.For<IUser>();
-            replacingUser.Username = "wrongUsername";
+            var user = Substitute.For<IUser>();
+            user.Username = "this is not the same username as the one above";
 
             // Act
 
-            var result = _uut.UpdateUser("username", replacingUser);
+            var result = _uut.UpdateUser(username, user);
 
             // Assert
 
@@ -236,24 +197,24 @@ namespace Application.Test.Unittests
         }
         
         [Test]
-        public void UpdateUser_UserExistsUsernameMatchesPassedUser_ReturnsUpdatedUser()
+        public void UpdateUser_UsernameMatchesPassedUserAndUpdateSucceeds_ReturnsUpdatedUser()
         {
             // Arrange
 
-            IUser returnedUser = Substitute.For<IUser>();
-            returnedUser.Username = "username";
-            returnedUser.Email = "anEmail";
-            
-            _fakeUnitOfWork.UserRepository.GetUserByUsername(Arg.Is("username"))
-                .Returns(returnedUser);
-
+            var originalUser = Substitute.For<IUser>();
+            originalUser.Username = "username";
+            originalUser.Email = "anEmail";
+           
             var replacingUser = Substitute.For<IUser>();
             replacingUser.Username = "username";
             replacingUser.Email = "ReplacedEmail";
 
+            _fakeRepository.UpdateItemAsync(Arg.Is("username"), Arg.Any<IUser>())
+                .Returns(replacingUser);
+
             // Act
 
-            var result = _uut.UpdateUser("username", replacingUser);
+            var result = _uut.UpdateUser("username", originalUser);
 
             // Assert
 
@@ -261,14 +222,15 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void UpdateUser_UserExistsUsernameMatchesPassedUser_UpdatesTheUserInTheRepository()
+        public void UpdateUser_UsernameMatchesPassedUserAndUpdateSucceeds_LogsInUser()
         {
             // Arrange
 
             IUser returnedUser = Substitute.For<IUser>();
             returnedUser.Username = "username";
+            returnedUser.Email = "anEmail";
 
-            _fakeUnitOfWork.UserRepository.GetUserByUsername(Arg.Is("username"))
+            _fakeRepository.UpdateItemAsync(Arg.Is("username"), Arg.Any<IUser>())
                 .Returns(returnedUser);
 
             var replacingUser = Substitute.For<IUser>();
@@ -281,7 +243,7 @@ namespace Application.Test.Unittests
 
             // Assert
 
-            _fakeUnitOfWork.UserRepository.Received().ReplaceUser(replacingUser);
+            _fakeLoginManager.Received().Login(result);
         }
 
     }
