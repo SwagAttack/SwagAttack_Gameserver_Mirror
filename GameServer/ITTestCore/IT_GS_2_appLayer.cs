@@ -14,8 +14,6 @@ using NSubstitute;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using Persistance;
-using Persistance.Repositories;
-using Persistance.UnitOfWork;
 using UserController = Application.Controllers.UserController;
 
 namespace IT_Core
@@ -24,6 +22,7 @@ namespace IT_Core
     //[TestFixture] <--- Er blevet udkommenteret, da en textFixture uden tests får Travis til at fejle
     public class IT_App_Layer
     {
+/*
 
         string user = "Username";
         string pass = "Pass";
@@ -35,6 +34,7 @@ namespace IT_Core
         private Mock<ILoginManager> LM = new Mock<ILoginManager>();
         private Mock<UnitOfWork> OUWM = new Mock<UnitOfWork>();
         private Application.Controllers.UserController _uut;
+*/
 
 
 
@@ -44,7 +44,7 @@ namespace IT_Core
 
         public void Setup()
         {
-            _uut = new UserController(pOUW,pLM);
+            /*_uut = new UserController(pOUW,pLM);
             string user = "UsernameIT";
             string givename = "GivennameIT";
             string last = "LastNameIT";
@@ -56,7 +56,7 @@ namespace IT_Core
             pers.LastName = last;
             pers.Password = pass;
             pers.Email = email;
-
+*/
 
         }
 

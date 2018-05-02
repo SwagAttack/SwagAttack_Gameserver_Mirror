@@ -100,7 +100,7 @@ namespace IT_Core
 
             var tmp = response;
 
-            fakeUserController.Received(1).GetUser("Maximillian","123456789");
+            fakeUserController.Received().GetUser("Maximillian","123456789");
             
         }
 
@@ -117,7 +117,7 @@ namespace IT_Core
             var response = await _client.PostAsync("api/User", stringContent);
 
             
-            fakeUserController.Received(1).CreateUser(Arg.Is<IUser>(x => x.Username == "Maximillian"));
+            fakeUserController.Received().CreateUser(Arg.Is<IUser>(x => x.Username == "Maximillian"));
         }
 
         [Test]
@@ -125,7 +125,7 @@ namespace IT_Core
         {
             var response = await _client.GetAsync("api/Lobby");
 
-            await fakeLobbyController.Received(1).GetAllLobbiesAsync();
+            await fakeLobbyController.Received().GetAllLobbiesAsync();
         }
 
         [Test]
@@ -161,7 +161,7 @@ namespace IT_Core
 
 
 
-            await fakeLobbyController.Received(1).CreateLobbyAsync("DenseLobby", "Maximillian");
+            await fakeLobbyController.Received().CreateLobbyAsync("DenseLobby", "Maximillian");
         }
 
         [Test]
@@ -210,7 +210,7 @@ namespace IT_Core
             
             HttpResponseMessage response = await _client.SendAsync(request);
 
-            await fakeLobbyController.Received(1).JoinLobbyAsync("DenseLobby", _pers2.Username);
+            await fakeLobbyController.Received().JoinLobbyAsync("DenseLobby", _pers2.Username);
         }
 
         [Test]
@@ -263,7 +263,7 @@ namespace IT_Core
 
 
 
-            await fakeLobbyController.Received(1).LeaveLobbyAsync("DenseLobby", _pers2.Username);
+            await fakeLobbyController.Received().LeaveLobbyAsync("DenseLobby", _pers2.Username);
         }
 
 
