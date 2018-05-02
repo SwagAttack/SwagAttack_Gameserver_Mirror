@@ -11,7 +11,7 @@ namespace Application.Test.Unittests
             private Persistance.Repository.TestRepo uut;
 
             [SetUp]
-            public void setup()
+            public void Setup()
             {
                 uut = new Persistance.Repository.TestRepo(new Persistance.Setup.DbContext(), "TestRepo");
             }

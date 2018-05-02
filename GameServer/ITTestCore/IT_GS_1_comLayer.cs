@@ -1,31 +1,11 @@
 ﻿using System.Net.Http;
-using System.Net.Mail;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading;
-using Application.Interfaces;
-using Application.Managers;
-using Application.Misc;
 using Communication;
-using Communication.Formatters;
 using Communication.RESTControllers;
-using Domain.Interfaces;
 using Domain.Models;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Azure.Documents.SystemFunctions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Moq;
-using NSubstitute;
 using NUnit.Framework;
-using NUnit.Framework.Interfaces;
-using Persistance;
-using Persistance.Repositories;
-using Persistance.UnitOfWork;
 using RestSharp;
-using LobbyController = Application.Controllers.LobbyController;
 
 namespace IT_Core
 {

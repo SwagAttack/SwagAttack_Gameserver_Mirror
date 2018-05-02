@@ -25,9 +25,6 @@
     <Reference Include="NSubstitute">
       <HintPath>..\..\..\..\..\.nuget\packages\nsubstitute\3.1.0\lib\netstandard1.3\NSubstitute.dll</HintPath>
     </Reference>
-    <Reference Include="RestClient">
-      <HintPath>..\..\..\..\..\..\.nuget\packages\restclient\2.4.0.10\lib\netstandard1.6\RestClient.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>
