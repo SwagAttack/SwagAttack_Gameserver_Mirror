@@ -2,6 +2,7 @@
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Communication.Filters
 {
@@ -15,10 +16,10 @@ namespace Communication.Filters
         private const string UserCredentials = "username";
         private const string KeyCredentials = "password";
 
-        public ILoginManager LoginManager => Application.Managers.LoginManager.GetInstance();
-
         public void OnAuthorization(AuthorizationFilterContext context)
         {
+            var loginManager = context.HttpContext.RequestServices.GetService<ILoginManager>();
+
             var tokens = context.HttpContext.Request.Headers;
 
             var confirmed = false;
@@ -29,7 +30,7 @@ namespace Communication.Filters
                 var username = name.ToString();
                 var password = pass.ToString();
 
-                confirmed = LoginManager.CheckLoginStatus(username, password);
+                confirmed = loginManager.CheckLoginStatus(username, password);
             }
 
             if(!confirmed)

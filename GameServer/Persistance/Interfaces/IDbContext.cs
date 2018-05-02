@@ -4,7 +4,7 @@ namespace Persistance.Interfaces
 {
     public interface IDbContext
     {
-        string DatabaseName { get; }
+        string DatabaseId { get; }
         DocumentClient DocumentClient { get; }
     }
 }

@@ -9,7 +9,7 @@ namespace Persistance.Setup
     {
         private DocumentClient _client;
 
-        public string DatabaseName { get; } = "SwagDb"; // XD
+        public string DatabaseId { get; } = "SwagDb"; // XD
 
         // Local
         private static string AuthenticationKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
@@ -32,7 +32,7 @@ namespace Persistance.Setup
         {
             try
             {
-                _client.CreateDatabaseIfNotExistsAsync(new Database() {Id = DatabaseName}).Wait();
+                _client.CreateDatabaseIfNotExistsAsync(new Database() {Id = DatabaseId}).Wait();
             }
             catch (DocumentClientException)
             {

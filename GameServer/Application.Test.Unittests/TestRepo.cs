@@ -34,12 +34,19 @@ namespace Application.Test.Unittests
                 Assert.That(test == null);
             }
 
-            //[Test]
+            //Test]
             public void TestShit()
             {
 
                 var items = uut.GetItemsAsync(u => u.Username == "Myusername123").Result;
                 Assert.IsNotEmpty(items);
+            }
+
+            //[Test]
+            public void TestDelete()
+            {
+                var test = uut.DeleteItemAsync("Myusername123");
+                Assert.That(test != null);
             }
 
         }
