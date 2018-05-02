@@ -1,6 +1,5 @@
 ﻿using Application.Interfaces;
 using Domain.Interfaces;
-using Persistance.UnitOfWork;
 
 namespace Application.Controllers
 {
@@ -11,15 +10,15 @@ namespace Application.Controllers
     public class UserController : IUserController
     {
         private readonly ILoginManager _loginManager;
-        private readonly IUnitOfWork _unitOfWork;
-        public UserController(IUnitOfWork unitOfWork, ILoginManager loginManager)
+        private readonly IUserRepository _userRepository;
+        public UserController(IUserRepository userRepository, ILoginManager loginManager)
         {
-            _unitOfWork = unitOfWork;
+            _userRepository = userRepository;
             _loginManager = loginManager;
         }
         public IUser GetUser(string username, string password)
         {
-            var user = _unitOfWork.UserRepository.GetUserByUsername(username);
+            var user = _userRepository.GetItemAsync(username).Result;
 
             if (user != null)
             {
@@ -35,10 +34,12 @@ namespace Application.Controllers
 
         public IUser CreateUser(IUser user)
         {
-            if (_unitOfWork.UserRepository.GetUserByUsername(user.Username) == null)
+
+            var result = _userRepository.CreateItemAsync(user).Result;
+
+            if (result != null)
             {
-                _unitOfWork.UserRepository.AddUser(user);
-                _loginManager.Login(user);
+                _loginManager.Login(result);
                 return user;
             }
 
@@ -47,18 +48,17 @@ namespace Application.Controllers
 
         public IUser UpdateUser(string username, IUser user)
         {
-            var result = _unitOfWork.UserRepository.GetUserByUsername(username);
+            if (username != user.Username)
+                return null;
+
+            var result = _userRepository.UpdateItemAsync(username, user).Result;
 
             if (result != null)
             {
-                if (username == user.Username)
-                {
-                    _unitOfWork.UserRepository.ReplaceUser(user);
-                    _loginManager.Login(user);
-                    return user;
-                }
-
+                _loginManager.Login(result);
+                return user;
             }
+
             return null;
         }
     }

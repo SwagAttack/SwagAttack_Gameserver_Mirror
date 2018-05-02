@@ -99,26 +99,12 @@ namespace Persistance.Repository
             }
         }
 
-        private void CreateCollectionIfNotExists()
-        {
-            try
-            {
-                Context.DocumentClient.CreateDocumentCollectionIfNotExistsAsync(
-                    UriFactory.CreateDatabaseUri(Context.DatabaseId),
-                    new DocumentCollection() {Id = CollectionId}).Wait();
-            }
-            catch (DocumentClientException)
-            {
-
-            }
-        }
-
         public async Task<TInterface> GetItemAsync(string id)
         {
             try
             {
-                Document document = await Context.DocumentClient.ReadDocumentAsync(UriFactory.CreateDocumentUri(Context.DatabaseId, CollectionId, id));
-                return (TEntity)(dynamic)document;
+                var result = await Context.DocumentClient.ReadDocumentAsync(UriFactory.CreateDocumentUri(Context.DatabaseId, CollectionId, id));
+                return (TEntity) (dynamic) result.Resource;
             }
             catch (DocumentClientException e)
             {
@@ -131,6 +117,23 @@ namespace Persistance.Repository
             }
         }
 
-    }
+        #region Creation
 
+        private void CreateCollectionIfNotExists()
+        {
+            try
+            {
+                Context.DocumentClient.CreateDocumentCollectionIfNotExistsAsync(
+                    UriFactory.CreateDatabaseUri(Context.DatabaseId),
+                    new DocumentCollection() { Id = CollectionId }).Wait();
+            }
+            catch (DocumentClientException)
+            {
+
+            }
+        }
+
+        #endregion
+
+    }
 }

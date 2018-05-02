@@ -2,12 +2,14 @@ using Application.Controllers;
 using Application.Interfaces;
 using Application.Managers;
 using Communication.Formatters;
+using Domain.DbAccess;
+using Domain.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Persistance;
-using Persistance.UnitOfWork;
+using Persistance.Interfaces;
+using Persistance.Setup;
 
 namespace Communication
 {
@@ -30,7 +32,14 @@ namespace Communication
                 options.InputFormatters.Insert(0, new JsonInputFormatter());
             });
 
-            services.AddTransient<IUnitOfWork>(u => new UnitOfWork(new DbContext()));
+            // Database
+            services.AddSingleton<IDbContext>(context => new DbContext("SwagAttackDb"));
+            var sp = services.BuildServiceProvider();
+
+            // Usercollection
+            services.AddTransient<IUserRepository, UserRepository>(u =>
+                new UserRepository(sp.GetService<IDbContext>(), "UserCollection"));
+
             services.AddSingleton(l => LoginManager.GetInstance());
             services.AddSingleton<ILobbyController, LobbyController>();
             services.AddTransient<IUserController, UserController>();

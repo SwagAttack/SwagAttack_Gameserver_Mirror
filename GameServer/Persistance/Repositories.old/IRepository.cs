@@ -1,7 +1,7 @@
-﻿namespace Persistance.Repositories.old
-{
-    public interface IRepository<T>
-    {
+﻿//namespace Persistance.Repositories.old
+//{
+//    public interface IRepository<T>
+//    {
     
-    }
-}
+//    }
+//}

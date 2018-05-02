@@ -9,7 +9,7 @@ namespace Persistance.Setup
     {
         private DocumentClient _client;
 
-        public string DatabaseId { get; } = "SwagDb"; // XD
+        public string DatabaseId { get; set; } = "SwagDb"; // XD
 
         // Local
         private static string AuthenticationKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
@@ -22,8 +22,9 @@ namespace Persistance.Setup
 
         public DocumentClient DocumentClient => _client;
 
-        public DbContext()
+        public DbContext(string databaseId = null)
         {
+            if (databaseId != null) DatabaseId = databaseId;
             _client = new DocumentClient(new Uri(ServiceEndpoint), AuthenticationKey);
             CreateDatabaseIfNotExists();
         }
