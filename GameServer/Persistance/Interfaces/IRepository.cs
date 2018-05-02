@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Persistance.Interfaces
 {
-    public interface IRepository<TInterface, TEntity> where TEntity : TInterface
-                                                      where TInterface : class
+    public interface IRepository<TInterface, TEntity> where TInterface : class
+        where TEntity : TInterface
     {
         Task<TInterface> GetItemAsync(string id);
         Task<IEnumerable<TInterface>> GetItemsAsync(Expression<Func<TInterface, bool>> predicate);
