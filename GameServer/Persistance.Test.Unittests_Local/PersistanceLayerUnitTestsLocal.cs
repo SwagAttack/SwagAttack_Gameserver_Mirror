@@ -7,8 +7,7 @@ using Persistance.Setup;
 
 namespace Persistance.Test.Unittests.Local
 {
-    //commented out because of refactored layers these need rewriting
-    /*[TestFixture]
+    [TestFixture]
     public class Test
     {
         [SetUp]
@@ -74,5 +73,5 @@ namespace Persistance.Test.Unittests.Local
             Assert.That(_testUser.GivenName == _uut.GetItemAsync(_testUser.Username).Result.GivenName);
             _addedUser = true;
         }
-    }*/
+    }
 }
