@@ -27,7 +27,6 @@ namespace IT_Core
     [TestFixture] //<--- Er blevet udkommenteret, da en textFixture uden tests får Travis til at fejle
     public class IntegrationTest1
     {
-        private static string _postmanUrl = "https://b594b385-5e55-41b2-8865-926a5168a42b.mock.pstmn.io";
         private static TestServer _server;
         private static HttpClient _client;
 
