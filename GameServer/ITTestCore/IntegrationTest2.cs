@@ -72,31 +72,16 @@ namespace IT_Core
 
 
         private IUserRepository _fakeUserRepository;
-        private IDbContext _fakeDbContext;
 
-        
-        private readonly User _pers = new User()
-        {
-            Username = "PatrickPer",
-            GivenName = "Patrick",
-            LastName = "Per",
-            Password = "somethingU1",
-            Email = "123@123.com"
-        };
 
-        private readonly User _pers2 = new User()
-        {
-            Username = "DamnTestNames",
-            GivenName = "Damn",
-            LastName = "Names",
-            Password = "TestTestTest",
-            Email = "123@123.com"
-        };
+        private readonly IUser _pers = Substitute.For<IUser>();
 
-        private readonly Lobby _testLooby = new Lobby("DamnTestNames")
-        {
-            Id = "DamnTestLobby"
-        };
+
+        private readonly IUser _pers2 = Substitute.For<IUser>();
+
+
+        private readonly ILobby _testLooby = Substitute.For<ILobby>();
+          
 
 
         [SetUp]
@@ -108,10 +93,26 @@ namespace IT_Core
             _server.Host.Start();
             _client = _server.CreateClient();
             
+            
+
             //Fakes Setup
             _fakeUserRepository = StartupIntegrationTest2.FakeUserRepository;
             //_fakeDbContext = StartupIntegrationTest2.FakeDbContext;
 
+            _pers.Username = "PatrickPer";
+            _pers.GivenName = "Patrick";
+            _pers.LastName = "Per";
+            _pers.Password = "somethingU1";
+            _pers.Email = "123@123.com";
+
+
+            _pers2.Username = "DamnTestNames";
+            _pers2.GivenName = "Damn";
+            _pers2.LastName = "Names";
+            _pers2.Password = "TestTestTest";
+            _pers2.Email = "123@123.com";
+
+            _testLooby.Id = "DamnTestLobby";
         }
 
 
@@ -169,7 +170,14 @@ namespace IT_Core
             //arrange
             _client.DefaultRequestHeaders.Add("username", _pers.Username);
             _client.DefaultRequestHeaders.Add("password", _pers.Password);
-            var stringContent = new StringContent(JsonConvert.SerializeObject(_pers), Encoding.UTF8, "application/json");
+            //Need concrete implementartion for this one, am not exactly sure why any more maybe its serialization maybe its not. will investigate
+            var tmp = new User();
+            tmp.Username = _pers.Username;
+            tmp.Email = _pers.Email;
+            tmp.GivenName = _pers.GivenName;
+            tmp.LastName = _pers.LastName;
+            tmp.Password = _pers.Password;
+            var stringContent = new StringContent(JsonConvert.SerializeObject(tmp), Encoding.UTF8, "application/json");
 
             //act
             var response = await _client.PostAsync("api/User", stringContent);
