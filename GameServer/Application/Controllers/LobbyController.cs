@@ -11,7 +11,7 @@ using Domain.Models;
 
 namespace Application.Controllers
 {
-    public class LobbyController : ILobbyController
+    public class LobbyController : Interfaces.ILobbyController
     {
         //private Task _logOutTask;
 

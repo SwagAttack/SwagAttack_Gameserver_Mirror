@@ -11,13 +11,13 @@ namespace Application.Test.Unittests
     public class LobbyControllerUnitTests
     {
         private ILoginManager _fakeLoginManager;
-        private LobbyController _uut;
+        private Controllers.LobbyController _uut;
 
         [SetUp]
         public void SetUp()
         {
             _fakeLoginManager = Substitute.For<ILoginManager>();
-            _uut = new LobbyController(_fakeLoginManager);
+			_uut = new Controllers.LobbyController(_fakeLoginManager);
         }
 
         #region CreateLobbyAsync
