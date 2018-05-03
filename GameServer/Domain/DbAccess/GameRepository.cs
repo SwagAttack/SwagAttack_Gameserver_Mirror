@@ -1,6 +1,6 @@
 ﻿namespace Domain.Interfaces
 {
-	class UserRepository : IUserRepository
+	class GameRepository : IGameRepository
 	{
 	}
 }
