@@ -362,5 +362,39 @@ namespace Application.Test.Unittests
 
         #endregion
 
+        #region GetLobbyByIdAsync
+
+        [Test]
+        public void GetLobbyByIdAsync_LobbyExists_ReturnsUser()
+        {
+            // Arrange
+
+            string USERNAME = "Username";
+            string LOBBY_ID = "LobbyId";
+
+            _fakeLoginManager.SubscribeOnLogOut(USERNAME, Arg.Any<UserLoggedOutHandle>()).Returns(true);
+            _uut.CreateLobbyAsync(LOBBY_ID, USERNAME).Wait();
+
+            // Assert
+            Assert.IsNotNull(_uut.GetLobbyByIdAsync(LOBBY_ID).Result);
+        }
+
+        [Test]
+        public void GetLobbyByIdAsync_LobbyDoesNotExist_ReturnsNull()
+        {
+            // Arrange
+
+            string USERNAME = "Username";
+            string LOBBY_ID = "LobbyId";
+
+            _uut.CreateLobbyAsync(LOBBY_ID, USERNAME).Wait();
+
+            // Assert
+            Assert.IsNull(_uut.GetLobbyByIdAsync(LOBBY_ID).Result);
+        }
+
+        #endregion
+
+
     }
 }
