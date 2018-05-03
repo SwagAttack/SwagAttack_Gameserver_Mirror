@@ -27,6 +27,7 @@ using UserController = Application.Controllers.UserController;
 
 namespace IT_Core
 {
+    #region IntegrationTest2Startup
     public class IntegrationTest2Startup
     {
         public IDbContext FakeDbContext = Substitute.For<IDbContext>();
@@ -67,6 +68,7 @@ namespace IT_Core
             app.UseMvc();
         }
     }
+    #endregion
     //[TestFixture] <--- Er blevet udkommenteret, da en textFixture uden tests får Travis til at fejle
     public class IntegrationTest2
     {
