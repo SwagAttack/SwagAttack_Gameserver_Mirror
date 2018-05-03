@@ -1,0 +1,10 @@
+version: 0.0.{build}
+environment:
+  COVERALLS_REPO_TOKEN:
+    secure: Vh/U97ttvqbrLobU2llEhM66cJPI3Ff4mhW2YQAhkNPRajfDgyyxIl26Z7QpKupT
+before_build:
+  - nuget restore GameServer/GameServer.sln
+build_script:
+  - dotnet build GameServer/GameServer.sln
+after_test:
+  - cmd: after_test.cmd
