@@ -2,7 +2,6 @@ using Application.Controllers;
 using Application.Interfaces;
 using Application.Managers;
 using Communication.Formatters;
-using Domain.DbAccess;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
