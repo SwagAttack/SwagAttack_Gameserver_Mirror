@@ -3,7 +3,7 @@ using Domain.Models;
 using Persistance.Interfaces;
 using Persistance.Repository;
 
-namespace Domain.Interfaces
+namespace Domain.DbAccess
 {
 	public class GameRepository : SwagRepository<IGamePlayerInfo, GamePlayerInfo>, IGameRepository
 	{
