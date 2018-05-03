@@ -1,16 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
-using Application.Interfaces;
-using Communication.Interfaces;
-using Communication.RESTControllers;
+﻿using System.Threading.Tasks;
 using Domain.Interfaces;
 using Domain.Models;
-using Microsoft.AspNetCore.Hosting.Internal;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using NSubstitute;
 using NUnit.Framework;
 using Moq;

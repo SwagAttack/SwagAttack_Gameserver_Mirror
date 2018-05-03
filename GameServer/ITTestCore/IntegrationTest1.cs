@@ -128,6 +128,23 @@ namespace IT_Core
             
         }
 
+        [Test]
+        public async Task IntegrationTest1_GameServer_CommunicationLayer_LoginUser_LoginUserReturnsNull()
+        {
+            //arrange
+            User nullUser = null;
+            _client.DefaultRequestHeaders.Add("username", "NotMaximillian");
+            _client.DefaultRequestHeaders.Add("password", "Not123456789");
+            fakeUserController.GetUser("NotMaximillian", "Not123456789").Returns(nullUser);
+
+            //act
+            var response = await _client.GetAsync("api/User/Login");
+
+            //assert
+            Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.NotFound));
+
+        }
+
 
         //Test if Createuser with pers as userobj, gets received in AppLayer CreateUser
         [Test]
@@ -144,6 +161,24 @@ namespace IT_Core
 
             //assert
             fakeUserController.Received().CreateUser(Arg.Is<IUser>(x => x.Username == "Maximillian"));
+        }
+
+        [Test]
+        public async Task IntegrationTest1_GameServer_CommunicationLayer_CreateUser_CreateUserReturnsNull()
+        {
+            //assert
+            User nullUser = null;
+            _client.DefaultRequestHeaders.Add("username", "Maximillian");
+            _client.DefaultRequestHeaders.Add("password", "123456789");
+            fakeUserController.CreateUser(Arg.Any<IUser>()).Returns(nullUser);
+
+            var stringContent = new StringContent(JsonConvert.SerializeObject(_pers), Encoding.UTF8, "application/json");
+
+            //act
+            var response = await _client.PostAsync("api/User", stringContent);
+
+            //assert
+            Assert.That(response.StatusCode,Is.EqualTo(System.Net.HttpStatusCode.BadRequest));
         }
 
         [Test]
@@ -189,6 +224,30 @@ namespace IT_Core
         }
 
         [Test]
+        public async Task IntegrationTest1_GameServer_CommunicationLayer_CreateLobby_CreateLobbyReturnsNull()
+        {
+            //arrange
+            Lobby nullLobby = null;
+            _client.DefaultRequestHeaders.Add("username", "Maximillian");
+            _client.DefaultRequestHeaders.Add("password", "123456789");
+            fakeLobbyController.CreateLobbyAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(nullLobby);
+
+            var parameters = new Dictionary<string, string>()
+            {
+                {"lobbyId","DenseLobby" }
+            };
+            var requestUri = QueryHelpers.AddQueryString("api/Lobby/Create", parameters);
+
+            var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
+
+            //act
+            HttpResponseMessage response = await _client.SendAsync(request);
+
+            //assert
+            Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.BadRequest));
+        }
+
+        [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_JoinLobby()
         {
             //arrange
@@ -211,6 +270,31 @@ namespace IT_Core
         }
 
         [Test]
+        public async Task IntegrationTest1_GameServer_CommunicationLayer_JoinLobby_JoinLobbyReturnsNull()
+        {
+            //arrange
+            Lobby nullLobby = null;
+            _client.DefaultRequestHeaders.Add("username", _pers2.Username);
+            _client.DefaultRequestHeaders.Add("password", _pers2.Password);
+            fakeLobbyController.JoinLobbyAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(nullLobby);
+
+
+            var parameters = new Dictionary<string, string>()
+            {
+                {"lobbyId", "DenseLobby"}
+            };
+            var requestUri = QueryHelpers.AddQueryString("api/Lobby/Join", parameters);
+
+            var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
+
+            //act
+            HttpResponseMessage response = await _client.SendAsync(request);
+
+            //assert
+            Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.BadRequest));
+        }
+
+        [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_LeaveLobby()
         {
             //arrange
@@ -230,6 +314,29 @@ namespace IT_Core
 
             //assert
             await fakeLobbyController.Received().LeaveLobbyAsync("DenseLobby", _pers.Username);
+        }
+
+        [Test]
+        public async Task IntegrationTest1_GameServer_CommunicationLayer_LeaveLobby_LeaveLobbyReturnsNull()
+        {
+            //arrange
+            _client.DefaultRequestHeaders.Add("username", _pers2.Username);
+            _client.DefaultRequestHeaders.Add("password", _pers2.Password);
+            fakeLobbyController.LeaveLobbyAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
+
+            var joinLobbyParameters = new Dictionary<string, string>()
+            {
+                {"lobbyId", "DenseLobby"}
+            };
+            var joinLobbyRequestUri = QueryHelpers.AddQueryString("api/Lobby/Leave", joinLobbyParameters);
+
+            var joinLobbyRequest = new HttpRequestMessage(HttpMethod.Post, joinLobbyRequestUri);
+
+            //act
+            HttpResponseMessage response = await _client.SendAsync(joinLobbyRequest);
+
+            //assert
+            Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.BadRequest));
         }
 
 
