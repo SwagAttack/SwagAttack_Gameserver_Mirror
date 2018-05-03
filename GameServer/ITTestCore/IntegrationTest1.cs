@@ -18,6 +18,7 @@ using NUnit.Framework;
 
 namespace IT_Core
 {
+    #region StartupIntegrationTest1
     public class StartupIntegrationTest1
     {
         public static IUserController FakeUserController = Substitute.For<IUserController>();
@@ -36,8 +37,6 @@ namespace IT_Core
         {
             services.AddMvc(options =>
             {
-                //options.Filters.Add(typeof(ValidateModelStateAttribute));
-                //options.Filters.Add(new RequireHttpsAttribute());
                 options.InputFormatters.Insert(0, new JsonInputFormatter());
             });
 
@@ -54,6 +53,7 @@ namespace IT_Core
             app.UseMvc();
         }
     }
+    #endregion
 
     [TestFixture] 
     public class IntegrationTest1
@@ -116,63 +116,62 @@ namespace IT_Core
         [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_LoginUser()
         {
-
+            //arrange
             _client.DefaultRequestHeaders.Add("username", "Maximillian");
             _client.DefaultRequestHeaders.Add("password", "123456789");
-
-            var stringContent = new StringContent(JsonConvert.SerializeObject(_pers), Encoding.UTF8, "application/json");
-            var responseCreateUser = await _client.PostAsync("api/User", stringContent);
         
+            //act
             var response = await _client.GetAsync("api/User/Login");
-
-            var tmp = response;
-
+            
+            //assert
             fakeUserController.Received().GetUser("Maximillian","123456789");
             
         }
+
 
         //Test if Createuser with pers as userobj, gets received in AppLayer CreateUser
         [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_CreateUser()
         {
+            //assert
             _client.DefaultRequestHeaders.Add("username", "Maximillian");
             _client.DefaultRequestHeaders.Add("password", "123456789");
 
             var stringContent = new StringContent(JsonConvert.SerializeObject(_pers), Encoding.UTF8, "application/json");
 
-
+            //act
             var response = await _client.PostAsync("api/User", stringContent);
 
-            
+            //assert
             fakeUserController.Received().CreateUser(Arg.Is<IUser>(x => x.Username == "Maximillian"));
         }
 
         [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_GetAllLobbies()
         {
+            //act
             var response = await _client.GetAsync("api/Lobby");
 
+            //assert
             await fakeLobbyController.Received().GetAllLobbiesAsync();
         }
 
         [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_GetLobby()
         {
+            //act
             var response = await _client.GetAsync("api/Lobby/DenseLobby");
 
+            //assert
             await fakeLobbyController.Received(1).GetLobbyByIdAsync("DenseLobby");
         }
 
         [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_CreateLobby()
         {
+            //arrange
             _client.DefaultRequestHeaders.Add("username", "Maximillian");
             _client.DefaultRequestHeaders.Add("password", "123456789");
-
-            var stringContent = new StringContent(JsonConvert.SerializeObject(_pers), Encoding.UTF8, "application/json");
-            var responseCreateUser = await _client.PostAsync("api/User", stringContent);
-
-            var loginResponse = await _client.GetAsync("api/User/Login");
 
             var parameters = new Dictionary<string, string>()
             {
@@ -181,52 +180,21 @@ namespace IT_Core
             var requestUri = QueryHelpers.AddQueryString("api/Lobby/Create", parameters);
 
             var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
-
-
-
+            
+            //act
             HttpResponseMessage response = await _client.SendAsync(request);
-
-
-
+            
+            //assert
             await fakeLobbyController.Received().CreateLobbyAsync("DenseLobby", "Maximillian");
         }
 
         [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_JoinLobby()
         {
-            _client.DefaultRequestHeaders.Add("username", "Maximillian");
-            _client.DefaultRequestHeaders.Add("password", "123456789");
-            var stringContent1 =
-                new StringContent(JsonConvert.SerializeObject(_pers), Encoding.UTF8, "application/json");
-            var stringContent2 =
-                new StringContent(JsonConvert.SerializeObject(_pers2), Encoding.UTF8, "application/json");
-
-            //Create 2 users and login with first
-
-            var responseCreateUser1 = await _client.PostAsync("api/User", stringContent1);
-            var responseCreateUser2 = await _client.PostAsync("api/User", stringContent2);
-            var loginResponseUser1 = await _client.GetAsync("api/User/Login");
-
-            //Create Lobby
-
-            var createLobbyParameters = new Dictionary<string, string>()
-            {
-                {"lobbyId", "DenseLobby"}
-            };
-            var createLobbyRequestUri = QueryHelpers.AddQueryString("api/Lobby/Create", createLobbyParameters);
-            var createLobbyRequest = new HttpRequestMessage(HttpMethod.Post, createLobbyRequestUri);
-
-            HttpResponseMessage createLobbyResponse = await _client.SendAsync(createLobbyRequest);
-
-            //Log in with second user
-            _client.DefaultRequestHeaders.Remove("username");
-            _client.DefaultRequestHeaders.Remove("password");
+            //arrange
             _client.DefaultRequestHeaders.Add("username", _pers2.Username);
             _client.DefaultRequestHeaders.Add("password", _pers2.Password);
-            var loginResponseUser2 = await _client.GetAsync("api/User/Login");
-
-            //Join Lobby
-
+            
             var parameters = new Dictionary<string, string>()
             {
                 {"lobbyId", "DenseLobby"}
@@ -235,47 +203,20 @@ namespace IT_Core
 
             var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
             
+            //act
             HttpResponseMessage response = await _client.SendAsync(request);
 
+            //assert
             await fakeLobbyController.Received().JoinLobbyAsync("DenseLobby", _pers2.Username);
         }
 
         [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_LeaveLobby()
         {
+            //arrange
             _client.DefaultRequestHeaders.Add("username", "Maximillian");
             _client.DefaultRequestHeaders.Add("password", "123456789");
-            var stringContent1 =
-                new StringContent(JsonConvert.SerializeObject(_pers), Encoding.UTF8, "application/json");
-            var stringContent2 =
-                new StringContent(JsonConvert.SerializeObject(_pers2), Encoding.UTF8, "application/json");
-
-            //Create 2 users and login with first
-
-            var responseCreateUser1 = await _client.PostAsync("api/User", stringContent1);
-            var responseCreateUser2 = await _client.PostAsync("api/User", stringContent2);
-            var loginResponseUser1 = await _client.GetAsync("api/User/Login");
-
-            //Create Lobby
-
-            var createLobbyParameters = new Dictionary<string, string>()
-            {
-                {"lobbyId", "DenseLobby"}
-            };
-            var createLobbyRequestUri = QueryHelpers.AddQueryString("api/Lobby/Create", createLobbyParameters);
-            var createLobbyRequest = new HttpRequestMessage(HttpMethod.Post, createLobbyRequestUri);
-
-            HttpResponseMessage createLobbyResponse = await _client.SendAsync(createLobbyRequest);
-
-            //Log in with second user
-            _client.DefaultRequestHeaders.Remove("username");
-            _client.DefaultRequestHeaders.Remove("password");
-            _client.DefaultRequestHeaders.Add("username", _pers2.Username);
-            _client.DefaultRequestHeaders.Add("password", _pers2.Password);
-            var loginResponseUser2 = await _client.GetAsync("api/User/Login");
-
-            //Join Lobby
-
+          
             var joinLobbyParameters = new Dictionary<string, string>()
             {
                 {"lobbyId", "DenseLobby"}
@@ -284,13 +225,11 @@ namespace IT_Core
 
             var joinLobbyRequest = new HttpRequestMessage(HttpMethod.Post, joinLobbyRequestUri);
 
+            //act
             HttpResponseMessage response = await _client.SendAsync(joinLobbyRequest);
 
-            //Leave Lobby
-
-
-
-            await fakeLobbyController.Received().LeaveLobbyAsync("DenseLobby", _pers2.Username);
+            //assert
+            await fakeLobbyController.Received().LeaveLobbyAsync("DenseLobby", _pers.Username);
         }
 
 
