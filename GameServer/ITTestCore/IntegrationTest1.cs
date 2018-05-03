@@ -61,50 +61,48 @@ namespace IT_Core
         private static TestServer _server;
         private static HttpClient _client;
 
-        string user = "Maximillian";
-        string pass = "123456789";
 
         private IUserController fakeUserController;
         private ILobbyController fakeLobbyController;
         private ILobby fakeLobby;
 
-        private readonly User _pers = new User();
+        private readonly IUser _pers = Substitute.For<IUser>();
 
-        private readonly User _pers2 = new User()
-        {
-            Username = "PatrickPer",
-            GivenName = "Patrick",
-            LastName = "Per",
-            Password = "somethingU1",
-            Email = "123@123.com"
-        };
+        private readonly IUser _pers2 = Substitute.For<IUser>();
+
         
         [SetUp]
         public void Setup()
         {
-            Lobby testLobby = new Lobby("Maximillian");
-            testLobby.Id = "DenseLobby";
-            testLobby.AdminUserName = "Maximillian";
-
-            Lobby testLobby2 = testLobby;
-            testLobby2.AddUser(_pers2.Username);
-
-
-            _pers.Username = user;
-            _pers.GivenName = "Max";
-            _pers.LastName = "Imilian";
-            _pers.Password = pass;
-            _pers.Email = "123@123.com";
-
-            // Arrange
+            // setup testserver
             _server = new TestServer(new WebHostBuilder()
                 .UseStartup<StartupIntegrationTest1>());
             _server.Host.Start();
-
             _client = _server.CreateClient();
+
+            //creating domain objects should these be fakes ´???
+
+            ILobby testLobby = Substitute.For<ILobby>();
+            testLobby.Id = "DenseLobby";
+            testLobby.AdminUserName = "Maximillian";
+            
+            _pers2.Username = "PatrickPer";
+            _pers2.GivenName = "Patrick";
+            _pers2.LastName = "Per";
+            _pers2.Password = "somethingU1";
+            _pers2.Email = "123@123.com";
+
+            _pers.Username = "Maximillian";
+            _pers.GivenName = "Max";
+            _pers.LastName = "Imilian";
+            _pers.Password = "123456789";
+            _pers.Email = "123@123.com";
+
+            
+            //Fakes Setup
             StartupIntegrationTest1.FakeLoginManager.CheckLoginStatus(Arg.Any<string>(),Arg.Any<string>()).Returns(true);
             StartupIntegrationTest1.FakeLobbyController.CreateLobbyAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(testLobby);
-            StartupIntegrationTest1.FakeLobbyController.JoinLobbyAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(testLobby2);
+            StartupIntegrationTest1.FakeLobbyController.JoinLobbyAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(testLobby);
             StartupIntegrationTest1.FakeLobbyController.LeaveLobbyAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
             fakeUserController = StartupIntegrationTest1.FakeUserController;
             fakeLobbyController = StartupIntegrationTest1.FakeLobbyController;
@@ -153,14 +151,23 @@ namespace IT_Core
             //assert
             _client.DefaultRequestHeaders.Add("username", "Maximillian");
             _client.DefaultRequestHeaders.Add("password", "123456789");
+            fakeUserController.CreateUser(Arg.Any<IUser>()).Returns(_pers);
 
-            var stringContent = new StringContent(JsonConvert.SerializeObject(_pers), Encoding.UTF8, "application/json");
+            //Concrete user is used, cuz serialization dont work on fakes.
+            var tmp = new User();
+            tmp.Username = _pers.Username;
+            tmp.Email = _pers.Email;
+            tmp.GivenName = _pers.GivenName;
+            tmp.LastName = _pers.LastName;
+            tmp.Password = _pers.Password;
+
+            var stringContent = new StringContent(JsonConvert.SerializeObject(tmp), Encoding.UTF8, "application/json");
 
             //act
             var response = await _client.PostAsync("api/User", stringContent);
 
             //assert
-            fakeUserController.Received().CreateUser(Arg.Is<IUser>(x => x.Username == "Maximillian"));
+            fakeUserController.Received().CreateUser(Arg.Any<IUser>());
         }
 
         [Test]
