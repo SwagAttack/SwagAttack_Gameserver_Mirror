@@ -20,10 +20,9 @@ namespace IT_Core
 {
 
     //[TestFixture] <--- Er blevet udkommenteret, da en textFixture uden tests får Travis til at fejle
-    public class IT_App_Layer
+    public class IntegrationTest2
     {
 /*
-
         string user = "Username";
         string pass = "Pass";
 
@@ -41,7 +40,6 @@ namespace IT_Core
 
 
         [SetUp]
-
         public void Setup()
         {
             /*_uut = new UserController(pOUW,pLM);

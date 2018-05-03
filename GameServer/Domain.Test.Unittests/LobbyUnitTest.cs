@@ -19,6 +19,7 @@ namespace Domain.Test.Unittests
             _adminUser = Substitute.For<IUser>();
             _adminUser.Username = "MacroMan";
             _uut = new Lobby(_adminUser.Username);
+            _uut.Id = "AwesomeTestLobby";
         }
 
         [Test]

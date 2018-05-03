@@ -1,13 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Application.Interfaces;
-using Application.Managers;
-using Communication;
 using Communication.Formatters;
-using Communication.RESTControllers;
 using Domain.Interfaces;
 using Domain.Models;
 using Microsoft.AspNetCore.Builder;
@@ -19,18 +15,52 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using NSubstitute;
 using NUnit.Framework;
-using RestSharp;
 
 namespace IT_Core
 {
-    
-    [TestFixture] //<--- Er blevet udkommenteret, da en textFixture uden tests får Travis til at fejle
+    public class StartupIntegrationTest1
+    {
+        public static IUserController FakeUserController = Substitute.For<IUserController>();
+        public static ILobbyController FakeLobbyController = Substitute.For<ILobbyController>();
+        public static ILoginManager FakeLoginManager = Substitute.For<ILoginManager>();
+
+        public StartupIntegrationTest1(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddMvc(options =>
+            {
+                //options.Filters.Add(typeof(ValidateModelStateAttribute));
+                //options.Filters.Add(new RequireHttpsAttribute());
+                options.InputFormatters.Insert(0, new JsonInputFormatter());
+            });
+
+            services.AddSingleton<ILoginManager>(provider => FakeLoginManager);
+            services.AddTransient<IUserController>(provider => FakeUserController);
+            services.AddTransient<ILobbyController>(provider => FakeLobbyController);
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
+            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+
+            app.UseMvc();
+        }
+    }
+
+    [TestFixture] 
     public class IntegrationTest1
     {
         private static TestServer _server;
         private static HttpClient _client;
 
-        //UserController.LoginDto LoginInfo = new UserController.LoginDto();
         string user = "Maximillian";
         string pass = "123456789";
 
@@ -82,7 +112,6 @@ namespace IT_Core
 
 
         //*************************Test Communication Layer***************************
-        //These tests are made by using PostMan to test the api.
         //Test if we sent username and password to Usercontroller in communicationlayer, it gets received in usercontroler in applicationLayer
         [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_LoginUser()
@@ -267,44 +296,6 @@ namespace IT_Core
 
     }
 
-    public class StartupIntegrationTest1
-    {
-        public static IUserController FakeUserController = Substitute.For<IUserController>();
-        public static ILobbyController FakeLobbyController = Substitute.For<ILobbyController>();
-        public static ILoginManager FakeLoginManager = Substitute.For<ILoginManager>();
-
-        public StartupIntegrationTest1(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddMvc(options =>
-            {
-                //options.Filters.Add(typeof(ValidateModelStateAttribute));
-                //options.Filters.Add(new RequireHttpsAttribute());
-                options.InputFormatters.Insert(0, new JsonInputFormatter());
-            });
-
-            services.AddSingleton<ILoginManager>(provider => FakeLoginManager);
-            services.AddTransient<IUserController>(provider => FakeUserController);
-            services.AddTransient<ILobbyController>(provider => FakeLobbyController);
-        }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-        {
-            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
-
-            //var options = new RewriteOptions().AddRedirectToHttps();
-            //app.UseRewriter(options);
-
-            app.UseMvc();
-        }
-    }
+  
 
 }
