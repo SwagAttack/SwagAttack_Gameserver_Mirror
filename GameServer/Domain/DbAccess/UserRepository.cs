@@ -1,8 +1,9 @@
-﻿using Domain.Models;
+﻿using Domain.Interfaces;
+using Domain.Models;
 using Persistance.Interfaces;
 using Persistance.Repository;
 
-namespace Domain.Interfaces
+namespace Domain.DbAccess
 {
 	public class UserRepository : SwagRepository<IUser,User>, IUserRepository
 	{
