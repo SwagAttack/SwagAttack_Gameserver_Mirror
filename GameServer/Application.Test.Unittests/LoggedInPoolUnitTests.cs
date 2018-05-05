@@ -229,7 +229,7 @@ namespace Application.Test.Unittests
             Thread.Sleep(5200);
 
             // Act
-            _fakeTimer.ExpiredEvent += Raise.EventWith(null, EventArgs.Empty);
+            _fakeTimer.ExpiredEvent += Raise.Event();
 
             // Assert
             Assert.That(loggedOutUsers.Count == 2);

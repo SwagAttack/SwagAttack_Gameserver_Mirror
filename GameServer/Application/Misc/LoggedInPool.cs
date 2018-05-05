@@ -62,7 +62,7 @@ namespace Application.Misc
 
         private void TimerTimeout(object sender, EventArgs eventArgs)
         {
-            var timeOuts = new ConcurrentBag<string>();
+            var timeOuts = new ConcurrentDictionary<string, UserKey>();
             var now = DateTime.Now;
 
             using (_lock.Lock())
@@ -71,16 +71,20 @@ namespace Application.Misc
                 {
                     if (CheckForTimeout(now, e.Value))
                     {
-                        timeOuts.Add(e.Key.Username);
-                        _loggedInUsers.Remove(e.Key.Username);
-                        _expirationStamps.Remove(e.Key);
+                        timeOuts[e.Key.Username] = e.Key;
                     }
                 });
+
+                foreach (var item in timeOuts)
+                {
+                    _expirationStamps.Remove(item.Value);
+                    _loggedInUsers.Remove(item.Key);
+                }
             }
 
             if(timeOuts.Count != 0)
                 UsersTimedOutEvent?.Invoke(this, 
-                    new LoggedOutUsersEventArgs(timeOuts.ToList()));
+                    new LoggedOutUsersEventArgs(timeOuts.Keys.ToList()));
 
             _timer.StartWithSeconds(10);
         }

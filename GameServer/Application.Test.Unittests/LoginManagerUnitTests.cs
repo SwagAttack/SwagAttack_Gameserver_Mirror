@@ -14,7 +14,6 @@ namespace Application.Test.Unittests
     public class LoginManagerUnitTests
     {
         private LoginManager _uut;
-        private ITimer _fakeTimer;
         private ILoggedInPool _fakeLoggedInPool;
 
         [SetUp]
