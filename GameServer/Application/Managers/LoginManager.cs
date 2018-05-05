@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Application.Interfaces;
 using Application.Misc;
 using Domain.Interfaces;
@@ -9,116 +11,42 @@ namespace Application.Managers
 {
     public class LoginManager : ILoginManager
     {
-        public class LoggedInUser
-        {
-            private string _username;
-            private string _password;
-            private DateTime _expiring;
-
-            public LoggedInUser(string username, string password, DateTime expiring)
-            {
-                _username = username;
-                _password = password;
-                _expiring = expiring;
-            }
-
-            public string Username => _username;
-            public string Password => _password;
-            public DateTime Expiration => _expiring;
-
-            public void Update(string password = null)
-            {
-                if (password != null)
-                    _password = password;
-
-                _expiring = DateTime.Now.AddMinutes(20);
-            }
-
-        }
-
         private static ILoginManager _instance = null;
 
-        public IReadOnlyDictionary<string, LoggedInUser> LoggedInUsers
-        {
-            get
-            {
-                lock (_loggedInUsers)
-                {
-                    return _loggedInUsers;
-                }           
-            }
-        }
+        private readonly BlockingCollection<string> _loggedOutUsers =
+            new BlockingCollection<string>(new ConcurrentQueue<string>(), 100); // Can hold to 100 names at once
 
-        private readonly Dictionary<string, LoggedInUser> _loggedInUsers;
         private readonly Dictionary<string, HashSet<UserLoggedOutHandle>> _listeners;
+        private readonly ILoggedInPool _loggedInPool;
 
-        private readonly ITimer _timeoutTimer;
-
-        public static ILoginManager GetInstance(ITimer timer = null)
+        public static ILoginManager GetInstance(ILoggedInPool pool = null)
         {
-
-            return _instance ?? (_instance = new LoginManager(timer ?? new CountDownTimer()));
-        }
-
-        public void Login(IUser user, DateTime timeout)
-        {
-            lock (_loggedInUsers)
-            {
-                if (!_loggedInUsers.ContainsKey(user.Username.ToLower()))
-                {
-                    var loggedInUser = new LoggedInUser(
-                        username: user.Username,
-                        password: user.Password,
-                        expiring: timeout);
-
-                    _loggedInUsers[user.Username.ToLower()] = loggedInUser;
-                }
-                else
-                {
-                    _loggedInUsers[user.Username.ToLower()].Update(user.Password);
-                }
-            }
+            return _instance ?? (_instance = new LoginManager(pool ?? new LoggedInPool(new CountDownTimer())));
         }
 
         public void Login(IUser user)
         {
-            Login(user, DateTime.Now.AddMinutes(20));
+            _loggedInPool.AddOrUpdateAsync(user.Username, user.Password);
         }
 
         public bool CheckLoginStatus(string username, string password)
         {
-            lock(_loggedInUsers)
-            {
-                if (_loggedInUsers.ContainsKey(username.ToLower()))
-                {
-                    var loggedInUser = _loggedInUsers[username.ToLower()];
-                    if (password == loggedInUser.Password)
-                    {
-                        loggedInUser.Update();
-                        return true;
-                    }
-                }
-
-                return false;
-            }
+            return _loggedInPool.ConfirmAndRefreshAsync(username, password).Result;
         }
 
         public bool SubscribeOnLogOut(string username, UserLoggedOutHandle handle)
         {
-            lock (_loggedInUsers)
-            {
-                if (!_loggedInUsers.ContainsKey(username.ToLower()))
-                    return false;
-            }
+            if (!_loggedInPool.ConfirmAsync(username).Result)
+                return false;
 
             lock (_listeners)
             {
-                if (!_listeners.ContainsKey(username.ToLower()))
+                if (!_listeners.ContainsKey(username))
                 {
-                    _listeners.Add(username.ToLower(), new HashSet<UserLoggedOutHandle>());
+                    _listeners.Add(username, new HashSet<UserLoggedOutHandle>());
                 }
 
-                return _listeners[username.ToLower()].Add(handle);
+                return _listeners[username].Add(handle);
             }
         }
 
@@ -126,64 +54,54 @@ namespace Application.Managers
         {
             lock (_listeners)
             {
-                if (!_listeners.ContainsKey(username.ToLower()))
+                if (!_listeners.ContainsKey(username))
                     return false;
 
-                if (!_listeners[username.ToLower()].Remove(handle))
+                if (!_listeners[username].Remove(handle))
                     return false;
 
-                if (_listeners[username.ToLower()].Count == 0)
-                    _listeners.Remove(username.ToLower());
+                if (_listeners[username].Count == 0)
+                    _listeners.Remove(username);
 
                 return true;
             }
         }
 
-        public LoginManager(ITimer timeoutTimer)
+        public LoginManager(ILoggedInPool loggedInPool)
         {
+            _loggedInPool = loggedInPool ?? throw new ArgumentNullException(nameof(loggedInPool));
             _listeners = new Dictionary<string, HashSet<UserLoggedOutHandle>>();
-            _loggedInUsers = new Dictionary<string, LoggedInUser>();
-            _timeoutTimer = timeoutTimer;
+            _loggedInPool.UsersTimedOutEvent += OnUsersTimedOutHandler;
 
-            _timeoutTimer.ExpiredEvent += TimeoutTimerOnExpiredEvent;
-            _timeoutTimer.StartWithSeconds(60); // StartWithSeconds for 60 seconds
+            var logOutInvokerThread = new Thread(LogOutInvoker) {IsBackground = true };
+            logOutInvokerThread.Start();
         }
 
-        private void TimeoutTimerOnExpiredEvent(object sender, EventArgs eventArgs)
+        private void OnUsersTimedOutHandler(object sender, LoggedOutUsersEventArgs loggedOutUsersEventArgs)
         {
-            var timer = (ITimer)sender;
-            var now = DateTime.Now;
-
-            var loggedOutUsers = new List<string>();
-
-            lock (_loggedInUsers)
+            foreach (var user in loggedOutUsersEventArgs.LoggedOutUsers)
             {
-                foreach (var user in _loggedInUsers.Values.ToList())
-                {
-                    // User expired
-                    if (user.Expiration.CompareTo(now) < 0)
-                    {
-                        loggedOutUsers.Add(user.Username);
-                        _loggedInUsers.Remove(user.Username.ToLower());                      
-                    }
-                }
+                _loggedOutUsers.Add(user);
             }
+        }
 
-            lock (_listeners)
+        private void LogOutInvoker()
+        {
+            for (;;)
             {
-                foreach (var username in loggedOutUsers)
+                var user = _loggedOutUsers.Take();
+                if (user == null) continue;
+                lock (_listeners)
                 {
-                    if (_listeners.ContainsKey(username.ToLower()))
+                    if (_listeners.TryGetValue(user, out var handlers))
                     {
-                        foreach (var handler in _listeners[username.ToLower()].ToList())
+                        foreach (var handler in handlers)
                         {
-                            handler.Invoke(this, username);
+                            handler.Invoke(null, user);
                         }
                     }
                 }
             }
-
-            timer.StartWithSeconds(60);
         }
     }
 
