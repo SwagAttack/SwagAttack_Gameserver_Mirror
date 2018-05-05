@@ -63,29 +63,35 @@ namespace Application.Misc
         private void TimerTimeout(object sender, EventArgs eventArgs)
         {
             var timeOuts = new ConcurrentDictionary<string, UserKey>();
-            var now = DateTime.Now;
 
             using (_lock.Lock())
             {
                 Parallel.ForEach(_expirationStamps, e =>
                 {
-                    if (CheckForTimeout(now, e.Value))
+                    if (DateTimeHelper.CheckForTimeout(e.Value))
                     {
                         timeOuts[e.Key.Username] = e.Key;
                     }
                 });
-
-                foreach (var item in timeOuts)
-                {
-                    _expirationStamps.Remove(item.Value);
-                    _loggedInUsers.Remove(item.Key);
-                }
             }
+
+            var remover = Task.Run((() =>
+            {
+                using (_lock.Lock())
+                {
+                    foreach (var item in timeOuts)
+                    {
+                        _expirationStamps.Remove(item.Value);
+                        _loggedInUsers.Remove(item.Key);
+                    }
+                }
+            }));
 
             if(timeOuts.Count != 0)
                 UsersTimedOutEvent?.Invoke(this, 
                     new LoggedOutUsersEventArgs(timeOuts.Keys.ToList()));
 
+            remover.Wait();
             _timer.StartWithSeconds(10);
         }
 
@@ -139,21 +145,22 @@ namespace Application.Misc
                 return false;
             }
         }
-
-        private static bool CheckForTimeout(DateTime now, DateTime markedTime)
-        {
-            return markedTime.CompareTo(now) < 0;
-        }
     }
 
     internal struct UserKey
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public string Username { get; }
+        public string Password { get; }
 
         public static UserKey CreateKey(string username, string password)
         {
-            return new UserKey{Username = username, Password = password};
+            return new UserKey(username, password);
+        }
+
+        private UserKey(string username, string password)
+        {
+            Username = username;
+            Password = password;
         }
     }
 
@@ -162,6 +169,11 @@ namespace Application.Misc
         public static DateTime GetNewTimeOut()
         {
             return DateTime.Now.AddMinutes(20);
+        }
+
+        public static bool CheckForTimeout(DateTime markedTime)
+        {
+            return markedTime.CompareTo(DateTime.Now) < 0;
         }
     }
 }
