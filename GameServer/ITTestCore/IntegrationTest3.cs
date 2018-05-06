@@ -93,13 +93,14 @@ namespace IT_Core
     }
     #endregion
 
-    [TestFixture]
+    [TestFixture, NonParallelizable]
     public class IntegrationTest3
     {
         private static TestServer _server;
         private static HttpClient _client;
 
         private IDbContext _fakeDbContext;
+        private IDocumentClient _fakeDocumentClient;
 
         private IUser _testUserOne = new User()
         {
@@ -132,9 +133,17 @@ namespace IT_Core
 
             //Fakes Setup
             _fakeDbContext = StartupIntegrationTest3.FakeDbContext;
+            _fakeDbContext.DocumentClient = Substitute.For<IDocumentClient>();
         }
 
-        [Test]
+        [TearDown]
+        public void TearDown()
+        {
+            _fakeDocumentClient = null;
+            _fakeDbContext = null;
+        }
+
+        [Test, NonParallelizable]
         public async Task IntegrationTask3_DomainLayer_UserRepository_GetItemAsync_ReadDocumentAsyncIsCalled_ResponseNotFound()
         {
             //arrange
@@ -145,13 +154,14 @@ namespace IT_Core
                 Message = "not found"
             };
 
-            var testException = HelperMethods.CreateDocumentClientExceptionForTesting(error,
+            var testException1 = HelperMethods.CreateDocumentClientExceptionForTesting(error,
                 HttpStatusCode.NotFound);
-            
-            _client.DefaultRequestHeaders.Add("username", _testUserOne.Username);
-            _client.DefaultRequestHeaders.Add("password", _testUserTwo.Password);
-            _fakeDbContext.DocumentClient.Returns(x => throw testException);
+            _fakeDbContext.DocumentClient.Returns(x => throw testException1);
 
+
+            _client.DefaultRequestHeaders.Add("username", _testUserOne.Username);
+            _client.DefaultRequestHeaders.Add("password", _testUserOne.Password);
+            
             //act
             var response = await _client.GetAsync("api/User/Login");
 
@@ -159,11 +169,11 @@ namespace IT_Core
             Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.NotFound));
         }
 
-        /*[Test]
+        [Test, NonParallelizable]
         public async Task IntegrationTask3_DomainLayer_UserRepository_GetItemAsync_ReadDocumentAsyncIsCalled_ResponseOk()
         {
             //arrange
-
+            
             var stringContent = new StringContent(JsonConvert.SerializeObject(_testUserOne), Encoding.UTF8, "application/json");
 
             var document = new Document();
@@ -171,19 +181,65 @@ namespace IT_Core
             document.LoadFrom(jsobObj.CreateReader());
 
             _client.DefaultRequestHeaders.Add("username", _testUserOne.Username);
-            _client.DefaultRequestHeaders.Add("password", _testUserTwo.Password);
-            var documentClientResponse = new ResourceResponse<Document>();
-
-
+            _client.DefaultRequestHeaders.Add("password", _testUserOne.Password);
+            var documentClientResponse = new ResourceResponse<Document>(document);
+                   
+            _fakeDbContext.DocumentClient.ReadDocumentAsync(Arg.Any<Uri>()).Returns(Task.FromResult(documentClientResponse));
+   
 
             //act
             var response = await _client.GetAsync("api/User/Login");
 
             //assert
+            Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.OK));
+        }
 
-            await _fakeDbContext.Received().DocumentClient.ReadDocumentAsync(Arg.Any<string>());
-            //Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.OK));
-        }*/
+        [Test]
+        public async Task IntegrationTask3_DomainLayer_UserRepository_CreateItemAsync_CreateDocumentAsyncIsCalled_ResponseNotFound()
+        {
+            //arrange
+            var error = new Error
+            {
+                Id = Guid.NewGuid().ToString(),
+                Code = "409",
+                Message = "bad request"
+            };
+
+            var testException = HelperMethods.CreateDocumentClientExceptionForTesting(error,
+                HttpStatusCode.Conflict);
+
+            var stringContent = new StringContent(JsonConvert.SerializeObject(_testUserOne), Encoding.UTF8, "application/json");
+            _fakeDbContext.DocumentClient.Returns(x => throw testException);
+
+            //act
+            var response = await _client.PostAsync("api/User", stringContent);
+
+            //assert
+            Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.BadRequest));
+        }
+
+        [Test]
+        public async Task IntegrationTask3_DomainLayer_UserRepository_CreateItemAsync_CreateDocumentAsyncIsCalled_ResponseCreated()
+        {
+            //arrange
+
+            var document = new Document();
+            JObject jsobObj = JObject.FromObject(_testUserOne);
+            document.LoadFrom(jsobObj.CreateReader());
+
+            _client.DefaultRequestHeaders.Add("username", _testUserOne.Username);
+            _client.DefaultRequestHeaders.Add("password", _testUserOne.Password);
+            var documentClientResponse = new ResourceResponse<Document>(document);
+            
+            var stringContent = new StringContent(JsonConvert.SerializeObject(_testUserOne), Encoding.UTF8, "application/json");
+            _fakeDbContext.DocumentClient.CreateDocumentAsync(Arg.Any<Uri>(), Arg.Any<IUser>()).Returns(Task.FromResult(documentClientResponse));
+
+            //act
+            var response = await _client.PostAsync("api/User", stringContent);
+
+            //assert
+            Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.Created));
+        }
 
     }
 }

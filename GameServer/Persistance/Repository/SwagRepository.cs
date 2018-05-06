@@ -123,9 +123,14 @@ namespace Persistance.Repository
         {
             try
             {
-                Context.DocumentClient.CreateDocumentCollectionIfNotExistsAsync(
+                Context.DocumentClient.CreateDocumentCollectionAsync(
                     UriFactory.CreateDatabaseUri(Context.DatabaseId),
                     new DocumentCollection() { Id = CollectionId }).Wait();
+
+            }
+            catch (AggregateException)
+            {
+                
             }
             catch (DocumentClientException)
             {
