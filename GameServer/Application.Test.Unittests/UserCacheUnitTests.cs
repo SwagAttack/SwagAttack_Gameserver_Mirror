@@ -66,11 +66,19 @@ namespace Application.Test.Unittests
         private DateTime _twentyMinutesFromNowLittleMore;
         private DateTime _twentyMinutesFromNowLittleLess;
 
+        private Dictionary<string, string> FakeUsers { get; set; }
+
         private bool TimeStampIsUpdatedAccordingToNow(DateTime dateTime)
         {
             _twentyMinutesFromNowLittleMore = DateTime.Now.AddMinutes(20).AddSeconds(1);
             _twentyMinutesFromNowLittleLess = DateTime.Now.AddMinutes(20).AddSeconds(-1);
             return (dateTime.CompareTo(_twentyMinutesFromNowLittleMore) < 0) && (dateTime.CompareTo(_twentyMinutesFromNowLittleLess) > 0);
+        }
+
+        [OneTimeSetUp]
+        public void BeforeAnyTest()
+        {
+            FakeUsers = FakeUserGenerator.GenerateFakeUsers(50000);
         }
 
         [SetUp]
@@ -268,25 +276,34 @@ namespace Application.Test.Unittests
             Assert.That(loggedOutUsers.Contains(UserOne) && loggedOutUsers.Contains(UserTwo) && !loggedOutUsers.Contains(UserThree));
         }
 
-        [Test]
-        public void AddOrUpdate_AddAlotOfUsersInParallel_TheyAreAllAdded()
+        [TestCase(1)]
+        [TestCase(2)]
+        [TestCase(3)]
+        [TestCase(4)]
+        [TestCase(5)]
+        [TestCase(6)]
+        [TestCase(7)]
+        [TestCase(8)]
+        public void AddOrUpdate_AddAlotOfUsersInParallel_TheyAreAllAdded(int i)
         {
-            var fakeUsers = FakeUserGenerator.GenerateFakeUsers(10000);
-
-            Parallel.ForEach(fakeUsers, e =>
+            try
             {
-                _uut.AddOrUpdateAsync(e.Key, e.Value).Wait();
-            });
+                Parallel.ForEach(FakeUsers, e =>
+                {
+                    _uut.AddOrUpdateAsync(e.Key, e.Value).Wait();
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
 
-            Assert.That(_uut.ExpirationStamps.Count, Is.EqualTo(fakeUsers.Count));
+            Assert.That(_uut.ExpirationStamps.Count, Is.EqualTo(FakeUsers.Count));
         }
 
         [Test]
         public void Timeout_ContainsManyOutDatedUsers_CorrectAmountIsLoggedOut()
         {
-            var fakeUsers = FakeUserGenerator.GenerateFakeUsers(10000);
-            var dateTimes = new ConcurrentBag<string>();
-
             var loggedOutUsers = new List<string>();
 
             // Subscribing to the event
@@ -298,30 +315,15 @@ namespace Application.Test.Unittests
                 }
             };
 
-            var lck = new object();
-            var random = new Random();
-
-            int GenerateRandom()
+            Parallel.ForEach(FakeUsers, e =>
             {
-                lock (lck)
-                {
-                    return random.Next(0, 6);
-                }
-            }
-            Parallel.ForEach(fakeUsers, e =>
-            {
-                var delay = GenerateRandom();
-                if (delay == 0)
-                {
-                    dateTimes.Add(e.Key);
-                }
-                var time = DateTime.Now.AddMinutes(delay);
-                _uut.AddOrUpdateAsync(e.Key, e.Value, time).Wait();
+                _uut.AddOrUpdateAsync(e.Key, e.Value, DateTime.Now.AddSeconds(5)).Wait();
             });
 
             _fakeTimer.ExpiredEvent += Raise.Event();
 
-            Assert.That(_uut.ExpirationStamps.Count, Is.EqualTo(fakeUsers.Count - dateTimes.Count));
+            Assert.That(_uut.ExpirationStamps.Count, Is.EqualTo(FakeUsers.Count - loggedOutUsers.Count));
+
             foreach (var loggedOutUser in loggedOutUsers)
             {
                 Assert.That(!_uut.ExpirationStamps.ContainsKey(loggedOutUser));

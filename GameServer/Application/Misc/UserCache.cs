@@ -138,7 +138,8 @@ namespace Application.Misc
         {
             return Task.Run(() =>
             {
-                while (_marks.Count != 0 && _marks.Peek().Expiration.HasTimeout())
+                var now = DateTime.Now;
+                while (_marks.Count != 0 && _marks.Peek().Expiration.HasTimeout(now))
                     usersToLogOutCollection.Add(_marks.Dequeue().Username);
                 usersToLogOutCollection.CompleteAdding();
             });
@@ -207,7 +208,10 @@ namespace Application.Misc
                 if (string.IsNullOrEmpty(y.Username))
                     return 1;
 
-                return x.Username == y.Username ? 0 : x.Expiration.CompareTo(y.Expiration);
+                if (x.Username == y.Username)
+                    return 0;
+
+                return x.Expiration.CompareTo(y.Expiration);
             }
         }
 
@@ -221,9 +225,9 @@ namespace Application.Misc
             return DateTime.Now.AddMinutes(20);
         }
 
-        public static bool HasTimeout(this DateTime markedTime)
+        public static bool HasTimeout(this DateTime markedTime, DateTime compareTo)
         {
-            return markedTime.CompareTo(DateTime.Now) < 0;
+            return markedTime.CompareTo(compareTo) < 0;
         }
     }
 }
