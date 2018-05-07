@@ -18,7 +18,6 @@
   
   <ItemGroup>
     <PackageReference Include="C5" Version="2.5.3" />
-    <PackageReference Include="MedallionPriorityQueue" Version="1.1.0" />
   </ItemGroup>
   
   <ItemGroup>

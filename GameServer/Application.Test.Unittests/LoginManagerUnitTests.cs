@@ -38,7 +38,7 @@ namespace Application.Test.Unittests
             _uut.Login(user);
 
             // Assert
-            Received.InOrder(() => { _fakeLoggedInPool.AddOrUpdateAsync(user.Username, user.Password); });
+            Received.InOrder(() => { _fakeLoggedInPool.AddOrUpdate(user.Username, user.Password); });
         }
 
         [Test]
@@ -50,7 +50,7 @@ namespace Application.Test.Unittests
             user.Username = "Username";
             user.Password = "Password";
 
-            _fakeLoggedInPool.ConfirmAndRefreshAsync(user.Username, user.Password).Returns(false);
+            _fakeLoggedInPool.ConfirmAndRefresh(user.Username, user.Password).Returns(false);
 
             // Act and assert
 
@@ -66,7 +66,7 @@ namespace Application.Test.Unittests
             user.Username = "Username";
             user.Password = "Password";
 
-            _fakeLoggedInPool.ConfirmAndRefreshAsync(user.Username, user.Password).Returns(true);
+            _fakeLoggedInPool.ConfirmAndRefresh(user.Username, user.Password).Returns(true);
 
             // Act and Assert
 
@@ -79,7 +79,7 @@ namespace Application.Test.Unittests
             // Arrange
 
             var username = "Username";
-            _fakeLoggedInPool.ConfirmAsync(username).Returns(true);
+            _fakeLoggedInPool.Confirm(username).Returns(true);
 
             var handle = new UserLoggedOutHandle((o, s) =>
             {
@@ -97,7 +97,7 @@ namespace Application.Test.Unittests
             // Arrange
 
             var username = "Username";
-            _fakeLoggedInPool.ConfirmAsync(username).Returns(true);
+            _fakeLoggedInPool.Confirm(username).Returns(true);
 
             var handle = new UserLoggedOutHandle((o, s) =>
             {
@@ -117,7 +117,7 @@ namespace Application.Test.Unittests
             // Arrange
 
             var username = "Username";
-            _fakeLoggedInPool.ConfirmAsync(username).Returns(false);
+            _fakeLoggedInPool.Confirm(username).Returns(false);
 
             var handle = new UserLoggedOutHandle((o, s) =>
             {
@@ -138,7 +138,7 @@ namespace Application.Test.Unittests
             // Arrange
 
             var username = "Username";
-            _fakeLoggedInPool.ConfirmAsync(username).Returns(true);
+            _fakeLoggedInPool.Confirm(username).Returns(true);
 
             var handle = new UserLoggedOutHandle((o, s) =>{});
 
@@ -175,7 +175,7 @@ namespace Application.Test.Unittests
 
             var username = "Username";
 
-            _fakeLoggedInPool.ConfirmAsync(Arg.Any<string>()).Returns(true);
+            _fakeLoggedInPool.Confirm(Arg.Any<string>()).Returns(true);
             _uut.SubscribeOnLogOut(username, (o, s) => { }); // The user exists with a default handle
 
             var handle = new UserLoggedOutHandle((o, s) => // This handle is not subscribed
@@ -197,7 +197,7 @@ namespace Application.Test.Unittests
             var userThatLeaves = "LeavingUser";
             var anotherLeavingUser = "AnotherleavingUser";
             
-            _fakeLoggedInPool.ConfirmAsync(Arg.Any<string>()).Returns(true);
+            _fakeLoggedInPool.Confirm(Arg.Any<string>()).Returns(true);
 
             var handleOneCount = 0;
             var handleTwoCount = 0;

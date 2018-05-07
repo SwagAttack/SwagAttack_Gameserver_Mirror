@@ -30,7 +30,7 @@ namespace Application.Interfaces
         /// <param name="username">Username of user</param>
         /// <param name="password">password of user</param>
         /// <returns></returns>
-        void AddOrUpdateAsync(string username, string password);
+        void AddOrUpdate(string username, string password);
 
         /// <summary>
         /// Adds a user to the cache with the timeout given in the paramater <see cref="timeout"/>.
@@ -39,14 +39,14 @@ namespace Application.Interfaces
         /// <param name="password">password of user</param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        void AddOrUpdateAsync(string username, string password, DateTime timeout);
+        void AddOrUpdate(string username, string password, DateTime timeout);
 
         /// <summary>
         /// Confirms that the user is currently in the cache. Does NOT refresh his timeout.
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
-        bool ConfirmAsync(string username);
+        bool Confirm(string username);
 
         /// <summary>
         /// Confirms that the user is currenty in the cache and if so refreshes the user's timeout.
@@ -55,7 +55,7 @@ namespace Application.Interfaces
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        bool ConfirmAndRefreshAsync(string username, string password);
+        bool ConfirmAndRefresh(string username, string password);
 
         /// <summary>
         /// Removes the user from the cache.
@@ -64,6 +64,6 @@ namespace Application.Interfaces
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        bool RemoveAsync(string username, string password);
+        bool Remove(string username, string password);
     }
 }

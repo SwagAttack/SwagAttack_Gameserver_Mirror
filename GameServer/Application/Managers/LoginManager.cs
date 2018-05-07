@@ -24,17 +24,17 @@ namespace Application.Managers
 
         public void Login(IUser user)
         {
-            _loggedInPool.AddOrUpdateAsync(user.Username, user.Password);
+            _loggedInPool.AddOrUpdate(user.Username, user.Password);
         }
 
         public bool CheckLoginStatus(string username, string password)
         {
-            return _loggedInPool.ConfirmAndRefreshAsync(username, password);
+            return _loggedInPool.ConfirmAndRefresh(username, password);
         }
 
         public bool SubscribeOnLogOut(string username, UserLoggedOutHandle handle)
         {
-            if (!_loggedInPool.ConfirmAsync(username))
+            if (!_loggedInPool.Confirm(username))
                 return false;
 
             lock (_listeners)

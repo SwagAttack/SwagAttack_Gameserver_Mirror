@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Interfaces;
 using Application.Misc;
 using NSubstitute;
 using NUnit.Framework;
-using NUnit.Framework.Internal.Execution;
 
 namespace Application.Test.Unittests
 {
@@ -35,7 +32,7 @@ namespace Application.Test.Unittests
         private DateTime _twentyMinutesFromNowLittleMore;
         private DateTime _twentyMinutesFromNowLittleLess;
 
-        private Dictionary<string, string> FakeUsers;
+        private Dictionary<string, string> _fakeUsers;
 
         private bool TimeStampIsUpdatedAccordingToNow(DateTime dateTime)
         {
@@ -49,14 +46,14 @@ namespace Application.Test.Unittests
         {
             _fakeTimer = Substitute.For<ITimer>();
             _uut = new UserCache(_fakeTimer);
-            FakeUsers = UserCacheTestSetup.FakeUsers;
+            _fakeUsers = UserCacheTestSetup.FakeUsers;
         }
 
         [Test]
         public void AddOrUpdateAsync_DoesNotContainItem_AddsItem()
         {
             // Act
-            _uut.AddOrUpdateAsync(UserOne, UserOnePassword);
+            _uut.AddOrUpdate(UserOne, UserOnePassword);
 
             // Assert
             Assert.That(_uut.ExpirationStamps.Count == 1);
@@ -67,7 +64,7 @@ namespace Application.Test.Unittests
         public void AddOrUpdateAsync_DoesNotContainItem_SetsTimeoutTo20MinFromNow()
         {
             // Act
-            _uut.AddOrUpdateAsync(UserTwo, UserTwoPassword);
+            _uut.AddOrUpdate(UserTwo, UserTwoPassword);
 
             // Assert
             var updatedDateTime = _uut.ExpirationStamps[UserTwo];
@@ -78,12 +75,12 @@ namespace Application.Test.Unittests
         public void AddOrUpdateAsync_ContainsItem_SetsTimeoutTo20MinFromNow()
         {
             // Setup
-            _uut.AddOrUpdateAsync(UserThree, UserThreePassword);
+            _uut.AddOrUpdate(UserThree, UserThreePassword);
 
             Thread.Sleep(5000);
 
             // Act
-            _uut.AddOrUpdateAsync(UserThree, UserThreePassword);
+            _uut.AddOrUpdate(UserThree, UserThreePassword);
 
             // Assert
             var updatedDateTime = _uut.ExpirationStamps[UserThree];
@@ -95,10 +92,10 @@ namespace Application.Test.Unittests
         public void ConfirmAsync_ContainsItem_ReturnsTrue()
         {
             // Setup
-            _uut.AddOrUpdateAsync(UserThree, UserThreePassword);
+            _uut.AddOrUpdate(UserThree, UserThreePassword);
 
             // Act
-            var confirmed = _uut.ConfirmAsync(UserThree);
+            var confirmed = _uut.Confirm(UserThree);
             // Assert
 
             Assert.That(confirmed);
@@ -108,7 +105,7 @@ namespace Application.Test.Unittests
         public void ConfirmAsync_DoesNotContainItem_ReturnsFalse()
         {
             // Act
-            var confirmed = _uut.ConfirmAsync(UserTwo);
+            var confirmed = _uut.Confirm(UserTwo);
 
             // Assert
             Assert.That(!confirmed);
@@ -118,12 +115,12 @@ namespace Application.Test.Unittests
         public void ConfirmAndRefreshAsync_ContainsItem_UpdatesTimeoutAndReturnsTrue()
         {
             // Setup
-            _uut.AddOrUpdateAsync(UserThree, UserThreePassword);
+            _uut.AddOrUpdate(UserThree, UserThreePassword);
 
             Thread.Sleep(5000);
 
             // Act
-            var confirmed = _uut.ConfirmAndRefreshAsync(UserThree, UserThreePassword);
+            var confirmed = _uut.ConfirmAndRefresh(UserThree, UserThreePassword);
 
             // Assert
             var updatedDateTime = _uut.ExpirationStamps[UserThree];
@@ -135,10 +132,10 @@ namespace Application.Test.Unittests
         public void ConfirmAndRefreshAsync_DoesNotContainItem_ReturnsFalse()
         {
             // Setup
-            _uut.AddOrUpdateAsync(UserThree, UserThreePassword);
+            _uut.AddOrUpdate(UserThree, UserThreePassword);
 
             // Act
-            var confirmed = _uut.ConfirmAndRefreshAsync(UserTwo, UserThreePassword); // Bad user
+            var confirmed = _uut.ConfirmAndRefresh(UserTwo, UserThreePassword); // Bad user
 
             // Assert
             Assert.That(!confirmed);
@@ -149,7 +146,7 @@ namespace Application.Test.Unittests
         public void RemoveAsync_DoesNotContainItem_ReturnsFalse()
         {
             // Act
-            var removed = _uut.RemoveAsync(UserOne, UserOnePassword);
+            var removed = _uut.Remove(UserOne, UserOnePassword);
 
             // Assert
             Assert.That(!removed);
@@ -159,10 +156,10 @@ namespace Application.Test.Unittests
         public void RemoveAsync_ContainsItem_ReturnsTrueAndRemovesItem()
         {
             // Setup
-            _uut.AddOrUpdateAsync(UserThree, UserThreePassword);
+            _uut.AddOrUpdate(UserThree, UserThreePassword);
 
             // Act
-            var removed = _uut.RemoveAsync(UserThree, UserThreePassword);
+            var removed = _uut.Remove(UserThree, UserThreePassword);
 
             // Assert
             Assert.That(removed);
@@ -173,7 +170,7 @@ namespace Application.Test.Unittests
         public void Timeout_ContainsOutdatedItem_RemovesItem()
         {
             // Setup
-            _uut.AddOrUpdateAsync(UserOne, UserOnePassword, DateTime.Now);
+            _uut.AddOrUpdate(UserOne, UserOnePassword, DateTime.Now);
 
             Thread.Sleep(5000);
 
@@ -188,7 +185,7 @@ namespace Application.Test.Unittests
         public void Timeout_ItemCloseToExpiring_ItemIsNotRemoved()
         {
             // Setup
-            _uut.AddOrUpdateAsync(UserOne, UserOnePassword, DateTime.Now.AddSeconds(5));
+            _uut.AddOrUpdate(UserOne, UserOnePassword, DateTime.Now.AddSeconds(5));
 
             Thread.Sleep(4000);
 
@@ -226,9 +223,9 @@ namespace Application.Test.Unittests
                 }
             };
 
-            _uut.AddOrUpdateAsync(UserOne, UserOnePassword, DateTime.Now.AddSeconds(5));
-            _uut.AddOrUpdateAsync(UserTwo, UserTwoPassword, DateTime.Now.AddSeconds(5));
-            _uut.AddOrUpdateAsync(UserThree, UserThreePassword, DateTime.Now.AddSeconds(6)); // This item should not be notified
+            _uut.AddOrUpdate(UserOne, UserOnePassword, DateTime.Now.AddSeconds(5));
+            _uut.AddOrUpdate(UserTwo, UserTwoPassword, DateTime.Now.AddSeconds(5));
+            _uut.AddOrUpdate(UserThree, UserThreePassword, DateTime.Now.AddSeconds(6)); // This item should not be notified
 
             Thread.Sleep(5200);
 
@@ -253,14 +250,17 @@ namespace Application.Test.Unittests
             Debug.WriteLine("Sup");
             try
             {
-                Parallel.ForEach(FakeUsers, e => { _uut.AddOrUpdateAsync(e.Key, e.Value); });
+                Parallel.ForEach(_fakeUsers, e =>
+                {
+                    _uut.AddOrUpdate(e.Key, e.Value);
+                });
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
 
-            Assert.That(_uut.ExpirationStamps.Count, Is.EqualTo(FakeUsers.Count));
+            Assert.That(_uut.ExpirationStamps.Count, Is.EqualTo(_fakeUsers.Count));
         }
 
         [Test]
@@ -277,14 +277,14 @@ namespace Application.Test.Unittests
                 }
             };
 
-            Parallel.ForEach(FakeUsers, e =>
+            Parallel.ForEach(_fakeUsers, e =>
             {
-                _uut.AddOrUpdateAsync(e.Key, e.Value, DateTime.Now.AddSeconds(5));
+                _uut.AddOrUpdate(e.Key, e.Value, DateTime.Now.AddSeconds(4));
             });
 
             _fakeTimer.ExpiredEvent += Raise.Event();
 
-            Assert.That(_uut.ExpirationStamps.Count, Is.EqualTo(FakeUsers.Count - loggedOutUsers.Count));
+            Assert.That(_uut.ExpirationStamps.Count, Is.EqualTo(_fakeUsers.Count - loggedOutUsers.Count));
 
             foreach (var loggedOutUser in loggedOutUsers)
             {
