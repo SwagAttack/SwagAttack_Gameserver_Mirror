@@ -29,12 +29,12 @@ namespace Application.Managers
 
         public bool CheckLoginStatus(string username, string password)
         {
-            return _loggedInPool.ConfirmAndRefreshAsync(username, password).Result;
+            return _loggedInPool.ConfirmAndRefreshAsync(username, password);
         }
 
         public bool SubscribeOnLogOut(string username, UserLoggedOutHandle handle)
         {
-            if (!_loggedInPool.ConfirmAsync(username).Result)
+            if (!_loggedInPool.ConfirmAsync(username))
                 return false;
 
             lock (_listeners)

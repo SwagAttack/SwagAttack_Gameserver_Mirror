@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Application.Interfaces;
 using Medallion.Collections;
@@ -14,10 +15,11 @@ namespace Application.Misc
     public class UserCache : IUserCache
     {
         private const int Timeout = 10; // 10 second timeout
-        private readonly SmartLock _lock;
         private readonly PriorityQueue<ExpirationMark> _marks;
         private readonly ITimer _timer;
         private readonly Dictionary<string, string> _users;
+
+        private readonly object _lckObject = new object();
 
         public UserCache(ITimer timer)
         {
@@ -25,8 +27,6 @@ namespace Application.Misc
 
             _users = new Dictionary<string, string>();
             _marks = new PriorityQueue<ExpirationMark>(new ExpirationComparer());
-
-            _lock = new SmartLock();
 
             _timer.ExpiredEvent += TimerTimeout;
             _timer.StartWithSeconds(Timeout);
@@ -51,23 +51,23 @@ namespace Application.Misc
 
         public event EventHandler<LoggedOutUsersEventArgs> UsersTimedOutEvent;
 
-        public async Task AddOrUpdateAsync(string username, string password)
+        public void AddOrUpdateAsync(string username, string password)
         {
-            await AddOrUpdateAsync(username, password,
+            AddOrUpdateAsync(username, password,
                 ExpirationMark.GetNewMark(username, DateTimeHelper.GetNewTimeOut()));
         }
 
-        public async Task<bool> ConfirmAsync(string username)
+        public bool ConfirmAsync(string username)
         {
-            using (await _lock.LockAsync())
+            lock (_lckObject)
             {
                 return _users.ContainsKey(username);
             }
         }
 
-        public async Task<bool> ConfirmAndRefreshAsync(string username, string password)
+        public bool ConfirmAndRefreshAsync(string username, string password)
         {
-            using (await _lock.LockAsync())
+            lock(_lckObject)
             {
                 if (_users.TryGetValue(username, out var pass) && pass == password)
                 {
@@ -81,9 +81,9 @@ namespace Application.Misc
             }
         }
 
-        public async Task<bool> RemoveAsync(string username, string password)
+        public bool RemoveAsync(string username, string password)
         {
-            using (await _lock.LockAsync())
+            lock(_lckObject)
             {
                 if (_users.Remove(username))
                 {
@@ -95,20 +95,21 @@ namespace Application.Misc
             }
         }
 
-        public async Task AddOrUpdateAsync(string username, string password, DateTime timeout)
+        public void AddOrUpdateAsync(string username, string password, DateTime timeout)
         {
-            await AddOrUpdateAsync(username, password, ExpirationMark.GetNewMark(username, timeout));
+            AddOrUpdateAsync(username, password, ExpirationMark.GetNewMark(username, timeout));
         }
 
         #endregion
 
         #region Utility
 
-        private async Task AddOrUpdateAsync(string username, string password, ExpirationMark mark)
+        private void AddOrUpdateAsync(string username, string password, ExpirationMark mark)
         {
-            using (await _lock.LockAsync())
+            lock(_lckObject)
             {
-                _marks.Remove(mark);
+                if(_marks.Remove(mark))
+                    Debug.WriteLine("WAISDJOAISUDOAILKAJSDLKJASLDKJALSKDJASDASDASDASDASD\nASDASDASD\nASDASDASD");
                 _marks.Add(mark);
                 _users[username] = password;
             }
@@ -120,7 +121,7 @@ namespace Application.Misc
 
         private void TimerTimeout(object sender, EventArgs eventArgs)
         {
-            using (_lock.Lock())
+            lock(_lckObject)
             {
                 var usersToLogOut = new BlockingCollection<string>();
                 var usersToNotify = new BlockingCollection<string>();
