@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 
 namespace Application.Test.Unittests
@@ -24,14 +25,14 @@ namespace Application.Test.Unittests
 
         public static Dictionary<string, string> GenerateFakeUsers(int count)
         {
-            var users = new Dictionary<string, string>();
-
-            for (var i = 0; i < count; i++)
+            var dictionary = new Dictionary<string, string>();
+            while (dictionary.Count != count)
             {
-                users[GenerateRandomString()] = Pass;
+                dictionary.Add(GenerateRandomString(), Pass);
             }
 
-            return users;
+            return dictionary;
+
         }
     }
     [SetUpFixture]
