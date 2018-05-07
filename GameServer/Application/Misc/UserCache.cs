@@ -8,11 +8,12 @@ using Medallion.Collections;
 namespace Application.Misc
 {
     /// <summary>
-    /// Documentation for the priorioty queue can be found at:
-    /// https://github.com/madelson/MedallionUtilities/blob/master/MedallionPriorityQueue/PriorityQueue.cs
+    ///     Documentation for the priorioty queue can be found at:
+    ///     https://github.com/madelson/MedallionUtilities/blob/master/MedallionPriorityQueue/PriorityQueue.cs
     /// </summary>
     public class UserCache : IUserCache
     {
+        private const int Timeout = 10; // 10 second timeout
         private readonly SmartLock _lock;
         private readonly PriorityQueue<ExpirationMark> _marks;
         private readonly ITimer _timer;
@@ -28,12 +29,13 @@ namespace Application.Misc
             _lock = new SmartLock();
 
             _timer.ExpiredEvent += TimerTimeout;
-            _timer.StartWithSeconds(10);
+            _timer.StartWithSeconds(Timeout);
         }
 
         /// <summary>
         ///     This was added for unit-testing purposes.
         ///     This is not thread-safe and should not be used for anything other than testing
+        ///     Will return a dictionary with usernames as keys and the value coresponding to the timeout of the user
         /// </summary>
         public IReadOnlyDictionary<string, DateTime> ExpirationStamps
         {
@@ -45,11 +47,14 @@ namespace Application.Misc
             }
         }
 
+        #region IUserCache Implementations
+
         public event EventHandler<LoggedOutUsersEventArgs> UsersTimedOutEvent;
 
         public async Task AddOrUpdateAsync(string username, string password)
         {
-            await AddOrUpdateAsync(username, password, ExpirationMark.GetNewMark(username, DateTimeHelper.GetNewTimeOut()));
+            await AddOrUpdateAsync(username, password,
+                ExpirationMark.GetNewMark(username, DateTimeHelper.GetNewTimeOut()));
         }
 
         public async Task<bool> ConfirmAsync(string username)
@@ -90,6 +95,29 @@ namespace Application.Misc
             }
         }
 
+        public async Task AddOrUpdateAsync(string username, string password, DateTime timeout)
+        {
+            await AddOrUpdateAsync(username, password, ExpirationMark.GetNewMark(username, timeout));
+        }
+
+        #endregion
+
+        #region Utility
+
+        private async Task AddOrUpdateAsync(string username, string password, ExpirationMark mark)
+        {
+            using (await _lock.LockAsync())
+            {
+                _marks.Remove(mark);
+                _marks.Add(mark);
+                _users[username] = password;
+            }
+        }
+
+        #endregion
+
+        #region Timeout Pipeline
+
         private void TimerTimeout(object sender, EventArgs eventArgs)
         {
             using (_lock.Lock())
@@ -103,7 +131,7 @@ namespace Application.Misc
                 Task.WaitAll(logoutRunner, logoutHandler, notifier);
             }
 
-            _timer.StartWithSeconds(10);
+            _timer.StartWithSeconds(Timeout);
         }
 
         private Task GetTimedOutUsersAsync(BlockingCollection<string> usersToLogOutCollection)
@@ -136,63 +164,54 @@ namespace Application.Misc
             return Task.Run(() => { UsersTimedOutEvent?.Invoke(this, new LoggedOutUsersEventArgs(usersToNotify)); });
         }
 
-        public async Task AddOrUpdateAsync(string username, string password, DateTime expiration)
-        {
-            await AddOrUpdateAsync(username, password, ExpirationMark.GetNewMark(username, expiration));
-        }
+        #endregion
 
-        private async Task AddOrUpdateAsync(string username, string password, ExpirationMark mark)
+        #region Expiration Utility
+
+        private class ExpirationMark
         {
-            using (await _lock.LockAsync())
+            private ExpirationMark(string username, DateTime expiration)
             {
-                _marks.Remove(mark);
-                _marks.Add(mark);
-                _users[username] = password;
+                Username = username;
+                Expiration = expiration;
+            }
+
+            public string Username { get; }
+            public DateTime Expiration { get; }
+
+            public static ExpirationMark GetNewMark(string username, DateTime expiration)
+            {
+                return new ExpirationMark(username, expiration);
             }
         }
-    }
 
-    internal class ExpirationMark
-    {
-        private ExpirationMark(string username, DateTime expiration)
+        private class ExpirationComparer : IComparer<ExpirationMark>
         {
-            Username = username;
-            Expiration = expiration;
+            public int Compare(ExpirationMark x, ExpirationMark y)
+            {
+                if (x == null && y == null)
+                    return 0;
+
+                if (x == null)
+                    return -1;
+
+                if (y == null)
+                    return 1;
+
+                if (string.IsNullOrEmpty(x.Username) && string.IsNullOrEmpty(y.Username))
+                    return 0;
+
+                if (string.IsNullOrEmpty(x.Username))
+                    return -1;
+
+                if (string.IsNullOrEmpty(y.Username))
+                    return 1;
+
+                return x.Username == y.Username ? 0 : x.Expiration.CompareTo(y.Expiration);
+            }
         }
 
-        public string Username { get; }
-        public DateTime Expiration { get; set; }
-
-        public static ExpirationMark GetNewMark(string username, DateTime expiration)
-        {
-            return new ExpirationMark(username, expiration);
-        }
-    }
-
-    internal class ExpirationComparer : IComparer<ExpirationMark>
-    {
-        public int Compare(ExpirationMark x, ExpirationMark y)
-        {
-            if (x == null && y == null)
-                return 0;
-
-            if (x == null)
-                return -1;
-
-            if (y == null)
-                return 1;
-
-            if (string.IsNullOrEmpty(x.Username) && string.IsNullOrEmpty(y.Username))
-                return 0;
-
-            if (string.IsNullOrEmpty(x.Username))
-                return -1;
-
-            if (string.IsNullOrEmpty(y.Username))
-                return 1;
-
-            return x.Username == y.Username ? 0 : x.Expiration.CompareTo(y.Expiration);
-        }
+        #endregion
     }
 
     internal static class DateTimeHelper
