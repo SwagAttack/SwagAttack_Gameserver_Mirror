@@ -28,7 +28,7 @@ namespace Application.Test.Unittests
             var dictionary = new Dictionary<string, string>();
             while (dictionary.Count != count)
             {
-                dictionary.Add(GenerateRandomString(), Pass);
+                dictionary.TryAdd(GenerateRandomString(), Pass);
             }
 
             return dictionary;
