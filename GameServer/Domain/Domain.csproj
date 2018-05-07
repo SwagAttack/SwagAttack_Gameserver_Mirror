@@ -19,5 +19,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Persistance\Persistance.csproj" />
   </ItemGroup>
-
 </Project>
