@@ -15,13 +15,13 @@ namespace Application.Test.Unittests
     public class LoginManagerUnitTests
     {
         private LoginManager _uut;
-        private IUserCache _fakeLoggedInPool;
+        private IUserCache _fakeUserCache;
 
         [SetUp]
         public void SetUp()
         {
-            _fakeLoggedInPool = Substitute.For<IUserCache>();
-            _uut = new LoginManager(_fakeLoggedInPool);
+            _fakeUserCache = Substitute.For<IUserCache>();
+            _uut = new LoginManager(_fakeUserCache);
         }
 
         [Test]
@@ -38,7 +38,7 @@ namespace Application.Test.Unittests
             _uut.Login(user);
 
             // Assert
-            Received.InOrder(() => { _fakeLoggedInPool.AddOrUpdate(user.Username, user.Password); });
+            Received.InOrder(() => { _fakeUserCache.AddOrUpdate(user.Username, user.Password); });
         }
 
         [Test]
@@ -50,7 +50,7 @@ namespace Application.Test.Unittests
             user.Username = "Username";
             user.Password = "Password";
 
-            _fakeLoggedInPool.ConfirmAndRefresh(user.Username, user.Password).Returns(false);
+            _fakeUserCache.ConfirmAndRefresh(user.Username, user.Password).Returns(false);
 
             // Act and assert
 
@@ -66,7 +66,7 @@ namespace Application.Test.Unittests
             user.Username = "Username";
             user.Password = "Password";
 
-            _fakeLoggedInPool.ConfirmAndRefresh(user.Username, user.Password).Returns(true);
+            _fakeUserCache.ConfirmAndRefresh(user.Username, user.Password).Returns(true);
 
             // Act and Assert
 
@@ -79,7 +79,7 @@ namespace Application.Test.Unittests
             // Arrange
 
             var username = "Username";
-            _fakeLoggedInPool.Confirm(username).Returns(true);
+            _fakeUserCache.Confirm(username).Returns(true);
 
             var handle = new UserLoggedOutHandle((o, s) =>
             {
@@ -97,7 +97,7 @@ namespace Application.Test.Unittests
             // Arrange
 
             var username = "Username";
-            _fakeLoggedInPool.Confirm(username).Returns(true);
+            _fakeUserCache.Confirm(username).Returns(true);
 
             var handle = new UserLoggedOutHandle((o, s) =>
             {
@@ -117,7 +117,7 @@ namespace Application.Test.Unittests
             // Arrange
 
             var username = "Username";
-            _fakeLoggedInPool.Confirm(username).Returns(false);
+            _fakeUserCache.Confirm(username).Returns(false);
 
             var handle = new UserLoggedOutHandle((o, s) =>
             {
@@ -138,7 +138,7 @@ namespace Application.Test.Unittests
             // Arrange
 
             var username = "Username";
-            _fakeLoggedInPool.Confirm(username).Returns(true);
+            _fakeUserCache.Confirm(username).Returns(true);
 
             var handle = new UserLoggedOutHandle((o, s) =>{});
 
@@ -175,7 +175,7 @@ namespace Application.Test.Unittests
 
             var username = "Username";
 
-            _fakeLoggedInPool.Confirm(Arg.Any<string>()).Returns(true);
+            _fakeUserCache.Confirm(Arg.Any<string>()).Returns(true);
             _uut.SubscribeOnLogOut(username, (o, s) => { }); // The user exists with a default handle
 
             var handle = new UserLoggedOutHandle((o, s) => // This handle is not subscribed
@@ -197,7 +197,7 @@ namespace Application.Test.Unittests
             var userThatLeaves = "LeavingUser";
             var anotherLeavingUser = "AnotherleavingUser";
             
-            _fakeLoggedInPool.Confirm(Arg.Any<string>()).Returns(true);
+            _fakeUserCache.Confirm(Arg.Any<string>()).Returns(true);
 
             var handleOneCount = 0;
             var handleTwoCount = 0;
@@ -225,7 +225,7 @@ namespace Application.Test.Unittests
             blockingCollection.CompleteAdding();
 
             // Act
-            _fakeLoggedInPool.UsersTimedOutEvent += Raise.EventWith(null, new LoggedOutUsersEventArgs(blockingCollection));
+            _fakeUserCache.UsersTimedOutEvent += Raise.EventWith(null, new LoggedOutUsersEventArgs(blockingCollection));
             
             Thread.Sleep(500);
 

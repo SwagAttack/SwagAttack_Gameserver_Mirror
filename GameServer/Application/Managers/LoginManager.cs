@@ -15,7 +15,7 @@ namespace Application.Managers
 
         private readonly Dictionary<string, HashSet<UserLoggedOutHandle>> _listeners;
         private readonly BlockingCollection<string> _loggedOutUsers;
-        private readonly IUserCache _loggedInPool;
+        private readonly IUserCache _userCache;
 
         public static ILoginManager GetInstance(IUserCache pool = null)
         {
@@ -24,17 +24,17 @@ namespace Application.Managers
 
         public void Login(IUser user)
         {
-            _loggedInPool.AddOrUpdate(user.Username, user.Password);
+            _userCache.AddOrUpdate(user.Username, user.Password);
         }
 
         public bool CheckLoginStatus(string username, string password)
         {
-            return _loggedInPool.ConfirmAndRefresh(username, password);
+            return _userCache.ConfirmAndRefresh(username, password);
         }
 
         public bool SubscribeOnLogOut(string username, UserLoggedOutHandle handle)
         {
-            if (!_loggedInPool.Confirm(username))
+            if (!_userCache.Confirm(username))
                 return false;
 
             lock (_listeners)
@@ -67,13 +67,13 @@ namespace Application.Managers
 
         public LoginManager(IUserCache loggedInPool)
         {
-            _loggedInPool = loggedInPool ?? throw new ArgumentNullException(nameof(loggedInPool));
+            _userCache = loggedInPool ?? throw new ArgumentNullException(nameof(loggedInPool));
             _listeners = new Dictionary<string, HashSet<UserLoggedOutHandle>>();
             _loggedOutUsers = new BlockingCollection<string>();
 
             new Thread(LogOutHandler){IsBackground = true}.Start(); 
             
-            _loggedInPool.UsersTimedOutEvent += OnUsersTimedOutHandler;
+            _userCache.UsersTimedOutEvent += OnUsersTimedOutHandler;
         }
 
         private void LogOutHandler()
