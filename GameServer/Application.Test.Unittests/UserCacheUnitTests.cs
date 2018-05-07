@@ -50,7 +50,7 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void AddOrUpdateAsync_DoesNotContainItem_AddsItem()
+        public void AddOrUpdate_DoesNotContainItem_AddsItem()
         {
             // Act
             _uut.AddOrUpdate(UserOne, UserOnePassword);
@@ -61,7 +61,7 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void AddOrUpdateAsync_DoesNotContainItem_SetsTimeoutTo20MinFromNow()
+        public void AddOrUpdate_DoesNotContainItem_SetsTimeoutTo20MinFromNow()
         {
             // Act
             _uut.AddOrUpdate(UserTwo, UserTwoPassword);
@@ -72,7 +72,7 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void AddOrUpdateAsync_ContainsItem_SetsTimeoutTo20MinFromNow()
+        public void AddOrUpdate_ContainsItem_SetsTimeoutTo20MinFromNow()
         {
             // Setup
             _uut.AddOrUpdate(UserThree, UserThreePassword);
@@ -89,7 +89,7 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void ConfirmAsync_ContainsItem_ReturnsTrue()
+        public void Confirm_ContainsItem_ReturnsTrue()
         {
             // Setup
             _uut.AddOrUpdate(UserThree, UserThreePassword);
@@ -102,7 +102,7 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void ConfirmAsync_DoesNotContainItem_ReturnsFalse()
+        public void Confirm_DoesNotContainItem_ReturnsFalse()
         {
             // Act
             var confirmed = _uut.Confirm(UserTwo);
@@ -112,7 +112,7 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void ConfirmAndRefreshAsync_ContainsItem_UpdatesTimeoutAndReturnsTrue()
+        public void ConfirmAndRefresh_ContainsItem_UpdatesTimeoutAndReturnsTrue()
         {
             // Setup
             _uut.AddOrUpdate(UserThree, UserThreePassword);
@@ -129,7 +129,7 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void ConfirmAndRefreshAsync_DoesNotContainItem_ReturnsFalse()
+        public void ConfirmAndRefresh_DoesNotContainItem_ReturnsFalse()
         {
             // Setup
             _uut.AddOrUpdate(UserThree, UserThreePassword);
@@ -143,7 +143,7 @@ namespace Application.Test.Unittests
 
 
         [Test]
-        public void RemoveAsync_DoesNotContainItem_ReturnsFalse()
+        public void Remove_DoesNotContainItem_ReturnsFalse()
         {
             // Act
             var removed = _uut.Remove(UserOne, UserOnePassword);
@@ -153,7 +153,7 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void RemoveAsync_ContainsItem_ReturnsTrueAndRemovesItem()
+        public void Remove_ContainsItem_ReturnsTrueAndRemovesItem()
         {
             // Setup
             _uut.AddOrUpdate(UserThree, UserThreePassword);
@@ -279,13 +279,22 @@ namespace Application.Test.Unittests
 
             Parallel.ForEach(_fakeUsers, e =>
             {
-                _uut.AddOrUpdate(e.Key, e.Value, DateTime.Now.AddSeconds(4));
+                _uut.AddOrUpdate(e.Key, e.Value, DateTime.Now.AddMilliseconds(25));
             });
 
+            // Make sure the users have been added
+            Assert.That(_uut.ExpirationStamps.Count, Is.EqualTo(_fakeUsers.Count));
+
+            // Act
             _fakeTimer.ExpiredEvent += Raise.Event();
 
+            // Make sure users have been logged out
+            Assert.That(_uut.ExpirationStamps.Count != _fakeUsers.Count);
+
+            // Make sure the correct amount has been logged out
             Assert.That(_uut.ExpirationStamps.Count, Is.EqualTo(_fakeUsers.Count - loggedOutUsers.Count));
 
+            // Make sure the logged out users are not contained in the uut
             foreach (var loggedOutUser in loggedOutUsers)
             {
                 Assert.That(!_uut.ExpirationStamps.ContainsKey(loggedOutUser));
