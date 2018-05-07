@@ -13,15 +13,12 @@ namespace Application.Managers
     {
         private static ILoginManager _instance = null;
 
-        private readonly BlockingCollection<string> _loggedOutUsers =
-            new BlockingCollection<string>(new ConcurrentQueue<string>(), 100); // Can hold to 100 names at once
-
         private readonly Dictionary<string, HashSet<UserLoggedOutHandle>> _listeners;
-        private readonly ILoggedInPool _loggedInPool;
+        private readonly IUserCache _loggedInPool;
 
-        public static ILoginManager GetInstance(ILoggedInPool pool = null)
+        public static ILoginManager GetInstance(IUserCache pool = null)
         {
-            return _instance ?? (_instance = new LoginManager(pool ?? new LoggedInPool(new CountDownTimer())));
+            return _instance ?? (_instance = new LoginManager(pool ?? new UserCache(new CountDownTimer())));
         }
 
         public void Login(IUser user)
@@ -67,29 +64,17 @@ namespace Application.Managers
             }
         }
 
-        public LoginManager(ILoggedInPool loggedInPool)
+        public LoginManager(IUserCache loggedInPool)
         {
             _loggedInPool = loggedInPool ?? throw new ArgumentNullException(nameof(loggedInPool));
             _listeners = new Dictionary<string, HashSet<UserLoggedOutHandle>>();
             _loggedInPool.UsersTimedOutEvent += OnUsersTimedOutHandler;
-
-            var logOutInvokerThread = new Thread(LogOutInvoker) {IsBackground = true };
-            logOutInvokerThread.Start();
         }
 
         private void OnUsersTimedOutHandler(object sender, LoggedOutUsersEventArgs loggedOutUsersEventArgs)
         {
-            foreach (var user in loggedOutUsersEventArgs.LoggedOutUsers)
+            foreach (var user in loggedOutUsersEventArgs.LoggedOutUserCollection.GetConsumingEnumerable())
             {
-                _loggedOutUsers.Add(user);
-            }
-        }
-
-        private void LogOutInvoker()
-        {
-            for (;;)
-            {
-                var user = _loggedOutUsers.Take();
                 if (user == null) continue;
                 lock (_listeners)
                 {

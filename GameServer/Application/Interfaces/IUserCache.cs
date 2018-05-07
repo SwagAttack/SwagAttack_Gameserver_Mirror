@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
@@ -9,16 +10,14 @@ namespace Application.Interfaces
 {
     public class LoggedOutUsersEventArgs : EventArgs
     {
-        private readonly List<string> _loggedOutUsers;
-        public LoggedOutUsersEventArgs(List<string> loggedOutUsers)
+        public LoggedOutUsersEventArgs(BlockingCollection<string> collection)
         {
-            _loggedOutUsers = loggedOutUsers;
+            LoggedOutUserCollection = collection ?? throw new ArgumentNullException(nameof(collection));
         }
-
-        public IReadOnlyList<string> LoggedOutUsers => _loggedOutUsers;
+        public BlockingCollection<string> LoggedOutUserCollection { get; }
     }
 
-    public interface ILoggedInPool
+    public interface IUserCache
     {
         event EventHandler<LoggedOutUsersEventArgs> UsersTimedOutEvent;
         Task AddOrUpdateAsync(string username, string password);

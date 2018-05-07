@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,12 +15,12 @@ namespace Application.Test.Unittests
     public class LoginManagerUnitTests
     {
         private LoginManager _uut;
-        private ILoggedInPool _fakeLoggedInPool;
+        private IUserCache _fakeLoggedInPool;
 
         [SetUp]
         public void SetUp()
         {
-            _fakeLoggedInPool = Substitute.For<ILoggedInPool>();
+            _fakeLoggedInPool = Substitute.For<IUserCache>();
             _uut = new LoginManager(_fakeLoggedInPool);
         }
 
@@ -219,12 +220,12 @@ namespace Application.Test.Unittests
             _uut.SubscribeOnLogOut(userThatLeaves, HandleTwo);
             _uut.SubscribeOnLogOut(anotherLeavingUser, HandleTwo);
 
+
+            var blockingCollection = new BlockingCollection<string> {userThatLeaves, anotherLeavingUser};
+            blockingCollection.CompleteAdding();
+
             // Act
-            _fakeLoggedInPool.UsersTimedOutEvent += Raise.EventWith(null, new LoggedOutUsersEventArgs(new List<string>
-            {
-                userThatLeaves,
-                anotherLeavingUser
-            }));
+            _fakeLoggedInPool.UsersTimedOutEvent += Raise.EventWith(null, new LoggedOutUsersEventArgs(blockingCollection));
             
             Thread.Sleep(500);
 

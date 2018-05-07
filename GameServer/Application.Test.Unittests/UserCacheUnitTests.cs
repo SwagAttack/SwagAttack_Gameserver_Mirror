@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Application.Interfaces;
 using Application.Misc;
 using NSubstitute;
@@ -10,10 +13,38 @@ using NUnit.Framework.Internal.Execution;
 
 namespace Application.Test.Unittests
 {
-    [TestFixture]
-    public class LoggedInPoolUnitTests
+    internal static class FakeUserGenerator
     {
-        private LoggedInPool _uut;
+        private static string GenerateRandomString()
+        {
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var stringChars = new char[8];
+            var random = new Random();
+
+            for (int i = 0; i < stringChars.Length; i++)
+            {
+                stringChars[i] = chars[random.Next(chars.Length)];
+            }
+
+            return new string(stringChars);
+        }
+
+        public static Dictionary<string, string> GenerateFakeUsers(int count)
+        {
+            var users = new Dictionary<string, string>();
+            for (var i = 0; i < count; i++)
+            {
+                users[GenerateRandomString()] = GenerateRandomString();
+            }
+
+            return users;
+        }
+    }
+
+    [TestFixture]
+    public class UserCacheUnitTests
+    {
+        private UserCache _uut;
         private ITimer _fakeTimer;
 
         /// <summary>
@@ -43,7 +74,7 @@ namespace Application.Test.Unittests
         public void SetUp()
         {
             _fakeTimer = Substitute.For<ITimer>();
-            _uut = new LoggedInPool(_fakeTimer);
+            _uut = new UserCache(_fakeTimer);
         }
 
         [Test]
@@ -53,8 +84,8 @@ namespace Application.Test.Unittests
             _uut.AddOrUpdateAsync(UserOne, UserOnePassword).Wait();
 
             // Assert
-            Assert.That(_uut.LoggedInUsers.Count == 1);
-            Assert.That(_uut.LoggedInUsers.FirstOrDefault(u => u == UserOne) != null);
+            Assert.That(_uut.ExpirationStamps.Count == 1);
+            Assert.That(_uut.ExpirationStamps.ContainsKey(UserOne));
         }
 
         [Test]
@@ -161,14 +192,13 @@ namespace Application.Test.Unittests
             // Assert
             Assert.That(removed);
             Assert.That(!_uut.ExpirationStamps.ContainsKey(UserThree));
-            Assert.That(!_uut.LoggedInUsers.Contains(UserThree));
         }
 
         [Test]
         public void Timeout_ContainsOutdatedItem_RemovesItem()
         {
             // Setup
-            _uut.AddOrUpdate(UserOne, UserOnePassword, DateTime.Now).Wait();
+            _uut.AddOrUpdateAsync(UserOne, UserOnePassword, DateTime.Now).Wait();
 
             Thread.Sleep(5000);
 
@@ -176,7 +206,6 @@ namespace Application.Test.Unittests
             _fakeTimer.ExpiredEvent += Raise.EventWith(null, EventArgs.Empty);
 
             // Assert
-            Assert.That(_uut.LoggedInUsers.Count == 0);
             Assert.That(_uut.ExpirationStamps.Count == 0);
         }
 
@@ -184,7 +213,7 @@ namespace Application.Test.Unittests
         public void Timeout_ItemCloseToExpiring_ItemIsNotRemoved()
         {
             // Setup
-            _uut.AddOrUpdate(UserOne, UserOnePassword, DateTime.Now.AddSeconds(5)).Wait();
+            _uut.AddOrUpdateAsync(UserOne, UserOnePassword, DateTime.Now.AddSeconds(5)).Wait();
 
             Thread.Sleep(4000);
 
@@ -192,7 +221,7 @@ namespace Application.Test.Unittests
             _fakeTimer.ExpiredEvent += Raise.EventWith(null, EventArgs.Empty);
 
             // Assert
-            Assert.That(_uut.LoggedInUsers.Count == 1);
+            Assert.That(_uut.ExpirationStamps.Count == 1);
         }
 
         [Test]
@@ -216,15 +245,15 @@ namespace Application.Test.Unittests
             // Subscribing to the event
             _uut.UsersTimedOutEvent += (s, a) =>
             {
-                foreach (var user in a.LoggedOutUsers)
+                foreach (var user in a.LoggedOutUserCollection.GetConsumingEnumerable())
                 {
                     loggedOutUsers.Add(user);
                 }
             };
 
-            _uut.AddOrUpdate(UserOne, UserOnePassword, DateTime.Now.AddSeconds(5)).Wait();
-            _uut.AddOrUpdate(UserTwo, UserTwoPassword, DateTime.Now.AddSeconds(5)).Wait();
-            _uut.AddOrUpdate(UserThree, UserThreePassword, DateTime.Now.AddSeconds(6)).Wait(); // This item should not be notified
+            _uut.AddOrUpdateAsync(UserOne, UserOnePassword, DateTime.Now.AddSeconds(5)).Wait();
+            _uut.AddOrUpdateAsync(UserTwo, UserTwoPassword, DateTime.Now.AddSeconds(5)).Wait();
+            _uut.AddOrUpdateAsync(UserThree, UserThreePassword, DateTime.Now.AddSeconds(6)).Wait(); // This item should not be notified
 
             Thread.Sleep(5200);
 
@@ -234,6 +263,56 @@ namespace Application.Test.Unittests
             // Assert
             Assert.That(loggedOutUsers.Count == 2);
             Assert.That(loggedOutUsers.Contains(UserOne) && loggedOutUsers.Contains(UserTwo) && !loggedOutUsers.Contains(UserThree));
+        }
+
+        [Test]
+        public void bla()
+        {
+            var fakeUsers = FakeUserGenerator.GenerateFakeUsers(10000);
+            var dateTimes = new ConcurrentBag<DateTime>();
+
+            Parallel.ForEach(fakeUsers, e =>
+            {
+                _uut.AddOrUpdateAsync(e.Key, e.Value).Wait();
+            });
+
+            Assert.That(_uut.ExpirationStamps.Count == fakeUsers.Count);
+        }
+
+        [Test]
+        public void Timeout_ContainsManyOutDatedUsers_CorrectAmountAreLoggedOut()
+        {
+            var fakeUsers = FakeUserGenerator.GenerateFakeUsers(10000);
+            var dateTimes = new ConcurrentBag<string>();
+
+            var lck = new object();
+            var random = new Random();
+
+            int GenerateRandom()
+            {
+                lock (lck)
+                {
+                    return random.Next(0, 6);
+                }
+            }
+            Parallel.ForEach(fakeUsers, e =>
+            {
+                var delay = GenerateRandom();
+                if (delay != 0)
+                {
+                    //delay += 1;
+                }
+                else
+                {
+                    dateTimes.Add(e.Key);
+                }
+                var time = DateTime.Now.AddMinutes(delay);
+                _uut.AddOrUpdateAsync(e.Key, e.Value, time).Wait();
+            });
+
+            _fakeTimer.ExpiredEvent += Raise.Event();
+
+            Assert.That(_uut.ExpirationStamps.Count, Is.EqualTo(fakeUsers.Count - dateTimes.Count));
         }
 
     }
