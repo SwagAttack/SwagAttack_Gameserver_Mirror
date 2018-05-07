@@ -1,10 +1,11 @@
-﻿using Microsoft.Azure.Documents.Client;
+﻿using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
 
 namespace Persistance.Interfaces
 {
     public interface IDbContext
     {
         string DatabaseId { get; }
-        DocumentClient DocumentClient { get; }
+        IDocumentClient DocumentClient { get; set; }
     }
 }
