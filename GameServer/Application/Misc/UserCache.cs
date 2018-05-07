@@ -49,7 +49,7 @@ namespace Application.Misc
 
         public async Task AddOrUpdateAsync(string username, string password)
         {
-            await AddOrUpdateAsync(username, password, DateTimeHelper.GetNewTimeOut());
+            await AddOrUpdateAsync(username, password, ExpirationMark.GetNewMark(username, DateTimeHelper.GetNewTimeOut()));
         }
 
         public async Task<bool> ConfirmAsync(string username)
@@ -136,19 +136,15 @@ namespace Application.Misc
             return Task.Run(() => { UsersTimedOutEvent?.Invoke(this, new LoggedOutUsersEventArgs(usersToNotify)); });
         }
 
+        public async Task AddOrUpdateAsync(string username, string password, DateTime expiration)
+        {
+            await AddOrUpdateAsync(username, password, ExpirationMark.GetNewMark(username, expiration));
+        }
+
         private async Task AddOrUpdateAsync(string username, string password, ExpirationMark mark)
         {
             using (await _lock.LockAsync())
             {
-
-            }
-        }
-
-        public async Task AddOrUpdateAsync(string username, string password, DateTime expiration)
-        {
-            using (await _lock.LockAsync())
-            {
-                var mark = ExpirationMark.GetNewMark(username, expiration);
                 _marks.Remove(mark);
                 _marks.Add(mark);
                 _users[username] = password;
