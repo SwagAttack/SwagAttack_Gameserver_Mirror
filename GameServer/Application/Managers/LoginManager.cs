@@ -14,6 +14,7 @@ namespace Application.Managers
         private static ILoginManager _instance = null;
 
         private readonly Dictionary<string, HashSet<UserLoggedOutHandle>> _listeners;
+        private readonly BlockingCollection<string> _loggedOutUsers;
         private readonly IUserCache _loggedInPool;
 
         public static ILoginManager GetInstance(IUserCache pool = null)
@@ -68,24 +69,39 @@ namespace Application.Managers
         {
             _loggedInPool = loggedInPool ?? throw new ArgumentNullException(nameof(loggedInPool));
             _listeners = new Dictionary<string, HashSet<UserLoggedOutHandle>>();
+            _loggedOutUsers = new BlockingCollection<string>();
+
+            new Thread(LogOutHandler){IsBackground = true}.Start(); 
+            
             _loggedInPool.UsersTimedOutEvent += OnUsersTimedOutHandler;
+        }
+
+        private void LogOutHandler()
+        {
+            for (;;)
+            {
+                foreach (var loggedOutUser in _loggedOutUsers.GetConsumingEnumerable())
+                {
+                    if (loggedOutUser == null) continue;
+                    lock (_listeners)
+                    {
+                        if (_listeners.TryGetValue(loggedOutUser, out var handlers))
+                        {
+                            foreach (var handler in handlers)
+                            {
+                                handler.Invoke(this, loggedOutUser);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void OnUsersTimedOutHandler(object sender, LoggedOutUsersEventArgs loggedOutUsersEventArgs)
         {
             foreach (var user in loggedOutUsersEventArgs.LoggedOutUserCollection.GetConsumingEnumerable())
             {
-                if (user == null) continue;
-                lock (_listeners)
-                {
-                    if (_listeners.TryGetValue(user, out var handlers))
-                    {
-                        foreach (var handler in handlers)
-                        {
-                            handler.Invoke(null, user);
-                        }
-                    }
-                }
+                _loggedOutUsers.Add(user);
             }
         }
     }
