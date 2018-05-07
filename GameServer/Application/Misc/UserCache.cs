@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Application.Interfaces;
+using C5;
 using Medallion.Collections;
 
 namespace Application.Misc
@@ -19,6 +20,9 @@ namespace Application.Misc
         private readonly ITimer _timer;
         private readonly Dictionary<string, string> _users;
 
+        private IntervalHeap<ExpirationMark> marks;
+        private readonly Dictionary<string, UserLookUp> users;
+
         private readonly object _lckObject = new object();
 
         public UserCache(ITimer timer)
@@ -28,8 +32,14 @@ namespace Application.Misc
             _users = new Dictionary<string, string>();
             _marks = new PriorityQueue<ExpirationMark>(new ExpirationComparer());
 
+
+            marks = new IntervalHeap<ExpirationMark>(new ExpirationComparer());
+            users = new Dictionary<string, UserLookUp>();
+
             _timer.ExpiredEvent += TimerTimeout;
             _timer.StartWithSeconds(Timeout);
+
+
         }
 
         /// <summary>
@@ -42,7 +52,7 @@ namespace Application.Misc
             get
             {
                 var dic = new Dictionary<string, DateTime>();
-                foreach (var exipiration in _marks) dic.Add(exipiration.Username, exipiration.Expiration);
+                foreach (var exipiration in marks) dic.Add(exipiration.Username, exipiration.Expiration);
                 return dic;
             }
         }
@@ -61,7 +71,7 @@ namespace Application.Misc
         {
             lock (_lckObject)
             {
-                return _users.ContainsKey(username);
+                return users.ContainsKey(username);
             }
         }
 
@@ -69,14 +79,12 @@ namespace Application.Misc
         {
             lock(_lckObject)
             {
-                if (_users.TryGetValue(username, out var pass) && pass == password)
+                if (users.TryGetValue(username, out var info) && info.Password == password)
                 {
-                    var mark = ExpirationMark.GetNewMark(username, DateTimeHelper.GetNewTimeOut());
-                    _marks.Remove(mark);
-                    _marks.Add(mark);
+                    marks.Replace(info.IndexMark, 
+                        ExpirationMark.GetNewMark(username, DateTimeHelper.GetNewTimeOut()));
                     return true;
                 }
-
                 return false;
             }
         }
@@ -85,12 +93,12 @@ namespace Application.Misc
         {
             lock(_lckObject)
             {
-                if (_users.Remove(username))
+                if (users.TryGetValue(username, out var item))
                 {
-                    _marks.Remove(ExpirationMark.GetNewMark(username, DateTimeHelper.GetNewTimeOut()));
+                    marks.Delete(item.IndexMark);
+                    users.Remove(username);
                     return true;
                 }
-
                 return false;
             }
         }
@@ -108,10 +116,19 @@ namespace Application.Misc
         {
             lock(_lckObject)
             {
-                if(_marks.Remove(mark))
-                    Debug.WriteLine("WAISDJOAISUDOAILKAJSDLKJASLDKJALSKDJASDASDASDASDASD\nASDASDASD\nASDASDASD");
-                _marks.Add(mark);
-                _users[username] = password;
+                IPriorityQueueHandle<ExpirationMark> handle = null;
+
+                if (users.TryGetValue(username, out var item))
+                {
+                    handle = item.IndexMark;
+                    marks.Replace(handle, mark);
+                }
+                else
+                {
+                    marks.Add(ref handle, mark);
+                }
+
+                users[username] = new UserLookUp {Password = password, IndexMark = handle};
             }
         }
 
@@ -140,8 +157,8 @@ namespace Application.Misc
             return Task.Run(() =>
             {
                 var now = DateTime.Now;
-                while (_marks.Count != 0 && _marks.Peek().Expiration.HasTimeout(now))
-                    usersToLogOutCollection.Add(_marks.Dequeue().Username);
+                while (marks.Count != 0 && marks.FindMin().Expiration.HasTimeout(now))
+                    usersToLogOutCollection.Add(marks.DeleteMin().Username);
                 usersToLogOutCollection.CompleteAdding();
             });
         }
@@ -170,7 +187,13 @@ namespace Application.Misc
 
         #region Expiration Utility
 
-        private class ExpirationMark
+        public class UserLookUp
+        {
+            public string Password { get; set; }
+            public IPriorityQueueHandle<ExpirationMark> IndexMark { get; set; }
+        }
+
+        public class ExpirationMark 
         {
             private ExpirationMark(string username, DateTime expiration)
             {
@@ -185,9 +208,10 @@ namespace Application.Misc
             {
                 return new ExpirationMark(username, expiration);
             }
+
         }
 
-        private class ExpirationComparer : IComparer<ExpirationMark>
+        public class ExpirationComparer : IComparer<ExpirationMark>
         {
             public int Compare(ExpirationMark x, ExpirationMark y)
             {
@@ -200,17 +224,17 @@ namespace Application.Misc
                 if (y == null)
                     return 1;
 
-                if (string.IsNullOrEmpty(x.Username) && string.IsNullOrEmpty(y.Username))
-                    return 0;
+                //if (string.IsNullOrEmpty(x.Username) && string.IsNullOrEmpty(y.Username))
+                //    return 0;
 
-                if (string.IsNullOrEmpty(x.Username))
-                    return -1;
+                //if (string.IsNullOrEmpty(x.Username))
+                //    return -1;
 
-                if (string.IsNullOrEmpty(y.Username))
-                    return 1;
+                //if (string.IsNullOrEmpty(y.Username))
+                //    return 1;
 
-                if (x.Username == y.Username)
-                    return 0;
+                //if (x.Username == y.Username)
+                //    return 0;
 
                 return x.Expiration.CompareTo(y.Expiration);
             }

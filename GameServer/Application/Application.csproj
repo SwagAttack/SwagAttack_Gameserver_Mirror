@@ -17,8 +17,8 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <PackageReference Include="C5" Version="2.5.3" />
     <PackageReference Include="MedallionPriorityQueue" Version="1.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.0.1" />
   </ItemGroup>
   
   <ItemGroup>
