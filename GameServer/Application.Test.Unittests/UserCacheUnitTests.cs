@@ -266,17 +266,16 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void bla()
+        public void AddOrUpdate_AddAlotOfUsersInParalell_TheyAreAllAdded()
         {
             var fakeUsers = FakeUserGenerator.GenerateFakeUsers(10000);
-            var dateTimes = new ConcurrentBag<DateTime>();
 
             Parallel.ForEach(fakeUsers, e =>
             {
                 _uut.AddOrUpdateAsync(e.Key, e.Value).Wait();
             });
 
-            Assert.That(_uut.ExpirationStamps.Count == fakeUsers.Count);
+            Assert.That(_uut.ExpirationStamps.Count, Is.EqualTo(fakeUsers.Count));
         }
 
         [Test]

@@ -9,11 +9,10 @@ namespace Application.Misc
 {
     public class UserCache : IUserCache
     {
-        private readonly Dictionary<string, string> _users;
-        private readonly PriorityQueue<ExpirationMark> _marks;
-
         private readonly SmartLock _lock;
+        private readonly PriorityQueue<ExpirationMark> _marks;
         private readonly ITimer _timer;
+        private readonly Dictionary<string, string> _users;
 
         public UserCache(ITimer timer)
         {
@@ -68,6 +67,7 @@ namespace Application.Misc
                     _marks.Add(mark);
                     return true;
                 }
+
                 return false;
             }
         }
@@ -81,6 +81,7 @@ namespace Application.Misc
                     _marks.Remove(ExpirationMark.GetNewMark(username, DateTimeHelper.GetNewTimeOut()));
                     return true;
                 }
+
                 return false;
             }
         }
@@ -90,8 +91,10 @@ namespace Application.Misc
             using (_lock.Lock())
             {
                 var usersToLogOut = new BlockingCollection<string>();
+                var usersToNotify = new BlockingCollection<string>();
+
                 var logoutRunner = GetTimedOutUsersAsync(usersToLogOut);
-                var logoutHandler = RemoveTimedOutUsersAsync(usersToLogOut, out var usersToNotify);
+                var logoutHandler = RemoveTimedOutUsersAsync(usersToLogOut, usersToNotify);
                 var notifier = NotifySubscribersAsync(usersToNotify);
                 Task.WaitAll(logoutRunner, logoutHandler, notifier);
             }
@@ -101,30 +104,32 @@ namespace Application.Misc
 
         private Task GetTimedOutUsersAsync(BlockingCollection<string> usersToLogOutCollection)
         {
-            while (_marks.Count != 0 && _marks.Peek().Expiration.HasTimeout())
+            return Task.Run(() =>
             {
-                usersToLogOutCollection.Add(_marks.Dequeue().Username);
-            }
-            usersToLogOutCollection.CompleteAdding();
-            return Task.CompletedTask;
+                while (_marks.Count != 0 && _marks.Peek().Expiration.HasTimeout())
+                    usersToLogOutCollection.Add(_marks.Dequeue().Username);
+                usersToLogOutCollection.CompleteAdding();
+            });
         }
 
-        private Task RemoveTimedOutUsersAsync(BlockingCollection<string> usersToRemove, out BlockingCollection<string> usersToNotify)
+        private Task RemoveTimedOutUsersAsync(BlockingCollection<string> usersToRemove,
+            BlockingCollection<string> usersToNotify)
         {
-            usersToNotify = new BlockingCollection<string>();
-            foreach (var user in usersToRemove.GetConsumingEnumerable())
+            return Task.Run(() =>
             {
-                _users.Remove(user);
-                usersToNotify.Add(user);
-            }
-            usersToNotify.CompleteAdding();
-            return Task.CompletedTask;
+                foreach (var user in usersToRemove.GetConsumingEnumerable())
+                {
+                    _users.Remove(user);
+                    usersToNotify.Add(user);
+                }
+
+                usersToNotify.CompleteAdding();
+            });
         }
 
         private Task NotifySubscribersAsync(BlockingCollection<string> usersToNotify)
         {
-            UsersTimedOutEvent?.Invoke(this, new LoggedOutUsersEventArgs(usersToNotify));
-            return Task.CompletedTask;
+            return Task.Run(() => { UsersTimedOutEvent?.Invoke(this, new LoggedOutUsersEventArgs(usersToNotify)); });
         }
 
         public async Task AddOrUpdateAsync(string username, string password, DateTime expiration)
@@ -139,8 +144,14 @@ namespace Application.Misc
         }
     }
 
-    public class ExpirationMark
+    internal class ExpirationMark
     {
+        public ExpirationMark(string username, DateTime expiration)
+        {
+            Username = username;
+            Expiration = expiration;
+        }
+
         public string Username { get; }
         public DateTime Expiration { get; set; }
 
@@ -148,21 +159,16 @@ namespace Application.Misc
         {
             return new ExpirationMark(username, expiration);
         }
-
-        public ExpirationMark(string username, DateTime expiration)
-        {
-            Username = username;
-            Expiration = expiration;
-        }
     }
 
-    public class ExpirationComparer : IComparer<ExpirationMark>
+    internal class ExpirationComparer : IComparer<ExpirationMark>
     {
         public int Compare(ExpirationMark x, ExpirationMark y)
         {
             return x.Username == y.Username ? 0 : x.Expiration.CompareTo(y.Expiration);
         }
     }
+
     internal static class DateTimeHelper
     {
         public static DateTime GetNewTimeOut()
