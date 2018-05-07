@@ -29,12 +29,15 @@ namespace Application.Test.Unittests
             return new string(stringChars);
         }
 
+        private static string Pass = "ADSAD";
+
         public static Dictionary<string, string> GenerateFakeUsers(int count)
         {
             var users = new Dictionary<string, string>();
+            
             for (var i = 0; i < count; i++)
             {
-                users[GenerateRandomString()] = GenerateRandomString();
+                users[GenerateRandomString()] = Pass;
             }
 
             return users;
@@ -266,7 +269,7 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void AddOrUpdate_AddAlotOfUsersInParalell_TheyAreAllAdded()
+        public void AddOrUpdate_AddAlotOfUsersInParallel_TheyAreAllAdded()
         {
             var fakeUsers = FakeUserGenerator.GenerateFakeUsers(10000);
 
@@ -279,10 +282,21 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void Timeout_ContainsManyOutDatedUsers_CorrectAmountAreLoggedOut()
+        public void Timeout_ContainsManyOutDatedUsers_CorrectAmountIsLoggedOut()
         {
             var fakeUsers = FakeUserGenerator.GenerateFakeUsers(10000);
             var dateTimes = new ConcurrentBag<string>();
+
+            var loggedOutUsers = new List<string>();
+
+            // Subscribing to the event
+            _uut.UsersTimedOutEvent += (s, a) =>
+            {
+                foreach (var user in a.LoggedOutUserCollection.GetConsumingEnumerable())
+                {
+                    loggedOutUsers.Add(user);
+                }
+            };
 
             var lck = new object();
             var random = new Random();
@@ -297,11 +311,7 @@ namespace Application.Test.Unittests
             Parallel.ForEach(fakeUsers, e =>
             {
                 var delay = GenerateRandom();
-                if (delay != 0)
-                {
-                    //delay += 1;
-                }
-                else
+                if (delay == 0)
                 {
                     dateTimes.Add(e.Key);
                 }
@@ -312,6 +322,10 @@ namespace Application.Test.Unittests
             _fakeTimer.ExpiredEvent += Raise.Event();
 
             Assert.That(_uut.ExpirationStamps.Count, Is.EqualTo(fakeUsers.Count - dateTimes.Count));
+            foreach (var loggedOutUser in loggedOutUsers)
+            {
+                Assert.That(!_uut.ExpirationStamps.ContainsKey(loggedOutUser));
+            }
         }
 
     }

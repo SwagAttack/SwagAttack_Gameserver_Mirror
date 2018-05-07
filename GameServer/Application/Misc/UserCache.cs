@@ -7,6 +7,10 @@ using Medallion.Collections;
 
 namespace Application.Misc
 {
+    /// <summary>
+    /// Documentation for the priorioty queue can be found at:
+    /// https://github.com/madelson/MedallionUtilities/blob/master/MedallionPriorityQueue/PriorityQueue.cs
+    /// </summary>
     public class UserCache : IUserCache
     {
         private readonly SmartLock _lock;
@@ -132,6 +136,14 @@ namespace Application.Misc
             return Task.Run(() => { UsersTimedOutEvent?.Invoke(this, new LoggedOutUsersEventArgs(usersToNotify)); });
         }
 
+        private async Task AddOrUpdateAsync(string username, string password, ExpirationMark mark)
+        {
+            using (await _lock.LockAsync())
+            {
+
+            }
+        }
+
         public async Task AddOrUpdateAsync(string username, string password, DateTime expiration)
         {
             using (await _lock.LockAsync())
@@ -146,7 +158,7 @@ namespace Application.Misc
 
     internal class ExpirationMark
     {
-        public ExpirationMark(string username, DateTime expiration)
+        private ExpirationMark(string username, DateTime expiration)
         {
             Username = username;
             Expiration = expiration;
@@ -165,7 +177,17 @@ namespace Application.Misc
     {
         public int Compare(ExpirationMark x, ExpirationMark y)
         {
-            return x.Username == y.Username ? 0 : x.Expiration.CompareTo(y.Expiration);
+            switch (x)
+            {
+                case null when y == null:
+                    return 0;
+                case null:
+                    return -1;
+                default:
+                    if (string.IsNullOrEmpty(x.Username))
+                        return -1;
+                    return x.Username == y.Username ? 0 : x.Expiration.CompareTo(y.Expiration);
+            }
         }
     }
 
@@ -174,11 +196,6 @@ namespace Application.Misc
         public static DateTime GetNewTimeOut()
         {
             return DateTime.Now.AddMinutes(20);
-        }
-
-        public static bool CheckForTimeout(DateTime markedTime)
-        {
-            return markedTime.CompareTo(DateTime.Now) < 0;
         }
 
         public static bool HasTimeout(this DateTime markedTime)
