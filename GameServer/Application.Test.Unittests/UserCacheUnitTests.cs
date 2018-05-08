@@ -29,16 +29,13 @@ namespace Application.Test.Unittests
         private const string UserThree = "UserThree";
         private const string UserThreePassword = "PasswordThree";
 
-        private DateTime _twentyMinutesFromNowLittleMore;
-        private DateTime _twentyMinutesFromNowLittleLess;
-
         private Dictionary<string, string> _fakeUsers;
 
         private bool TimeStampIsUpdatedAccordingToNow(DateTime dateTime)
         {
-            _twentyMinutesFromNowLittleMore = DateTime.Now.AddMinutes(20).AddSeconds(1);
-            _twentyMinutesFromNowLittleLess = DateTime.Now.AddMinutes(20).AddSeconds(-1);
-            return (dateTime.CompareTo(_twentyMinutesFromNowLittleMore) < 0) && (dateTime.CompareTo(_twentyMinutesFromNowLittleLess) > 0);
+            var twentyMinutesFromNowLittleMore = DateTime.Now.AddMinutes(20).AddSeconds(1);
+            var twentyMinutesFromNowLittleLess = DateTime.Now.AddMinutes(20).AddSeconds(-1);
+            return (dateTime.CompareTo(twentyMinutesFromNowLittleMore) < 0) && (dateTime.CompareTo(twentyMinutesFromNowLittleLess) > 0);
         }
 
         [SetUp]
