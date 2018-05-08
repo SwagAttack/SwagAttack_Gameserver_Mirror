@@ -16,19 +16,19 @@ namespace Application.Misc
     public class UserCache : IUserCache
     {
         private const int Timeout = 10; // 10 second timeout
-        private readonly ITimer _timer;
-
-        private readonly CacheList<string> _timeoutList;
-        private readonly Dictionary<string, string> _userDictionary;
 
         private readonly object _lock = new object();
+
+        private readonly CacheList<string> _timeoutList;
+        private readonly ITimer _timer;
+        private readonly Dictionary<string, UserInfo> _userDictionary;
 
         public UserCache(ITimer timer)
         {
             _timer = timer ?? throw new ArgumentNullException(nameof(timer));
 
             _timeoutList = new CacheList<string>();
-            _userDictionary = new Dictionary<string, string>();
+            _userDictionary = new Dictionary<string, UserInfo>();
 
             _timer.ExpiredEvent += TimerTimeout;
             _timer.StartWithSeconds(Timeout);
@@ -47,9 +47,13 @@ namespace Application.Misc
                 foreach (var exipiration in _timeoutList.Collection)
                 {
                     dic.Add(exipiration.Item, exipiration.Expiration);
-                    if(!_userDictionary.ContainsKey(exipiration.Item)) throw new InvalidDataException($"{nameof(_userDictionary)} does not contain item: {exipiration.Item}");
+                    if (!_userDictionary.ContainsKey(exipiration.Item))
+                        throw new InvalidDataException(
+                            $"{nameof(_userDictionary)} does not contain item: {exipiration.Item}");
                 }
-                if (dic.Count != _userDictionary.Count) throw new InvalidDataException($"Return value does not match internal dictionary");
+
+                if (dic.Count != _userDictionary.Count)
+                    throw new InvalidDataException($"Return value does not match internal dictionary");
                 return dic;
             }
         }
@@ -67,23 +71,24 @@ namespace Application.Misc
         {
             lock (_lock)
             {
-                if (_userDictionary.ContainsKey(username))
+                ICacheHandle handle;
+                if (_userDictionary.TryGetValue(username, out var item))
                 {
-                    var index = _timeoutList.Find(username);
-                    _timeoutList.Update(index, timeout);
+                    handle = item.CacheHandle;
+                    _timeoutList.Update(handle, timeout);
                 }
                 else
                 {
-                    _timeoutList.Add(username, timeout);
+                    _timeoutList.Add(username, timeout, out handle);
                 }
 
-                _userDictionary[username] = password;
+                _userDictionary[username] = new UserInfo {CacheHandle = handle, Password = password};
             }
         }
 
         public bool Confirm(string username)
         {
-            lock(_lock)
+            lock (_lock)
             {
                 return _userDictionary.ContainsKey(username);
             }
@@ -91,26 +96,25 @@ namespace Application.Misc
 
         public bool ConfirmAndRefresh(string username, string password)
         {
-            lock(_lock)
+            lock (_lock)
             {
-                if (_userDictionary.TryGetValue(username, out var pass) && pass == password)
+                if (_userDictionary.TryGetValue(username, out var item) && item.Password == password)
                 {
-                    var index = _timeoutList.Find(username);
-                    _timeoutList.Update(index, DateTimeHelper.GetNewTimeOut());
+                    _timeoutList.Update(item.CacheHandle, DateTimeHelper.GetNewTimeOut());
                     return true;
                 }
+
                 return false;
             }
         }
 
         public bool Remove(string username, string password)
         {
-            lock(_lock)
+            lock (_lock)
             {
-                if (_userDictionary.ContainsKey(username))
+                if (_userDictionary.TryGetValue(username, out var item))
                 {
-                    var index = _timeoutList.Find(username);
-                    _timeoutList.Remove(index);
+                    _timeoutList.Remove(item.CacheHandle);
                     return _userDictionary.Remove(username);
                 }
 
@@ -126,7 +130,7 @@ namespace Application.Misc
         {
             Task notifier;
 
-            lock(_lock)
+            lock (_lock)
             {
                 var usersToLogOut = new BlockingCollection<string>();
                 var usersToNotify = new BlockingCollection<string>();
@@ -170,15 +174,10 @@ namespace Application.Misc
         private Task NotifySubscribersAsync(BlockingCollection<string> usersToNotify)
         {
             if (UsersTimedOutEvent != null)
-            {
                 return Task.Run(() =>
                 {
-                    foreach (var username in usersToNotify.GetConsumingEnumerable())
-                    {
-                        InvokeUserTimedOutEvent(username);
-                    }
+                    foreach (var username in usersToNotify.GetConsumingEnumerable()) InvokeUserTimedOutEvent(username);
                 });
-            }
 
             return Task.CompletedTask;
         }
@@ -186,6 +185,12 @@ namespace Application.Misc
         private void InvokeUserTimedOutEvent(string username)
         {
             UsersTimedOutEvent?.Invoke(this, new TimedOutUserEventArgs(username));
+        }
+
+        private class UserInfo
+        {
+            public ICacheHandle CacheHandle { get; set; }
+            public string Password { get; set; }
         }
 
         #endregion

@@ -4,77 +4,62 @@ using System.Linq;
 
 namespace Application.Misc
 {
-    public class CacheList<T> where T : IComparable<T>
+    public class CacheList<T>
     {
-        private readonly List<ContainedItem> _collection;
-
-        public IReadOnlyList<ContainedItem> Collection => _collection;
+        private readonly LinkedList<ContainedItem> _collection;
 
         public CacheList()
         {
-            _collection = new List<ContainedItem>();
+            _collection = new LinkedList<ContainedItem>();
         }
 
-        public CacheList(int capacity)
-        {
-            _collection = new List<ContainedItem>(capacity);
-        }
+        public IReadOnlyList<ContainedItem> Collection => _collection.ToList();
 
-        public void Add(T item, DateTime expiration)
+        public void Add(T item, DateTime expiration, out ICacheHandle handle)
         {
-            var index = _collection.Count - 1;
-            while (index >= 0)
+            LinkedListNode<ContainedItem> node = null;
+
+            var current = _collection.Last;
+            while (current != null)
             {
-                if (_collection[index].Expiration.IsBefore(expiration))
-                {
-                    _collection.Insert(index + 1,
-                        new ContainedItem { Expiration = expiration, Item = item});
-                    return;
-                }
-                index--;
+                if (!expiration.IsBefore(current.Value.Expiration))
+                    break;
+                current = current.Previous;
             }
-            _collection.Insert(0, 
-                new ContainedItem { Expiration = expiration, Item = item});
+
+            if (current == null)
+                node = _collection.AddFirst(ContainedItem.CreateItem(item, expiration));
+            else
+                node = _collection.AddAfter(current, ContainedItem.CreateItem(item, expiration));
+
+            handle = CacheHandle.CreateHandle(node);
         }
 
-        public int Find(T item)
+        public void Remove(ICacheHandle handle)
         {
-            return _collection.FindIndex(c => c.Item.CompareTo(item) == 0);
+            _collection.Remove(CacheHandle.GetHandle(handle).NodeItem);
         }
 
-        public void Remove(int index)
+        public void Update(ICacheHandle handle, DateTime expiration)
         {
-            _collection.RemoveAt(index);
-        }
-
-        public bool Update(int index, DateTime expiration)
-        {
-            try
-            {
-                var item = _collection[index];
-                _collection.RemoveAt(index);
-                Add(item.Item, expiration);
-                return true;
-            }
-            catch(Exception)
-            {
-                return false;
-            }
+            var updatingNote = CacheHandle.GetHandle(handle).NodeItem;
+            _collection.Remove(updatingNote);
+            Add(updatingNote.Value.Item, expiration, out var newHandle);
+            CacheHandle.GetHandle(handle).Update(newHandle);
         }
 
         public bool ContainsOutdatedItem(DateTime compareTo)
         {
             if (_collection.Count == 0) return false;
-            return _collection[0].Expiration.IsBefore(compareTo);
-
+            return _collection.First.Value.Expiration.IsBefore(compareTo);
         }
 
         public T RemoveAndGet()
         {
-            if(_collection.Count == 0)
+            if (_collection.Count == 0)
                 throw new IndexOutOfRangeException();
-            var item = _collection[0];
-            _collection.RemoveAt(0);
+            var item = _collection.First.Value;
+            _collection.RemoveFirst();
             return item.Item;
         }
 
@@ -82,13 +67,49 @@ namespace Application.Misc
         {
             public T Item { get; set; }
             public DateTime Expiration { get; set; }
+
+            public static ContainedItem CreateItem(T item, DateTime expiration)
+            {
+                return new ContainedItem {Expiration = expiration, Item = item};
+            }
         }
+
+        private class CacheHandle : ICacheHandle
+        {
+            private CacheHandle(LinkedListNode<ContainedItem> node)
+            {
+                NodeItem = node;
+            }
+
+            public LinkedListNode<ContainedItem> NodeItem { get; private set; }
+
+            public void Update(ICacheHandle handle)
+            {
+                var converted = GetHandle(handle);
+                NodeItem = converted.NodeItem;
+            }
+
+            public static ICacheHandle CreateHandle(LinkedListNode<ContainedItem> node)
+            {
+                return new CacheHandle(node);
+            }
+
+            public static CacheHandle GetHandle(ICacheHandle handle)
+            {
+                var target = handle as CacheHandle;
+                return target;
+            }
+        }
+    }
+
+    public interface ICacheHandle
+    {
     }
 
     internal static class DateTimeExtentions
     {
         /// <summary>
-        /// Returns whether current is before target
+        ///     Returns whether current is before target
         /// </summary>
         /// <param name="current"></param>
         /// <param name="target"></param>

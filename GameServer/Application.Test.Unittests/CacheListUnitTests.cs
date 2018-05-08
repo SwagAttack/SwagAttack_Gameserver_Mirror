@@ -20,9 +20,9 @@ namespace Application.Test.Unittests
         [Test]
         public void Add_AddThreeStringsNotInOrder_UutOrderIsCorrect()
         {
-            _uut.Add("Third", DateTime.Now.AddMinutes(4));
-            _uut.Add("Second", DateTime.Now.AddMinutes(3));
-            _uut.Add("First", DateTime.Now.AddMinutes(2));
+            _uut.Add("Third", DateTime.Now.AddMinutes(4), out var handle4);
+            _uut.Add("Second", DateTime.Now.AddMinutes(3), out var handle3);
+            _uut.Add("First", DateTime.Now.AddMinutes(2), out var handle2);
 
             Assert.That(_uut.Collection[0].Item == "First");
             Assert.That(_uut.Collection[1].Item == "Second");
@@ -36,7 +36,7 @@ namespace Application.Test.Unittests
             var random = new Random();
             foreach (var fakeString in fakeStrings)
             {
-                _uut.Add(fakeString, DateTime.Now.AddMinutes(random.Next(20)));
+                _uut.Add(fakeString, DateTime.Now.AddMinutes(random.Next(20)), out var handle);
             }
 
             for (int i = _uut.Collection.Count - 1; i > 0; i--)
@@ -46,91 +46,54 @@ namespace Application.Test.Unittests
         }
 
         [Test]
-        public void Find_ItemExists_ReturnsIndexOfItem()
+        public void Remove_AddToGetHandleThenRemove_RemovesItem()
         {
             List<string> fakeStrings = FakeUserGenerator.GenerateFakeUsers(10).Keys.ToList();
+            List<ICacheHandle> handles = new List<ICacheHandle>(15);
 
             var random = new Random();
-            foreach (var fakeString in fakeStrings)
-            {
-                _uut.Add(fakeString, DateTime.Now.AddMinutes(random.Next(20)));
+            for(int i = 0; i < 10; i++)
+            {              
+                _uut.Add(fakeStrings[i], DateTime.Now.AddMinutes(random.Next(20)), out var handle);
+                handles.Add(handle);
             }
 
-            // Act
-            var index = _uut.Find(fakeStrings[0]);
+            _uut.Remove(handles[4]);
 
             // Assert
-            Assert.That(_uut.Collection[index].Item == fakeStrings[0]);
+            Assert.That(_uut.Collection.Count(t => t.Item == fakeStrings[4]) == 0);
         }
 
         [Test]
-        public void Find_ItemDoesNotExist_ReturnsNegative()
-        {
-            var index = _uut.Find("BadItem");
-            Assert.That(index < 0);
-        }
-
-        [Test]
-        public void Remove_ItemExists_RemovesItem()
+        public void Update_AddItemsThenUpdateSomeItems_UutOrderIsCorrect()
         {
             List<string> fakeStrings = FakeUserGenerator.GenerateFakeUsers(10).Keys.ToList();
+            List<ICacheHandle> handles = new List<ICacheHandle>(10);
 
             var random = new Random();
-            foreach (var fakeString in fakeStrings)
-            {
-                _uut.Add(fakeString, DateTime.Now.AddMinutes(random.Next(20)));
-            }
-
-            // Act
-            var index = _uut.Find(fakeStrings[0]);
-            _uut.Remove(index);
-
-            // Assert
-            Assert.That(_uut.Collection.Count(t => t.Item == fakeStrings[0]) == 0);
-        }
-
-        [Test]
-        public void Update_AddItemsThenUpdateSomeItems_ReturnsTrueAndUutOrderIsCorrect()
-        {
-            List<string> fakeStrings = new List<string>();
             for (int i = 0; i < 10; i++)
             {
-                fakeStrings.Add(FakeUserGenerator.GenerateRandomString());
-            }
-
-            var random = new Random();
-            foreach (var fakeString in fakeStrings)
-            {
-                _uut.Add(fakeString, DateTime.Now.AddMinutes(random.Next(20)));
+                _uut.Add(fakeStrings[i], DateTime.Now.AddMinutes(random.Next(20)), out var handle);
+                handles.Add(handle);
             }
 
             // Act
 
-            var index = _uut.Find(fakeStrings[5]);
-            var firstResult = _uut.Update(index, DateTime.Now.AddMinutes(random.Next(5)));
+            _uut.Update(handles[6], DateTime.Now.AddMinutes(random.Next(5)));
 
-            index = _uut.Find(fakeStrings[3]);
-            var secondResult = _uut.Update(index, DateTime.Now.AddMinutes(random.Next(10)));
+            _uut.Update(handles[5], DateTime.Now.AddMinutes(random.Next(10)));
 
             // Assert
-            Assert.That(firstResult && secondResult);
             for (int i = _uut.Collection.Count - 1; i > 0; i--)
             {
                 Assert.That(_uut.Collection[i].Expiration.CompareTo(_uut.Collection[i - 1].Expiration), Is.EqualTo(1)); // Assert that the current item is after the one standing before it
             }
-        }
-
-        [Test]
-        public void Update_DoesntContainItem_ReturnsFalse()
-        {
-            var result = _uut.Update(4, DateTime.Now);
-            Assert.That(!result);
         }
 
         [Test]
         public void ContainsOutDatedItem_ContainsAnItemThatIsOutdated_ReturnsTrue()
         {
-            _uut.Add("OutdatedItem", DateTime.Now.AddMinutes(-1));
+            _uut.Add("OutdatedItem", DateTime.Now.AddMinutes(-1), out var handle);
             var result = _uut.ContainsOutdatedItem(DateTime.Now);
             Assert.That(result);
         }
@@ -138,7 +101,7 @@ namespace Application.Test.Unittests
         [Test]
         public void ContainsOutDatedItem_ContainsItemsButNoneAreOutdated_ReturnsFalse()
         {
-            _uut.Add("NotOutDated", DateTime.Now.AddMinutes(1));
+            _uut.Add("NotOutDated", DateTime.Now.AddMinutes(1), out var handle);
             var result = _uut.ContainsOutdatedItem(DateTime.Now);
             Assert.That(!result);
         }
@@ -153,7 +116,7 @@ namespace Application.Test.Unittests
         [Test]
         public void RemoveAndGet_ContainsItem_ReturnsItemAndRemovesIt()
         {
-            _uut.Add("Item", DateTime.Now.AddMinutes(1));
+            _uut.Add("Item", DateTime.Now.AddMinutes(1), out var handle);
             var item = _uut.RemoveAndGet();
             Assert.That(item == "Item");
             Assert.That(_uut.Collection.Count == 0);
