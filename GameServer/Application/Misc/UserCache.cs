@@ -124,6 +124,8 @@ namespace Application.Misc
 
         private void TimerTimeout(object sender, EventArgs eventArgs)
         {
+            Task notifier;
+
             lock(_lock)
             {
                 var usersToLogOut = new BlockingCollection<string>();
@@ -131,10 +133,11 @@ namespace Application.Misc
 
                 var logoutRunner = GetTimedOutUsersAsync(usersToLogOut);
                 var logoutHandler = RemoveTimedOutUsersAsync(usersToLogOut, usersToNotify);
-                var notifier = NotifySubscribersAsync(usersToNotify);
-                Task.WaitAll(logoutRunner, logoutHandler, notifier);
+                notifier = NotifySubscribersAsync(usersToNotify);
+                Task.WaitAll(logoutRunner, logoutHandler);
             }
 
+            notifier.Wait();
             _timer.StartWithSeconds(Timeout);
         }
 
