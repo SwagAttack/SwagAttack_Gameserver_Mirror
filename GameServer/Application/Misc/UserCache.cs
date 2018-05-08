@@ -44,8 +44,12 @@ namespace Application.Misc
             get
             {
                 var dic = new Dictionary<string, DateTime>();
-                foreach (var exipiration in _timeoutList.Collection) dic.Add(exipiration.Item, exipiration.Expiration);
-                if (_timeoutList.Collection.Count != _userDictionary.Count) throw new InvalidDataException();
+                foreach (var exipiration in _timeoutList.Collection)
+                {
+                    dic.Add(exipiration.Item, exipiration.Expiration);
+                    if(!_userDictionary.ContainsKey(exipiration.Item)) throw new InvalidDataException();
+                }
+                if (dic.Count != _userDictionary.Count) throw new InvalidDataException();
                 return dic;
             }
         }
