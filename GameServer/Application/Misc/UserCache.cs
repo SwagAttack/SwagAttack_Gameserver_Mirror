@@ -56,7 +56,7 @@ namespace Application.Misc
 
         #region IUserCache Implementations
 
-        public event EventHandler<LoggedOutUsersEventArgs> UsersTimedOutEvent;
+        public event EventHandler<TimedOutUserEventArgs> UsersTimedOutEvent;
 
         public void AddOrUpdate(string username, string password)
         {
@@ -166,7 +166,18 @@ namespace Application.Misc
 
         private Task NotifySubscribersAsync(BlockingCollection<string> usersToNotify)
         {
-            return Task.Run(() => { UsersTimedOutEvent?.Invoke(this, new LoggedOutUsersEventArgs(usersToNotify)); });
+            if (UsersTimedOutEvent != null)
+            {
+                return Task.Run(() =>
+                {
+                    foreach (var user in usersToNotify.GetConsumingEnumerable())
+                    {
+                        UsersTimedOutEvent.Invoke(this, new TimedOutUserEventArgs(user));
+                    }
+                });
+            }
+
+            return Task.CompletedTask;
         }
 
         #endregion

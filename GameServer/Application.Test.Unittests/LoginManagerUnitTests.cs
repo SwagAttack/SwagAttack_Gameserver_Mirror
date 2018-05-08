@@ -220,13 +220,10 @@ namespace Application.Test.Unittests
             _uut.SubscribeOnLogOut(userThatLeaves, HandleTwo);
             _uut.SubscribeOnLogOut(anotherLeavingUser, HandleTwo);
 
-
-            var blockingCollection = new BlockingCollection<string> {userThatLeaves, anotherLeavingUser};
-            blockingCollection.CompleteAdding();
-
             // Act
-            _fakeUserCache.UsersTimedOutEvent += Raise.EventWith(null, new LoggedOutUsersEventArgs(blockingCollection));
-            
+            _fakeUserCache.UsersTimedOutEvent += Raise.EventWith(null, new TimedOutUserEventArgs(userThatLeaves));
+            _fakeUserCache.UsersTimedOutEvent += Raise.EventWith(null, new TimedOutUserEventArgs(anotherLeavingUser));
+
             Thread.Sleep(500);
 
             // Assert

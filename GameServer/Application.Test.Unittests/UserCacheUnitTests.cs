@@ -239,10 +239,7 @@ namespace Application.Test.Unittests
             // Subscribing to the event
             _uut.UsersTimedOutEvent += (s, a) =>
             {
-                foreach (var user in a.LoggedOutUserCollection.GetConsumingEnumerable())
-                {
-                    loggedOutUsers.Add(user);
-                }
+                loggedOutUsers.Add(a.TimedOutUsername);
             };
 
             _uut.AddOrUpdate(UserOne, UserOnePassword, DateTime.Now.AddSeconds(5));
@@ -293,10 +290,7 @@ namespace Application.Test.Unittests
             // Subscribing to the event
             _uut.UsersTimedOutEvent += (s, a) =>
             {
-                foreach (var user in a.LoggedOutUserCollection.GetConsumingEnumerable())
-                {
-                    loggedOutUsers.Add(user);
-                }
+                loggedOutUsers.Add(a.TimedOutUsername);
             };
 
             Parallel.ForEach(_fakeUsers, e =>

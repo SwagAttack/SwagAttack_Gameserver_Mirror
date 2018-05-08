@@ -8,13 +8,13 @@ using Application.Misc;
 
 namespace Application.Interfaces
 {
-    public class LoggedOutUsersEventArgs : EventArgs
+    public class TimedOutUserEventArgs : EventArgs
     {
-        public LoggedOutUsersEventArgs(BlockingCollection<string> collection)
+        public TimedOutUserEventArgs(string username)
         {
-            LoggedOutUserCollection = collection ?? throw new ArgumentNullException(nameof(collection));
+            TimedOutUsername = username;
         }
-        public BlockingCollection<string> LoggedOutUserCollection { get; }
+        public string TimedOutUsername { get; }
     }
 
     public interface IUserCache
@@ -22,7 +22,7 @@ namespace Application.Interfaces
         /// <summary>
         /// Users timeout event. Will contain a blocking collection of usernames that have been logged out.
         /// </summary>
-        event EventHandler<LoggedOutUsersEventArgs> UsersTimedOutEvent;
+        event EventHandler<TimedOutUserEventArgs> UsersTimedOutEvent;
 
         /// <summary>
         /// Adds a user to the cache with the default timeout of 20 minutes.
@@ -49,7 +49,7 @@ namespace Application.Interfaces
         bool Confirm(string username);
 
         /// <summary>
-        /// Confirms that the user is currenty in the cache and if so refreshes the user's timeout.
+        /// Confirms that the user is currenty in the cache and if so refreshes the user's timeout. The password must match.
         /// Returns true if user is found and refreshed, else false.
         /// </summary>
         /// <param name="username"></param>

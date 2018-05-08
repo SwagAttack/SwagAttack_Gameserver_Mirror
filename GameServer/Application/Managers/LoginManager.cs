@@ -97,12 +97,9 @@ namespace Application.Managers
             }
         }
 
-        private void OnUsersTimedOutHandler(object sender, LoggedOutUsersEventArgs loggedOutUsersEventArgs)
+        private void OnUsersTimedOutHandler(object sender, TimedOutUserEventArgs timedOutUserEventArgs)
         {
-            foreach (var user in loggedOutUsersEventArgs.LoggedOutUserCollection.GetConsumingEnumerable())
-            {
-                _loggedOutUsers.Add(user);
-            }
+              _loggedOutUsers.Add(timedOutUserEventArgs.TimedOutUsername);
         }
     }
 
