@@ -173,14 +173,19 @@ namespace Application.Misc
             {
                 return Task.Run(() =>
                 {
-                    foreach (var user in usersToNotify.GetConsumingEnumerable())
+                    foreach (var username in usersToNotify.GetConsumingEnumerable())
                     {
-                        UsersTimedOutEvent.Invoke(this, new TimedOutUserEventArgs(user));
+                        InvokeUserTimedOutEvent(username);
                     }
                 });
             }
 
             return Task.CompletedTask;
+        }
+
+        private void InvokeUserTimedOutEvent(string username)
+        {
+            UsersTimedOutEvent?.Invoke(this, new TimedOutUserEventArgs(username));
         }
 
         #endregion
