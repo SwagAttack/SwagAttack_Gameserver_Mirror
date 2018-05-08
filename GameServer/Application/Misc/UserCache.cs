@@ -47,9 +47,9 @@ namespace Application.Misc
                 foreach (var exipiration in _timeoutList.Collection)
                 {
                     dic.Add(exipiration.Item, exipiration.Expiration);
-                    if(!_userDictionary.ContainsKey(exipiration.Item)) throw new InvalidDataException();
+                    if(!_userDictionary.ContainsKey(exipiration.Item)) throw new InvalidDataException($"{nameof(_userDictionary)} does not contain item: {exipiration.Item}");
                 }
-                if (dic.Count != _userDictionary.Count) throw new InvalidDataException();
+                if (dic.Count != _userDictionary.Count) throw new InvalidDataException($"Return value does not match internal dictionary");
                 return dic;
             }
         }
