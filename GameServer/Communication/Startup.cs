@@ -41,6 +41,7 @@ namespace Communication
                 new UserRepository(sp.GetService<IDbContext>(), "UserCollection"));
             services.AddTransient<IGameRepository, GameRepository>(u =>
                 new GameRepository(sp.GetService<IDbContext>(), "GameCollection"));
+
             services.AddSingleton(l => LoginManager.GetInstance());
             services.AddSingleton<ILobbyController, LobbyController>();
             services.AddTransient<IUserController, UserController>();
