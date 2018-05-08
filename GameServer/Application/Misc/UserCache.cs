@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Application.Interfaces;
 
@@ -44,6 +45,7 @@ namespace Application.Misc
             {
                 var dic = new Dictionary<string, DateTime>();
                 foreach (var exipiration in _timeoutList.Collection) dic.Add(exipiration.Item, exipiration.Expiration);
+                if (_timeoutList.Collection.Count != _userDictionary.Count) throw new InvalidDataException();
                 return dic;
             }
         }
