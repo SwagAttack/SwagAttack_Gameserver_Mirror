@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Application.Interfaces;
 using Application.Managers;
 using Domain.Interfaces;
@@ -12,109 +15,30 @@ namespace Application.Test.Unittests
     public class LoginManagerUnitTests
     {
         private LoginManager _uut;
-        private ITimer _fakeTimer;
+        private IUserCache _fakeUserCache;
 
         [SetUp]
         public void SetUp()
         {
-            _fakeTimer = Substitute.For<ITimer>();
-            _uut = new LoginManager(_fakeTimer);
+            _fakeUserCache = Substitute.For<IUserCache>();
+            _uut = new LoginManager(_fakeUserCache);
         }
 
         [Test]
-        public void Login_CallingOnce_ContainsUserNameWithTimeStampNow()
+        public void Login_AddsUserToLoggedInPool()
         {
             // Arrange
 
             var user = Substitute.For<IUser>();
             user.Username = "Username";
-
-            var fakeTime_littleMore = DateTime.Now.AddMinutes(20).AddSeconds(1);
-            var fakeTime_littleLess = DateTime.Now.AddMinutes(20).AddSeconds(-1);
+            user.Password = "Password";
 
             // Act
 
             _uut.Login(user);
 
             // Assert
-
-            Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username.ToLower()), Is.EqualTo(true)); 
-            Assert.That(_uut.LoggedInUsers[user.Username.ToLower()].Expiration.CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
-            Assert.That(_uut.LoggedInUsers[user.Username.ToLower()].Expiration.CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
-        }
-
-        [Test]
-        public void Login_CalledTwiceWithSleepInBetween_ContainsUserNameWithUpdatedTimestamp()
-        {
-            // Arrange
-
-            var user = Substitute.For<IUser>();
-            user.Username = "Username";
-
-            // Act 
-
-            _uut.Login(user);
-
-            Thread.Sleep(15000);
-
-            _uut.Login(user);
-
-            var fakeTime_littleMore = DateTime.Now.AddMinutes(20).AddSeconds(1);
-            var fakeTime_littleLess = DateTime.Now.AddMinutes(20).AddSeconds(-1);
-
-            // Assert
-
-            Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username.ToLower()), Is.EqualTo(true));
-            Assert.That(_uut.LoggedInUsers[user.Username.ToLower()].Expiration.CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
-            Assert.That(_uut.LoggedInUsers[user.Username.ToLower()].Expiration.CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
-        }
-
-        [Test]
-        public void TimerExpired_RestartsTimer()
-        {
-            // Act
-            _fakeTimer.ExpiredEvent += Raise.EventWith(_fakeTimer, EventArgs.Empty);
-            // Assert
-            _fakeTimer.Received(2).StartWithSeconds(60);
-        }
-
-        [Test]
-        public void TimerExpired_HasTimedOutUser_RemovesUser()
-        {
-            // Arrange
-
-            var user = Substitute.For<IUser>();
-            user.Username = "Username";
-            var fakeTime = DateTime.Now.AddMinutes(-1);
-
-            _uut.Login(user, fakeTime);
-
-            // Act
-
-            _fakeTimer.ExpiredEvent += Raise.EventWith(_fakeTimer, EventArgs.Empty);
-
-            // Assert
-
-            Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username.ToLower()), Is.EqualTo(false));
-        }
-
-        [Test]
-        public void TimerExpired_HasUserCloseToExpiring_DoesntRemovesUser()
-        {
-            // Arrange
-
-            var user = Substitute.For<IUser>();
-            user.Username = "Username";
-            var fakeTime = DateTime.Now.AddMinutes(1);
-            _uut.Login(user, fakeTime);
-
-            // Act
-
-            _fakeTimer.ExpiredEvent += Raise.EventWith(_fakeTimer, EventArgs.Empty);
-
-            // Assert
-
-            Assert.That(_uut.LoggedInUsers.ContainsKey(user.Username.ToLower()), Is.EqualTo(true));
+            Received.InOrder(() => { _fakeUserCache.AddOrUpdate(user.Username, user.Password); });
         }
 
         [Test]
@@ -125,6 +49,8 @@ namespace Application.Test.Unittests
             var user = Substitute.For<IUser>();
             user.Username = "Username";
             user.Password = "Password";
+
+            _fakeUserCache.ConfirmAndRefresh(user.Username, user.Password).Returns(false);
 
             // Act and assert
 
@@ -140,159 +66,97 @@ namespace Application.Test.Unittests
             user.Username = "Username";
             user.Password = "Password";
 
-            // Act
+            _fakeUserCache.ConfirmAndRefresh(user.Username, user.Password).Returns(true);
 
-            _uut.Login(user);
-
-            // Assert
+            // Act and Assert
 
             Assert.That(_uut.CheckLoginStatus(user.Username, user.Password), Is.EqualTo(true));
         }
 
         [Test]
-        public void CheckLoginStatus_ContainsUserWrongPassword_ReturnsFalse()
+        public void SubscribeOnLogout_UserExistNotPreviouslySubscribed_ReturnsTrue()
         {
             // Arrange
 
-            var user = Substitute.For<IUser>();
-            user.Username = "Username";
-            user.Password = "Password";
+            var username = "Username";
+            _fakeUserCache.Confirm(username).Returns(true);
 
-            // Act
-
-            _uut.Login(user);
-
-            // Assert
-
-            Assert.That(_uut.CheckLoginStatus(user.Username, "Wrong password"), Is.EqualTo(false));
-        }
-
-        [Test]
-        public void CheckLoginStatus_ContainsUserCorrectPassword_UpdatesTimeStampCorrectly()
-        {
-            // Arrange
-
-            var user = Substitute.For<IUser>();
-            user.Username = "Username";
-            user.Password = "Password";
-
-            _uut.Login(user);
-
-            Thread.Sleep(5);
-
-            // Act
-
-            _uut.CheckLoginStatus(user.Username, user.Password);
-
-            var fakeTime_littleMore = DateTime.Now.AddMinutes(20).AddSeconds(1);
-            var fakeTime_littleLess = DateTime.Now.AddMinutes(20).AddSeconds(-1);
-
-            // Assert
-
-            Assert.That(_uut.LoggedInUsers[user.Username.ToLower()].Expiration.CompareTo(fakeTime_littleMore) < 0, Is.EqualTo(true));
-            Assert.That(_uut.LoggedInUsers[user.Username.ToLower()].Expiration.CompareTo(fakeTime_littleLess) > 0, Is.EqualTo(true));
-        }
-
-        [TestCase("UsernameOne", "UsernameOne", true)] // Correct user
-        [TestCase("UsernameTwo", "UsernameOne", false)] // Invalid user
-        public void SubscribeOnLogOut_ValidAndInvalidUserNotPreviouslySubscribedToUserName_ReturnsCorrectly(string usernameToSubscribeTo, string username, bool expected)
-        {
-            // Arrange
-
-            var user = Substitute.For<IUser>();
-            user.Username = username;
-            _uut.Login(user);
-
-            UserLoggedOutHandle handle = new UserLoggedOutHandle((o, s) =>
+            var handle = new UserLoggedOutHandle((o, s) =>
             {
 
             });
 
             // Act and assert
 
-            Assert.That(_uut.SubscribeOnLogOut(usernameToSubscribeTo, handle), Is.EqualTo(expected));
+            Assert.That(_uut.SubscribeOnLogOut(username, handle), Is.EqualTo(true));
         }
 
         [Test]
-        public void SubscribeOnLogOut_PreviouslySubscribedToUserName_ReturnsFalse()
+        public void SubscribeOnLogout_UserExistsPreviouslySubscribed_ReturnsFalse()
         {
             // Arrange
 
-            var user = Substitute.For<IUser>();
-            user.Username = "Username";
-            _uut.Login(user);
+            var username = "Username";
+            _fakeUserCache.Confirm(username).Returns(true);
 
-            UserLoggedOutHandle handle = new UserLoggedOutHandle((o, s) =>
+            var handle = new UserLoggedOutHandle((o, s) =>
+            {
+
+            });
+
+            _uut.SubscribeOnLogOut(username, handle);
+
+            // Act and assert
+
+            Assert.That(_uut.SubscribeOnLogOut(username, handle), Is.EqualTo(false));
+        }
+
+        [Test]
+        public void SubscribeOnLogout_UserDoesNotExist_ReturnsFalse()
+        {
+            // Arrange
+
+            var username = "Username";
+            _fakeUserCache.Confirm(username).Returns(false);
+
+            var handle = new UserLoggedOutHandle((o, s) =>
             {
 
             });
 
             // Act
 
-            _uut.SubscribeOnLogOut(user.Username, handle);
+            var subscribed = _uut.SubscribeOnLogOut(username, handle);
 
             // Assert
-
-            Assert.That(_uut.SubscribeOnLogOut(user.Username, handle), Is.EqualTo(false));
+            Assert.That(!subscribed);
         }
-
-        [Test]
-        public void SubscribeOnLogOut_SameHandlerForTwoUsernames_ReturnsTrue()
-        {
-            // Arrange
-
-            var user = Substitute.For<IUser>();
-            user.Username = "Username";
-            _uut.Login(user);
-
-            var anotherUser = Substitute.For<IUser>();
-            anotherUser.Username = "UsernameTwo";
-            _uut.Login(anotherUser);
-
-            UserLoggedOutHandle handle = new UserLoggedOutHandle((o, s) =>
-            {
-
-            });
-
-            // Act and assert
-
-            Assert.That(_uut.SubscribeOnLogOut(user.Username, handle), Is.EqualTo(true));
-            Assert.That(_uut.SubscribeOnLogOut(anotherUser.Username, handle), Is.EqualTo(true));
-        }
-
-
 
         [Test]
         public void UnsubscribeOnLogOut_PreviouslySubscribedToUserName_ReturnsTrue()
         {
             // Arrange
 
-            var user = Substitute.For<IUser>();
-            user.Username = "Username";
-            _uut.Login(user);
+            var username = "Username";
+            _fakeUserCache.Confirm(username).Returns(true);
 
-            UserLoggedOutHandle handle = new UserLoggedOutHandle((o, s) =>
-            {
-
-            });
+            var handle = new UserLoggedOutHandle((o, s) =>{});
 
             // Act 
 
-            _uut.SubscribeOnLogOut(user.Username, handle);
+            _uut.SubscribeOnLogOut(username, handle);
 
             // Assert
 
-            Assert.That(_uut.UnsubscribeOnLogOut(user.Username, handle), Is.EqualTo(true));
+            Assert.That(_uut.UnsubscribeOnLogOut(username, handle), Is.EqualTo(true));
         }
 
         [Test]
-        public void UnsubscribeOnLogOut_NotPreviouslySubscribedToUserName_ReturnsFalse()
+        public void UnsubscribeOnLogOut_UserDoesNotExistNotPreviouslySubscribedToUserName_ReturnsFalse()
         {
             // Arrange
 
-            var user = Substitute.For<IUser>();
-            user.Username = "Username";
-            _uut.Login(user);
+            var username = "Username";
 
             UserLoggedOutHandle handle = new UserLoggedOutHandle((o, s) =>
             {
@@ -301,26 +165,27 @@ namespace Application.Test.Unittests
 
             // Act and assert Assert
 
-            Assert.That(_uut.UnsubscribeOnLogOut(user.Username, handle), Is.EqualTo(false));
+            Assert.That(_uut.UnsubscribeOnLogOut(username, handle), Is.EqualTo(false));
         }
 
         [Test]
-        public void UnsubscribeOnLogOut_InvalidUser_ReturnsFalse()
+        public void UnsubscribeOnLogOut_UserDoesExistNotPreviouslySubscribedToUserName_ReturnsFalse()
         {
             // Arrange
 
-            var user = Substitute.For<IUser>();
-            user.Username = "Username";
-            _uut.Login(user);
+            var username = "Username";
 
-            UserLoggedOutHandle handle = new UserLoggedOutHandle((o, s) =>
+            _fakeUserCache.Confirm(Arg.Any<string>()).Returns(true);
+            _uut.SubscribeOnLogOut(username, (o, s) => { }); // The user exists with a default handle
+
+            var handle = new UserLoggedOutHandle((o, s) => // This handle is not subscribed
             {
 
             });
 
             // Act and assert Assert
 
-            Assert.That(_uut.UnsubscribeOnLogOut("THIS IS AN INVALID USER", handle), Is.EqualTo(false));
+            Assert.That(_uut.UnsubscribeOnLogOut(username, handle), Is.EqualTo(false));
         }
 
         [Test]
@@ -328,44 +193,45 @@ namespace Application.Test.Unittests
         {
             // Arrange
 
-            var userThatStays = Substitute.For<IUser>();
-            userThatStays.Username = "UserThatStays";
-            _uut.Login(userThatStays);
+            var userThatStays = "UserThatStays";
+            var userThatLeaves = "LeavingUser";
+            var anotherLeavingUser = "AnotherleavingUser";
+            
+            _fakeUserCache.Confirm(Arg.Any<string>()).Returns(true);
 
-            var userThatLeaves = Substitute.For<IUser>();
-            userThatLeaves.Username = "LeavingUser";
-            _uut.Login(userThatLeaves, DateTime.Now.AddMinutes(-1));
+            var handleOneCount = 0;
+            var handleTwoCount = 0;
 
-            var userTwoThatLeaves = Substitute.For<IUser>();
-            userTwoThatLeaves.Username = "LeavingUserTwo";
-            _uut.Login(userTwoThatLeaves, DateTime.Now.AddMinutes(-1));
-
-            int handleOneCount = 0;
-            int handleTwoCount = 0;
-
-            void HandleOne(object o, string s)
+            void HandleOne(object o, string username)
             {
                 handleOneCount++;
             }
 
-            UserLoggedOutHandle handleTwo = (o, s) => { handleTwoCount++; };
+            void HandleTwo(object o, string username)
+            {
+                handleTwoCount++;
+            }
+
+            // Assumming we have one subscriber that subscribes to two usernames - this handle should receive one call
+            _uut.SubscribeOnLogOut(userThatStays, HandleOne);
+            _uut.SubscribeOnLogOut(userThatLeaves, HandleOne);
+            
+            // And another handler subscribes to two usernames - this handle should receive two calls
+            _uut.SubscribeOnLogOut(userThatLeaves, HandleTwo);
+            _uut.SubscribeOnLogOut(anotherLeavingUser, HandleTwo);
+
+
+            var blockingCollection = new BlockingCollection<string> {userThatLeaves, anotherLeavingUser};
+            blockingCollection.CompleteAdding();
 
             // Act
-
-            _uut.SubscribeOnLogOut(userThatLeaves.Username, HandleOne);
-            _uut.SubscribeOnLogOut(userTwoThatLeaves.Username, HandleOne);
-
-            _uut.SubscribeOnLogOut(userThatLeaves.Username, handleTwo);
-
-            _fakeTimer.ExpiredEvent += Raise.EventWith(_fakeTimer, EventArgs.Empty);
+            _fakeUserCache.UsersTimedOutEvent += Raise.EventWith(null, new LoggedOutUsersEventArgs(blockingCollection));
+            
+            Thread.Sleep(500);
 
             // Assert
-            Assert.That(handleTwoCount, Is.EqualTo(1));
-            Assert.That(handleOneCount, Is.EqualTo(2));
+            Assert.That(handleOneCount, Is.EqualTo(1));
+            Assert.That(handleTwoCount, Is.EqualTo(2));
         }
-
-
-
-
     }
 }

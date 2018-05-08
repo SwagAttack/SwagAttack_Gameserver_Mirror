@@ -10,7 +10,7 @@ install:
 script:
     - dotnet build GameServer/GameServer.sln
     - dotnet vstest **/*tests/bin/Debug/netcoreapp2.0/*tests.dll --ListTests #--logger:"trx;LogFileName=testresultz.trx" --ResultsDirectory:./TestRetults
-    - travis_wait dotnet vstest **/*tests/bin/Debug/netcoreapp2.0/*tests.dll
+    - travis_wait 60 dotnet vstest **/*tests/bin/Debug/netcoreapp2.0/*tests.dll
 #deploy:
 #  provider: releases
 #  api_key: "mfadtiInujG8BQjk45kQBA"
