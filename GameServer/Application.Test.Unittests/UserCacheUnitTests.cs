@@ -131,14 +131,39 @@ namespace Application.Test.Unittests
         [Test]
         public void ConfirmAndRefresh_DoesNotContainItem_ReturnsFalse()
         {
-            // Setup
-            _uut.AddOrUpdate(UserThree, UserThreePassword);
-
             // Act
-            var confirmed = _uut.ConfirmAndRefresh(UserTwo, UserThreePassword); // Bad user
+            var confirmed = _uut.ConfirmAndRefresh(UserTwo, UserTwoPassword); // Bad user
 
             // Assert
             Assert.That(!confirmed);
+        }
+
+        [Test]
+        public void ConfirmAndRefresh_ContainsUserBadPassWord_ReturnsFalse()
+        {
+            // Setup
+            _uut.AddOrUpdate(UserOne, UserOnePassword);
+
+            // Act
+            var confirmed = _uut.ConfirmAndRefresh(UserOne, UserTwoPassword);
+
+            // Assert
+            Assert.That(!confirmed);
+        }
+
+        [Test]
+        public void ConfirmAndRefresh_ContainsUserBadPassWord_DoesNotUpdateTimestamp()
+        {
+            // Setup
+            var now = DateTime.Now;
+            _uut.AddOrUpdate(UserOne, UserOnePassword, now);
+
+            // Act
+            var confirmed = _uut.ConfirmAndRefresh(UserOne, UserTwoPassword); // Wrong password
+
+            // Assert
+            Assert.That(!confirmed);
+            Assert.That(_uut.ExpirationStamps[UserOne] == now);
         }
 
 
