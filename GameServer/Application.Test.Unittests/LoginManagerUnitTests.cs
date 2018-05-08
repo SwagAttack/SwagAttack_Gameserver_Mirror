@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Interfaces;
@@ -193,42 +194,34 @@ namespace Application.Test.Unittests
         {
             // Arrange
 
-            var userThatStays = "UserThatStays";
-            var userThatLeaves = "LeavingUser";
-            var anotherLeavingUser = "AnotherleavingUser";
-            
             _fakeUserCache.Confirm(Arg.Any<string>()).Returns(true);
 
             var handleOneCount = 0;
             var handleTwoCount = 0;
 
-            void HandleOne(object o, string username)
+            var usersThatLeave = FakeUserGenerator.GenerateFakeUsers(50).Keys.ToList();
+
+            foreach (var user in usersThatLeave)
             {
-                handleOneCount++;
+                _uut.SubscribeOnLogOut(user, (o, username) => { handleOneCount++; });
             }
 
-            void HandleTwo(object o, string username)
+            for (int i = 0; i < 25; i++)
             {
-                handleTwoCount++;
+                _uut.SubscribeOnLogOut(usersThatLeave[i], ((o, username) => { handleTwoCount++; }));
             }
-
-            // Assumming we have one subscriber that subscribes to two usernames - this handle should receive one call
-            _uut.SubscribeOnLogOut(userThatStays, HandleOne);
-            _uut.SubscribeOnLogOut(userThatLeaves, HandleOne);
-            
-            // And another handler subscribes to two usernames - this handle should receive two calls
-            _uut.SubscribeOnLogOut(userThatLeaves, HandleTwo);
-            _uut.SubscribeOnLogOut(anotherLeavingUser, HandleTwo);
 
             // Act
-            _fakeUserCache.UsersTimedOutEvent += Raise.EventWith(null, new TimedOutUserEventArgs(userThatLeaves));
-            _fakeUserCache.UsersTimedOutEvent += Raise.EventWith(null, new TimedOutUserEventArgs(anotherLeavingUser));
+            foreach (var user in usersThatLeave)
+            {
+                _fakeUserCache.UsersTimedOutEvent += Raise.EventWith(null, new TimedOutUserEventArgs(user));
+            }
 
             Thread.Sleep(500);
 
             // Assert
-            Assert.That(handleOneCount, Is.EqualTo(1));
-            Assert.That(handleTwoCount, Is.EqualTo(2));
+            Assert.That(handleOneCount, Is.EqualTo(50));
+            Assert.That(handleTwoCount, Is.EqualTo(25));
         }
     }
 }
