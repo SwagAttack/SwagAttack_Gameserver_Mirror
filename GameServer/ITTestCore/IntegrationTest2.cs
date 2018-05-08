@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Interfaces;
 using Application.Managers;
@@ -462,6 +463,55 @@ namespace IT_Core
 
             //assert
             Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.BadRequest));
+
+        }
+
+        [Test]
+        public async Task IntegrationTest2_GameServer_ApplicationLayer_JoinLobby_WaitTillLogOut_ResponseUnauthorized()
+        {
+            //arrange 
+            
+            _client.DefaultRequestHeaders.Add("username", _pers.Username);
+            _client.DefaultRequestHeaders.Add("password", _pers.Password);
+            _fakeUserRepository.GetItemAsync(_pers.Username).Returns(_pers);
+            _fakeUserRepository.GetItemAsync(_pers2.Username).Returns(_pers2);
+
+            var parameters = new Dictionary<string, string>()
+            {
+                {"lobbyId", "AwesomeTestLobby" }
+            };
+
+            var joinLobbyRequestUri = QueryHelpers.AddQueryString("api/Lobby/Join", parameters);
+            var leaveLobbyRequestUri = QueryHelpers.AddQueryString("api/Lobby/Leave", parameters);
+
+
+            var joinLobbyRequest = new HttpRequestMessage(HttpMethod.Post, joinLobbyRequestUri);
+            var leaveLobbyRequest = new HttpRequestMessage(HttpMethod.Post, joinLobbyRequestUri);
+
+
+            //Log in
+            var loginResponse = await _client.GetAsync("api/User/Login");
+
+            //log in with new user 
+            _client.DefaultRequestHeaders.Remove("username");
+            _client.DefaultRequestHeaders.Remove("password");
+            _client.DefaultRequestHeaders.Add("username", _pers2.Username);
+            _client.DefaultRequestHeaders.Add("password", _pers2.Password);
+
+            loginResponse = await _client.GetAsync("api/User/Login");
+
+            //JoinLobby
+            HttpResponseMessage joinLobbyResponse = await _client.SendAsync(joinLobbyRequest);
+
+            //wait 20 min
+            Thread.Sleep((1000 * 60 * 20) + (1000 * 10)); //20 min and 10 seconds
+
+            //leave lobby
+            HttpResponseMessage leaveLobbyResponse = await _client.SendAsync(leaveLobbyRequest);
+
+
+            //assert
+            Assert.That(leaveLobbyResponse.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.Unauthorized));
 
         }
 
