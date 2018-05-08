@@ -58,6 +58,8 @@ namespace IT_Core
     [TestFixture] 
     public class IntegrationTest1
     {
+        #region Variables
+
         private static TestServer _server;
         private static HttpClient _client;
 
@@ -70,7 +72,10 @@ namespace IT_Core
 
         private readonly IUser _pers2 = Substitute.For<IUser>();
 
-        
+        #endregion
+
+        #region Setup
+
         [SetUp]
         public void Setup()
         {
@@ -85,7 +90,7 @@ namespace IT_Core
             ILobby testLobby = Substitute.For<ILobby>();
             testLobby.Id = "DenseLobby";
             testLobby.AdminUserName = "Maximillian";
-            
+
             _pers2.Username = "PatrickPer";
             _pers2.GivenName = "Patrick";
             _pers2.LastName = "Per";
@@ -98,9 +103,9 @@ namespace IT_Core
             _pers.Password = "123456789";
             _pers.Email = "123@123.com";
 
-            
+
             //Fakes Setup
-            StartupIntegrationTest1.FakeLoginManager.CheckLoginStatus(Arg.Any<string>(),Arg.Any<string>()).Returns(true);
+            StartupIntegrationTest1.FakeLoginManager.CheckLoginStatus(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
             StartupIntegrationTest1.FakeLobbyController.CreateLobbyAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(testLobby);
             StartupIntegrationTest1.FakeLobbyController.JoinLobbyAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(testLobby);
             StartupIntegrationTest1.FakeLobbyController.LeaveLobbyAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
@@ -108,22 +113,25 @@ namespace IT_Core
             fakeLobbyController = StartupIntegrationTest1.FakeLobbyController;
         }
 
+        #endregion
 
         //*************************Test Communication Layer***************************
-        //Test if we sent username and password to Usercontroller in communicationlayer, it gets received in usercontroler in applicationLayer
+
+        #region LoginUser
+
         [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_LoginUser()
         {
             //arrange
             _client.DefaultRequestHeaders.Add("username", "Maximillian");
             _client.DefaultRequestHeaders.Add("password", "123456789");
-        
+
             //act
             var response = await _client.GetAsync("api/User/Login");
-            
+
             //assert
-            fakeUserController.Received().GetUser("Maximillian","123456789");
-            
+            fakeUserController.Received().GetUser("Maximillian", "123456789");
+
         }
 
         [Test]
@@ -143,6 +151,9 @@ namespace IT_Core
 
         }
 
+        #endregion
+
+        #region CreateUser
 
         //Test if Createuser with pers as userobj, gets received in AppLayer CreateUser
         [Test]
@@ -185,8 +196,12 @@ namespace IT_Core
             var response = await _client.PostAsync("api/User", stringContent);
 
             //assert
-            Assert.That(response.StatusCode,Is.EqualTo(System.Net.HttpStatusCode.BadRequest));
+            Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.BadRequest));
         }
+
+        #endregion
+
+        #region GetLobby
 
         [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_GetAllLobbies()
@@ -208,6 +223,10 @@ namespace IT_Core
             await fakeLobbyController.Received(1).GetLobbyByIdAsync("DenseLobby");
         }
 
+        #endregion
+
+        #region CreateLobby
+
         [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_CreateLobby()
         {
@@ -222,10 +241,10 @@ namespace IT_Core
             var requestUri = QueryHelpers.AddQueryString("api/Lobby/Create", parameters);
 
             var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
-            
+
             //act
             HttpResponseMessage response = await _client.SendAsync(request);
-            
+
             //assert
             await fakeLobbyController.Received().CreateLobbyAsync("DenseLobby", "Maximillian");
         }
@@ -254,13 +273,17 @@ namespace IT_Core
             Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.BadRequest));
         }
 
+        #endregion
+
+        #region JoinLobby
+
         [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_JoinLobby()
         {
             //arrange
             _client.DefaultRequestHeaders.Add("username", _pers2.Username);
             _client.DefaultRequestHeaders.Add("password", _pers2.Password);
-            
+
             var parameters = new Dictionary<string, string>()
             {
                 {"lobbyId", "DenseLobby"}
@@ -268,7 +291,7 @@ namespace IT_Core
             var requestUri = QueryHelpers.AddQueryString("api/Lobby/Join", parameters);
 
             var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
-            
+
             //act
             HttpResponseMessage response = await _client.SendAsync(request);
 
@@ -301,13 +324,17 @@ namespace IT_Core
             Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.BadRequest));
         }
 
+        #endregion
+
+        #region LeaveLobby
+
         [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_LeaveLobby()
         {
             //arrange
             _client.DefaultRequestHeaders.Add("username", "Maximillian");
             _client.DefaultRequestHeaders.Add("password", "123456789");
-          
+
             var joinLobbyParameters = new Dictionary<string, string>()
             {
                 {"lobbyId", "DenseLobby"}
@@ -346,6 +373,7 @@ namespace IT_Core
             Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.BadRequest));
         }
 
+        #endregion
 
     }
 

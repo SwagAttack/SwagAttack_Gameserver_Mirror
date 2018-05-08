@@ -67,6 +67,8 @@ namespace IT_Core
     [TestFixture]
     public class IntegrationTest2
     {
+        #region Variables
+
         private static TestServer _server;
         private static HttpClient _client;
 
@@ -81,9 +83,11 @@ namespace IT_Core
 
 
         private readonly ILobby _testLooby = Substitute.For<ILobby>();
-          
 
 
+        #endregion
+
+        #region Setup
         [SetUp]
         public void Setup()
         {
@@ -92,8 +96,8 @@ namespace IT_Core
                 .UseStartup<StartupIntegrationTest2>());
             _server.Host.Start();
             _client = _server.CreateClient();
-            
-            
+
+
 
             //Fakes Setup
             _fakeUserRepository = StartupIntegrationTest2.FakeUserRepository;
@@ -114,9 +118,10 @@ namespace IT_Core
 
             _testLooby.Id = "DamnTestLobby";
         }
-
-
+        #endregion
+        
         //*************************Test App Layer***************************
+        #region GetUser
         [Test]
         public async Task IntegrationTest2_GameServer_ApplicationLayer_GetUser_GetItemAsyncIsCalled()
         {
@@ -163,7 +168,10 @@ namespace IT_Core
             Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.OK));
 
         }
-        
+        #endregion
+
+        #region CreateUser
+
         [Test]
         public async Task IntegrationTest2_GameServer_ApplicationLayer_CreateUser_CreateItemAsyncIsCalled()
         {
@@ -231,6 +239,9 @@ namespace IT_Core
 
         }
 
+        #endregion
+
+        #region GetLobby
         [Test]
         public async Task IntegrationTest1_GameServer_CommunicationLayer_GetAllLobbies()
         {
@@ -280,6 +291,10 @@ namespace IT_Core
             Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.NotFound));
         }
 
+        #endregion
+
+        #region CreateLobby
+
         [Test]
         public async Task IntegrationTest2_GameServer_ApplicationLayer_CreateLobby_ResponseCreated()
         {
@@ -320,7 +335,7 @@ namespace IT_Core
                 {"lobbyId", "" }
             };
             var requestUri = QueryHelpers.AddQueryString("api/Lobby/Create", parameters);
-            
+
             var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
 
             //Log in
@@ -362,6 +377,10 @@ namespace IT_Core
 
         }
 
+        #endregion
+
+        #region JoinLobby
+
         [Test]
         public async Task IntegrationTest2_GameServer_ApplicationLayer_JoinLobby_ResponseCreated()
         {
@@ -396,7 +415,7 @@ namespace IT_Core
             _client.DefaultRequestHeaders.Remove("password");
             _client.DefaultRequestHeaders.Add("username", _pers2.Username);
             _client.DefaultRequestHeaders.Add("password", _pers2.Password);
-            
+
             loginResponse = await _client.GetAsync("api/User/Login");
 
             //JoinLobby
@@ -429,7 +448,7 @@ namespace IT_Core
 
             //Log in
             var loginResponse = await _client.GetAsync("api/User/Login");
-            
+
             //log in with new user 
             _client.DefaultRequestHeaders.Remove("username");
             _client.DefaultRequestHeaders.Remove("password");
@@ -445,6 +464,10 @@ namespace IT_Core
             Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.BadRequest));
 
         }
+
+        #endregion
+
+        #region LeaveLobby
 
         [Test]
         public async Task IntegrationTest2_GameServer_ApplicationLayer_LeaveLobby_ResponseRedirect()
@@ -515,7 +538,7 @@ namespace IT_Core
             var createLobbyRequestUri = QueryHelpers.AddQueryString("api/Lobby/Create", parameters);
 
             var createLobbyRequest = new HttpRequestMessage(HttpMethod.Post, createLobbyRequestUri);
-            
+
             var leaveLobbyRequestUri = QueryHelpers.AddQueryString("api/Lobby/Leave", parameters);
 
             var leaveLobbyRequest = new HttpRequestMessage(HttpMethod.Post, leaveLobbyRequestUri);
@@ -544,7 +567,6 @@ namespace IT_Core
             Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.BadRequest));
 
         }
-
+        #endregion
     }
-
 }

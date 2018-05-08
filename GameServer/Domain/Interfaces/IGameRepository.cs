@@ -5,7 +5,7 @@ using Persistance.Interfaces;
 
 namespace Domain.Interfaces
 {
-    public interface IGameRepository : IRepository<IGamePlayerInfo>
+    public interface IGameRepository : IRepository<IGame>
     {
     }
 }

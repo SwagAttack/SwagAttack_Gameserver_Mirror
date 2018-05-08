@@ -10,7 +10,7 @@ namespace Application.Interfaces
 	    /// <summary>
 		/// starts a game with a Id and a list of player names
 		/// </summary>
-		/// <param name="gameId"></param>
+		/// <param name="gameId"> </param>
 		/// <param name="playesrList"></param>
 	    void StartGame(string gameId, List<string> playesrList);
 

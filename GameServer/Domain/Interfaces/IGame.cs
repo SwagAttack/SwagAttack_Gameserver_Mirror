@@ -1,7 +1,10 @@
-﻿namespace Domain.Interfaces
+﻿
+namespace Domain.Interfaces
 {
-    public interface IGame
-    {
-        
-    }
+	public interface IGame
+	{
+		string GameId { get; set; }
+
+		IGamePlayerInfo GetPlyerinfo(string username);
+	}
 }
