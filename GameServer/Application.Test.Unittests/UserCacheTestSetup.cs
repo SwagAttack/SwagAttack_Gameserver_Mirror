@@ -7,7 +7,7 @@ namespace Application.Test.Unittests
 {
     internal static class FakeUserGenerator
     {
-        private static string GenerateRandomString()
+        public static string GenerateRandomString()
         {
             var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             var stringChars = new char[8];
@@ -33,16 +33,6 @@ namespace Application.Test.Unittests
 
             return dictionary;
 
-        }
-    }
-    [SetUpFixture]
-    public class UserCacheTestSetup
-    {
-        public static Dictionary<string, string> FakeUsers { get; set; }
-        [OneTimeSetUp]
-        public void BeforeAnyTest()
-        {
-            FakeUsers = FakeUserGenerator.GenerateFakeUsers(50000);
         }
     }
 }

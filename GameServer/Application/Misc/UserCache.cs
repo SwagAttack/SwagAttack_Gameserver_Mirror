@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Interfaces;
-using C5;
 
 namespace Application.Misc
 {
@@ -18,8 +17,8 @@ namespace Application.Misc
         private const int Timeout = 10; // 10 second timeout
         private readonly ITimer _timer;
 
-        private readonly IntervalHeap<ExpirationMark> _expirationMarks;
-        private readonly Dictionary<string, UserLookUp> _userLookUpDictionary;
+        private readonly CacheList<string> _timeoutList;
+        private readonly Dictionary<string, string> _userDictionary;
 
         private readonly object _lock = new object();
 
@@ -27,8 +26,8 @@ namespace Application.Misc
         {
             _timer = timer ?? throw new ArgumentNullException(nameof(timer));
 
-            _expirationMarks = new IntervalHeap<ExpirationMark>(new ExpirationComparer());
-            _userLookUpDictionary = new Dictionary<string, UserLookUp>();
+            _timeoutList = new CacheList<string>();
+            _userDictionary = new Dictionary<string, string>();
 
             _timer.ExpiredEvent += TimerTimeout;
             _timer.StartWithSeconds(Timeout);
@@ -44,7 +43,7 @@ namespace Application.Misc
             get
             {
                 var dic = new Dictionary<string, DateTime>();
-                foreach (var exipiration in _expirationMarks) dic.Add(exipiration.Username, exipiration.Expiration);
+                foreach (var exipiration in _timeoutList.Collection) dic.Add(exipiration.Item, exipiration.Expiration);
                 return dic;
             }
         }
@@ -55,15 +54,32 @@ namespace Application.Misc
 
         public void AddOrUpdate(string username, string password)
         {
-            AddOrUpdate(username, password,
-                ExpirationMark.GetNewMark(username, DateTimeHelper.GetNewTimeOut()));
+            AddOrUpdate(username, password, DateTime.Now.AddMinutes(20));
+        }
+
+        public void AddOrUpdate(string username, string password, DateTime timeout)
+        {
+            lock (_lock)
+            {
+                if (_userDictionary.ContainsKey(username))
+                {
+                    var index = _timeoutList.Find(username);
+                    _timeoutList.Update(index, timeout);
+                }
+                else
+                {
+                    _timeoutList.Add(username, timeout);
+                }
+
+                _userDictionary[username] = password;
+            }
         }
 
         public bool Confirm(string username)
         {
             lock(_lock)
             {
-                return _userLookUpDictionary.ContainsKey(username);
+                return _userDictionary.ContainsKey(username);
             }
         }
 
@@ -71,10 +87,10 @@ namespace Application.Misc
         {
             lock(_lock)
             {
-                if (_userLookUpDictionary.TryGetValue(username, out var info) && info.Password == password)
+                if (_userDictionary.TryGetValue(username, out var pass) && pass == password)
                 {
-                    _expirationMarks.Replace(info.IndexMark, 
-                        ExpirationMark.GetNewMark(username, DateTimeHelper.GetNewTimeOut()));
+                    var index = _timeoutList.Find(username);
+                    _timeoutList.Update(index, DateTimeHelper.GetNewTimeOut());
                     return true;
                 }
                 return false;
@@ -85,42 +101,14 @@ namespace Application.Misc
         {
             lock(_lock)
             {
-                if (_userLookUpDictionary.TryGetValue(username, out var item))
+                if (_userDictionary.ContainsKey(username))
                 {
-                    _expirationMarks.Delete(item.IndexMark);
-                    _userLookUpDictionary.Remove(username);
-                    return true;
+                    var index = _timeoutList.Find(username);
+                    _timeoutList.Remove(index);
+                    return _userDictionary.Remove(username);
                 }
+
                 return false;
-            }
-        }
-
-        public void AddOrUpdate(string username, string password, DateTime timeout)
-        {
-            AddOrUpdate(username, password, ExpirationMark.GetNewMark(username, timeout));
-        }
-
-        #endregion
-
-        #region Utility
-
-        private void AddOrUpdate(string username, string password, ExpirationMark mark)
-        {
-            lock(_lock)
-            {
-                IPriorityQueueHandle<ExpirationMark> handle = null;
-
-                if (_userLookUpDictionary.TryGetValue(username, out var item))
-                {
-                    handle = item.IndexMark;
-                    _expirationMarks.Replace(handle, mark);
-                }
-                else
-                {
-                    _expirationMarks.Add(ref handle, mark);
-                }
-
-                _userLookUpDictionary[username] = new UserLookUp {Password = password, IndexMark = handle};
             }
         }
 
@@ -149,8 +137,8 @@ namespace Application.Misc
             return Task.Run(() =>
             {
                 var now = DateTime.Now;
-                while (_expirationMarks.Count != 0 && _expirationMarks.FindMin().Expiration.HasTimeout(now))
-                    usersToLogOutCollection.Add(_expirationMarks.DeleteMin().Username);
+                while (_timeoutList.ContainsOutdatedItem(now))
+                    usersToLogOutCollection.Add(_timeoutList.RemoveAndGet());
                 usersToLogOutCollection.CompleteAdding();
             });
         }
@@ -162,7 +150,7 @@ namespace Application.Misc
             {
                 foreach (var user in usersToRemove.GetConsumingEnumerable())
                 {
-                    _userLookUpDictionary.Remove(user);
+                    _userDictionary.Remove(user);
                     usersToNotify.Add(user);
                 }
 
@@ -176,51 +164,6 @@ namespace Application.Misc
         }
 
         #endregion
-
-        #region Expiration Utility
-
-        private class UserLookUp
-        {
-            public string Password { get; set; }
-            public IPriorityQueueHandle<ExpirationMark> IndexMark { get; set; }
-        }
-
-        private class ExpirationMark 
-        {
-            private ExpirationMark(string username, DateTime expiration)
-            {
-                Username = username;
-                Expiration = expiration;
-            }
-
-            public string Username { get; }
-            public DateTime Expiration { get; }
-
-            public static ExpirationMark GetNewMark(string username, DateTime expiration)
-            {
-                return new ExpirationMark(username, expiration);
-            }
-
-        }
-
-        private class ExpirationComparer : IComparer<ExpirationMark>
-        {
-            public int Compare(ExpirationMark x, ExpirationMark y)
-            {
-                if (x == null && y == null)
-                    return 0;
-
-                if (x == null)
-                    return -1;
-
-                if (y == null)
-                    return 1;
-
-                return x.Expiration.CompareTo(y.Expiration);
-            }
-        }
-
-        #endregion
     }
 
     internal static class DateTimeHelper
@@ -228,11 +171,6 @@ namespace Application.Misc
         public static DateTime GetNewTimeOut()
         {
             return DateTime.Now.AddMinutes(20);
-        }
-
-        public static bool HasTimeout(this DateTime markedTime, DateTime compareTo)
-        {
-            return markedTime.CompareTo(compareTo) < 0;
         }
     }
 }

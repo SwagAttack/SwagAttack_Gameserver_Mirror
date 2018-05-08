@@ -46,7 +46,7 @@ namespace Application.Test.Unittests
         {
             _fakeTimer = Substitute.For<ITimer>();
             _uut = new UserCache(_fakeTimer);
-            _fakeUsers = UserCacheTestSetup.FakeUsers;
+            _fakeUsers = FakeUserGenerator.GenerateFakeUsers(50000);
         }
 
         [Test]
@@ -304,7 +304,7 @@ namespace Application.Test.Unittests
 
             Parallel.ForEach(_fakeUsers, e =>
             {
-                _uut.AddOrUpdate(e.Key, e.Value, DateTime.Now.AddMilliseconds(25));
+                _uut.AddOrUpdate(e.Key, e.Value, DateTime.Now.AddMilliseconds(15));
             });
 
             // Make sure the users have been added
