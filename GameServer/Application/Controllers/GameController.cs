@@ -7,30 +7,32 @@ using Domain.Models;
 
 namespace Application.Controllers
 {
-    class GameController : IGameController
-    {
-	    private readonly IGameRepository _gameRepository;
-	    public GameController(IGameRepository gameRepo)
-	    {
-		    _gameRepository = gameRepo;
-	    }
+	class GameController : IGameController
+	{
+		private readonly IGameRepository _gameRepository;
 
-	    public void StartGame(string gameId, List<string> playesrList)
-	    {
-		    foreach (var player in playesrList)
-		    {
-			    _gameRepository.CreateItemAsync(new GamePlayerInfo(gameId, player));
-		    }
-	    }
+		public GameController(IGameRepository gameRepo)
+		{
+			_gameRepository = gameRepo;
+		}
 
-	    public IGamePlayerInfo GetPlayersGameInfo(string gameId, string username)
-	    {
-		    return _gameRepository.GetItemAsync(gameId + "_" + username).Result;
-	    }
+		public void StartGame(string gameId, List<string> playesrList)
+		{
+			var game = new Game(gameId, playesrList);
 
-	    public bool LeaveGame(string gameId, string username)
-	    {
-		   return _gameRepository.DeleteItemAsync(gameId + "_" + username).IsCompleted;
-	    }
-    }
+			_gameRepository.CreateItemAsync(game);
+		}
+
+		public IGamePlayerInfo GetPlayersGameInfo(string gameId, string username)
+		{
+			var gameinfo = _gameRepository.GetItemAsync(gameId).Result;
+			return gameinfo.GetPlyerinfo(username);
+
+		}
+
+		public bool LeaveGame(string gameId, string username)
+		{
+			return _gameRepository.DeleteItemAsync(gameId + "_" + username).IsCompleted;
+		}
+	}
 }

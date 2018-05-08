@@ -5,7 +5,7 @@ using Persistance.Repository;
 
 namespace Domain.DbAccess
 {
-	public class GameRepository : SwagRepository<IGamePlayerInfo, GamePlayerInfo>, IGameRepository
+	public class GameRepository : SwagRepository<IGame, Game>, IGameRepository
 	{
 		public GameRepository(IDbContext context, string collectionId) : base(context, collectionId)
 		{
