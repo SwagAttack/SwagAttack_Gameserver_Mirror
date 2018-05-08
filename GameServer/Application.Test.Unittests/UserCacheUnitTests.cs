@@ -304,7 +304,7 @@ namespace Application.Test.Unittests
 
             Parallel.ForEach(_fakeUsers, e =>
             {
-                _uut.AddOrUpdate(e.Key, e.Value, DateTime.Now.AddMilliseconds(15));
+                _uut.AddOrUpdate(e.Key, e.Value, DateTime.Now.AddMilliseconds(5));
             });
 
             // Make sure the users have been added
