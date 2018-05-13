@@ -15,9 +15,8 @@ namespace Persistance.Setup
         private static string ServiceEndpoint = "https://localhost:8081";
 
         // Remote
-
-        //private static string AuthenticationKey = "https://swagattack.documents.azure.com:443/";
-        //private static string ServiceEndpoint = "DDqKAMshqSd0cktDjmGqZSUFprEFgGD44Eo6FLOfK9CmuJVCLG7K7blhV2YL0yRpir5kTVuarKmuriXNKw0flg==";
+        //private static string ServiceEndpoint = "https://swagattack.documents.azure.com:443/";
+        //private static string AuthenticationKey = "DDqKAMshqSd0cktDjmGqZSUFprEFgGD44Eo6FLOfK9CmuJVCLG7K7blhV2YL0yRpir5kTVuarKmuriXNKw0flg==";
 
         public IDocumentClient DocumentClient { get; set; }
 
