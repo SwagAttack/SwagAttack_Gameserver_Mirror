@@ -20,16 +20,12 @@ namespace Persistance.Setup
         //private static string AuthenticationKey = "https://swagattack.documents.azure.com:443/";
         //private static string ServiceEndpoint = "DDqKAMshqSd0cktDjmGqZSUFprEFgGD44Eo6FLOfK9CmuJVCLG7K7blhV2YL0yRpir5kTVuarKmuriXNKw0flg==";
 
-        public IDocumentClient DocumentClient
-        {
-            get => _client;
-            set => _client = value;
-        }
+        public IDocumentClient DocumentClient => _client;
 
         public DbContext(string databaseId = null, IDocumentClient  client = null)
         {
             if (databaseId != null) DatabaseId = databaseId;
-            if (client == null)_client = new DocumentClient(new Uri(ServiceEndpoint), AuthenticationKey);
+            _client = client ?? new DocumentClient(new Uri(ServiceEndpoint), AuthenticationKey);
             CreateDatabaseIfNotExists();
         }
 
