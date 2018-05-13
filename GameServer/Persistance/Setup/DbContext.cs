@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Persistance.Interfaces;
@@ -33,18 +34,26 @@ namespace Persistance.Setup
         {
             try
             {
-                if(_client.ReadDatabaseAsync(DatabaseId).IsFaulted)
-                    _client.CreateDatabaseAsync(new Database() {Id = DatabaseId}).Wait();
+                _client.CreateDatabaseAsync(new Database() {Id = DatabaseId}).Wait();
             }
-            catch (DocumentClientException)
+            catch (AggregateException e)
             {
-
+                e.Handle(ex =>
+                {
+                    if (ex is DocumentClientException de)
+                    {
+                        if (de.StatusCode == HttpStatusCode.Conflict)
+                            return true;
+                    }
+                    return false;
+                });
             }
-            catch (Exception) // Error occured - throw
+            catch (DocumentClientException e)
             {
+                if (e.StatusCode == HttpStatusCode.Conflict)
+                    return;
                 throw;
-            }
-
+            }           
         }
     }
 }
