@@ -6,6 +6,6 @@ namespace Persistance.Interfaces
     public interface IDbContext
     {
         string DatabaseId { get; }
-        IDocumentClient DocumentClient { get; }
+        IDocumentClient DocumentClient { get; set; }
     }
 }

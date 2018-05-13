@@ -8,8 +8,6 @@ namespace Persistance.Setup
 {
     public class DbContext : IDbContext
     {
-        private IDocumentClient _client;
-
         public string DatabaseId { get; set; } = "UserDB"; // XD
 
         // Local
@@ -21,12 +19,12 @@ namespace Persistance.Setup
         //private static string AuthenticationKey = "https://swagattack.documents.azure.com:443/";
         //private static string ServiceEndpoint = "DDqKAMshqSd0cktDjmGqZSUFprEFgGD44Eo6FLOfK9CmuJVCLG7K7blhV2YL0yRpir5kTVuarKmuriXNKw0flg==";
 
-        public IDocumentClient DocumentClient => _client;
+        public IDocumentClient DocumentClient { get; set; }
 
         public DbContext(string databaseId = null, IDocumentClient  client = null)
         {
             if (databaseId != null) DatabaseId = databaseId;
-            _client = client ?? new DocumentClient(new Uri(ServiceEndpoint), AuthenticationKey);
+            DocumentClient = client ?? new DocumentClient(new Uri(ServiceEndpoint), AuthenticationKey);
             CreateDatabaseIfNotExists();
         }
 
@@ -34,7 +32,7 @@ namespace Persistance.Setup
         {
             try
             {
-                _client.CreateDatabaseAsync(new Database() {Id = DatabaseId}).Wait();
+                DocumentClient.CreateDatabaseAsync(new Database() {Id = DatabaseId}).Wait();
             }
             catch (AggregateException e)
             {
