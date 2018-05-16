@@ -197,7 +197,7 @@ namespace IT_Core
         }
 
         [Test]
-        public async Task IntegrationTest3_DomainLayer_UserRepository_CreateItemAsync_CreateDocumentAsyncIsCalled_ResponseNotFound()
+        public async Task IntegrationTest3_DomainLayer_UserRepository_CreateItemAsync_CreateDocumentAsyncIsCalled_ResponseBadRequest()
         {
             //arrange
             var error = new Error
