@@ -8,11 +8,7 @@ using Communication;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NSubstitute;
 using NUnit.Framework;
 using User = Domain.Models.User;
 
@@ -22,6 +18,7 @@ namespace IT_Core
 
     public static class Misc
     {
+        //This is heavily inspired by https://stackoverflow.com/questions/1344221/how-can-i-generate-random-alphanumeric-strings-in-c
         private static Random random = new Random();
         private static string RandomString(int length)
         {

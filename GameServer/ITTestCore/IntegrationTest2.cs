@@ -17,7 +17,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using NSubstitute;
 using NUnit.Framework;
-using Persistance.Interfaces;
 using LobbyController = Application.Controllers.LobbyController;
 using UserController = Application.Controllers.UserController;
 
