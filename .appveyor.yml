@@ -3,10 +3,11 @@ environment:
   COVERALLS_REPO_TOKEN:
     secure: Vh/U97ttvqbrLobU2llEhM66cJPI3Ff4mhW2YQAhkNPRajfDgyyxIl26Z7QpKupT
 init:
-  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  - rmdir C:\cygwin /s /q
+  #- ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 before_build:
-  - #nuget restore GameServer/GameServer.sln
+  - nuget restore GameServer/GameServer.sln
 build_script:
-  - #dotnet build GameServer/GameServer.sln
+  - dotnet build GameServer/GameServer.sln
 after_test:
-  - cmd: #after_test.cmd
+  - cmd: after_test.cmd
