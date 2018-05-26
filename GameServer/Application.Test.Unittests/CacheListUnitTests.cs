@@ -79,9 +79,15 @@ namespace Application.Test.Unittests
 
             // Act
 
-            _uut.Update(handles[6], DateTime.Now.AddMinutes(random.Next(5)));
+            for (int i = 0; i < 10; i++)
+            {
+                _uut.Update(handles[i], DateTime.Now.AddMinutes(random.Next(-15, 15)));
+            }
 
-            _uut.Update(handles[5], DateTime.Now.AddMinutes(random.Next(10)));
+            for (int i = 0; i < 10; i++)
+            {
+                _uut.Update(handles[i], DateTime.Now.AddMinutes(random.Next(-15, 15)));
+            }
 
             // Assert
             for (int i = _uut.Collection.Count - 1; i > 0; i--)

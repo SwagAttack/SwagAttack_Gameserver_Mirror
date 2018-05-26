@@ -4,48 +4,40 @@ using System.Linq;
 
 namespace Application.Misc
 {
-    public class CacheList<T>
+    public class CacheList<TClass> where TClass : class
     {
         private readonly LinkedList<ContainedItem> _collection;
+        public IReadOnlyList<ContainedItem> Collection => _collection.ToList();
 
         public CacheList()
         {
             _collection = new LinkedList<ContainedItem>();
         }
 
-        public IReadOnlyList<ContainedItem> Collection => _collection.ToList();
-
-        public void Add(T item, DateTime expiration, out ICacheHandle handle)
+        public void Add(TClass item, DateTime expiration, out ICacheHandle handle)
         {
-            LinkedListNode<ContainedItem> node = null;
-
-            var current = _collection.Last;
-            while (current != null)
-            {
-                if (!expiration.IsBefore(current.Value.Expiration))
-                    break;
-                current = current.Previous;
-            }
-
-            if (current == null)
-                node = _collection.AddFirst(ContainedItem.CreateItem(item, expiration));
-            else
-                node = _collection.AddAfter(current, ContainedItem.CreateItem(item, expiration));
-
-            handle = CacheHandle.CreateHandle(node);
+            Add(item, expiration, out LinkedListNode<ContainedItem> node);
+            handle = CreateHandle(node);
         }
 
-        public void Remove(ICacheHandle handle)
+        public void Remove(ICacheHandle cacheHandle)
         {
-            _collection.Remove(CacheHandle.GetHandle(handle).NodeItem);
+            var handle = GetHandle(cacheHandle);
+            if (!ConfirmHandle(handle))
+                return;
+            _collection.Remove(handle.Node);
         }
 
-        public void Update(ICacheHandle handle, DateTime expiration)
+        public void Update(ICacheHandle cacheHandle, DateTime expiration, TClass item = null)
         {
-            var updatingNote = CacheHandle.GetHandle(handle).NodeItem;
-            _collection.Remove(updatingNote);
-            Add(updatingNote.Value.Item, expiration, out var newHandle);
-            CacheHandle.GetHandle(handle).Update(newHandle);
+            var handle = GetHandle(cacheHandle);
+            if (!ConfirmHandle(handle))
+                return;
+
+            _collection.Remove(handle.Node);
+
+            Add(item ?? handle.Node.Value.Item, expiration, out LinkedListNode<ContainedItem> newNode);
+            handle.Node = newNode;
         }
 
         public bool ContainsOutdatedItem(DateTime compareTo)
@@ -54,7 +46,7 @@ namespace Application.Misc
             return _collection.First.Value.Expiration.IsBefore(compareTo);
         }
 
-        public T RemoveAndGet()
+        public TClass RemoveAndGet()
         {
             if (_collection.Count == 0)
                 throw new IndexOutOfRangeException();
@@ -63,41 +55,61 @@ namespace Application.Misc
             return item.Item;
         }
 
-        public class ContainedItem
+        private void Add(TClass item, DateTime expiration, out LinkedListNode<ContainedItem> node)
         {
-            public T Item { get; set; }
-            public DateTime Expiration { get; set; }
-
-            public static ContainedItem CreateItem(T item, DateTime expiration)
+            var current = _collection.Last;
+            while (current != null && expiration.IsBefore(current.Value.Expiration))
             {
-                return new ContainedItem {Expiration = expiration, Item = item};
+                current = current.Previous;
             }
+
+            current = current == null ?
+                _collection.AddFirst(new ContainedItem(item, expiration)) :
+                _collection.AddAfter(current, new ContainedItem(item, expiration));
+
+            node = current;
         }
+
+        #region CacheHandle
 
         private class CacheHandle : ICacheHandle
         {
-            private CacheHandle(LinkedListNode<ContainedItem> node)
+            public CacheHandle(LinkedListNode<ContainedItem> node)
             {
-                NodeItem = node;
+                Node = node;
             }
 
-            public LinkedListNode<ContainedItem> NodeItem { get; private set; }
+            public LinkedListNode<ContainedItem> Node { get; set; }
+        }
 
-            public void Update(ICacheHandle handle)
-            {
-                var converted = GetHandle(handle);
-                NodeItem = converted.NodeItem;
-            }
+        private static ICacheHandle CreateHandle(LinkedListNode<ContainedItem> node)
+        {
+            return new CacheHandle(node);
+        }
 
-            public static ICacheHandle CreateHandle(LinkedListNode<ContainedItem> node)
-            {
-                return new CacheHandle(node);
-            }
+        private static CacheHandle GetHandle(ICacheHandle cacheHandle)
+        {
+            return cacheHandle is CacheHandle handle ? handle : null;
+        }
 
-            public static CacheHandle GetHandle(ICacheHandle handle)
+        private bool ConfirmHandle(CacheHandle handle)
+        {
+            if (handle == null) return false;
+            if (handle.Node.List != _collection) return false;
+            return true;
+        }
+
+        #endregion
+
+        public class ContainedItem
+        {
+            public TClass Item { get; internal set; }
+            public DateTime Expiration { get; internal set; }
+
+            internal ContainedItem(TClass item, DateTime expiration)
             {
-                var target = handle as CacheHandle;
-                return target;
+                Item = item;
+                Expiration = expiration;
             }
         }
     }
