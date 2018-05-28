@@ -44,6 +44,11 @@ namespace IT_Core
 
     #endregion
 
+    /// <summary>
+    /// Please make sure that Azzure Cosmos Db Emulator is running when executing tests.
+    /// These tests can only be run locally, thus they need to be in a seperate project
+    /// than the rest of the integration tests in order to be excluded on CI build-servers.
+    /// </summary>
     [TestFixture]
     public class IntegrationTest4
     {
