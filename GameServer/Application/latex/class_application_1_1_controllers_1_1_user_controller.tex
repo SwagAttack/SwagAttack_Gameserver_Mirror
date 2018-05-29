@@ -1,0 +1,116 @@
+\hypertarget{class_application_1_1_controllers_1_1_user_controller}{}\section{Application.\+Controllers.\+User\+Controller Class Reference}
+\label{class_application_1_1_controllers_1_1_user_controller}\index{Application.\+Controllers.\+User\+Controller@{Application.\+Controllers.\+User\+Controller}}
+
+
+\mbox{\hyperlink{namespace_application}{Application}} User Controller The main purpose of this class is to decouple the framework from our application logic  
+
+
+Inheritance diagram for Application.\+Controllers.\+User\+Controller\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_application_1_1_controllers_1_1_user_controller}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_application_1_1_controllers_1_1_user_controller_aedfae5fded8199d832e92294b088e418}{User\+Controller}} (I\+User\+Repository user\+Repository, \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_login_manager}{I\+Login\+Manager}} login\+Manager)
+\item 
+I\+User \mbox{\hyperlink{class_application_1_1_controllers_1_1_user_controller_adb2565915559692fae6a146d23d5fe01}{Get\+User}} (string username, string password)
+\begin{DoxyCompactList}\small\item\em Returns the user with the given username and password. Null if not found \end{DoxyCompactList}\item 
+I\+User \mbox{\hyperlink{class_application_1_1_controllers_1_1_user_controller_abf08955a5adc363fa137399a961a14fc}{Create\+User}} (I\+User user)
+\begin{DoxyCompactList}\small\item\em Creates a new user to be stored in the database. Returns valid user upon succes. Otherwise null \end{DoxyCompactList}\item 
+I\+User \mbox{\hyperlink{class_application_1_1_controllers_1_1_user_controller_af509b1d73f3a654edfb48dcc1f623ca8}{Update\+User}} (string username, I\+User user)
+\begin{DoxyCompactList}\small\item\em Updates the user as given by username and password. Will return null if unsuccesfull \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\mbox{\hyperlink{namespace_application}{Application}} User Controller The main purpose of this class is to decouple the framework from our application logic 
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_application_1_1_controllers_1_1_user_controller_aedfae5fded8199d832e92294b088e418}\label{class_application_1_1_controllers_1_1_user_controller_aedfae5fded8199d832e92294b088e418}} 
+\index{Application\+::\+Controllers\+::\+User\+Controller@{Application\+::\+Controllers\+::\+User\+Controller}!User\+Controller@{User\+Controller}}
+\index{User\+Controller@{User\+Controller}!Application\+::\+Controllers\+::\+User\+Controller@{Application\+::\+Controllers\+::\+User\+Controller}}
+\subsubsection{\texorpdfstring{User\+Controller()}{UserController()}}
+{\footnotesize\ttfamily Application.\+Controllers.\+User\+Controller.\+User\+Controller (\begin{DoxyParamCaption}\item[{I\+User\+Repository}]{user\+Repository,  }\item[{\mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_login_manager}{I\+Login\+Manager}}}]{login\+Manager }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{class_application_1_1_controllers_1_1_user_controller_abf08955a5adc363fa137399a961a14fc}\label{class_application_1_1_controllers_1_1_user_controller_abf08955a5adc363fa137399a961a14fc}} 
+\index{Application\+::\+Controllers\+::\+User\+Controller@{Application\+::\+Controllers\+::\+User\+Controller}!Create\+User@{Create\+User}}
+\index{Create\+User@{Create\+User}!Application\+::\+Controllers\+::\+User\+Controller@{Application\+::\+Controllers\+::\+User\+Controller}}
+\subsubsection{\texorpdfstring{Create\+User()}{CreateUser()}}
+{\footnotesize\ttfamily I\+User Application.\+Controllers.\+User\+Controller.\+Create\+User (\begin{DoxyParamCaption}\item[{I\+User}]{user }\end{DoxyParamCaption})}
+
+
+
+Creates a new user to be stored in the database. Returns valid user upon succes. Otherwise null 
+
+
+\begin{DoxyParams}{Parameters}
+{\em user} & User to be stored\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_user_controller_aca064ba3a4c3c2d0dd1339b8a4995e86}{Application.\+Interfaces.\+I\+User\+Controller}}.
+
+\mbox{\Hypertarget{class_application_1_1_controllers_1_1_user_controller_adb2565915559692fae6a146d23d5fe01}\label{class_application_1_1_controllers_1_1_user_controller_adb2565915559692fae6a146d23d5fe01}} 
+\index{Application\+::\+Controllers\+::\+User\+Controller@{Application\+::\+Controllers\+::\+User\+Controller}!Get\+User@{Get\+User}}
+\index{Get\+User@{Get\+User}!Application\+::\+Controllers\+::\+User\+Controller@{Application\+::\+Controllers\+::\+User\+Controller}}
+\subsubsection{\texorpdfstring{Get\+User()}{GetUser()}}
+{\footnotesize\ttfamily I\+User Application.\+Controllers.\+User\+Controller.\+Get\+User (\begin{DoxyParamCaption}\item[{string}]{username,  }\item[{string}]{password }\end{DoxyParamCaption})}
+
+
+
+Returns the user with the given username and password. Null if not found 
+
+
+\begin{DoxyParams}{Parameters}
+{\em username} & Username of requested user\\
+\hline
+{\em password} & Password of requested user\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+User
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_user_controller_afdea9f68822192392d4b973e300f56af}{Application.\+Interfaces.\+I\+User\+Controller}}.
+
+\mbox{\Hypertarget{class_application_1_1_controllers_1_1_user_controller_af509b1d73f3a654edfb48dcc1f623ca8}\label{class_application_1_1_controllers_1_1_user_controller_af509b1d73f3a654edfb48dcc1f623ca8}} 
+\index{Application\+::\+Controllers\+::\+User\+Controller@{Application\+::\+Controllers\+::\+User\+Controller}!Update\+User@{Update\+User}}
+\index{Update\+User@{Update\+User}!Application\+::\+Controllers\+::\+User\+Controller@{Application\+::\+Controllers\+::\+User\+Controller}}
+\subsubsection{\texorpdfstring{Update\+User()}{UpdateUser()}}
+{\footnotesize\ttfamily I\+User Application.\+Controllers.\+User\+Controller.\+Update\+User (\begin{DoxyParamCaption}\item[{string}]{username,  }\item[{I\+User}]{user }\end{DoxyParamCaption})}
+
+
+
+Updates the user as given by username and password. Will return null if unsuccesfull 
+
+
+\begin{DoxyParams}{Parameters}
+{\em username} & Username of user to be updated\\
+\hline
+{\em user} & User object containing updated information\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_user_controller_a433f4021d60dafe735aff4d4b5536370}{Application.\+Interfaces.\+I\+User\+Controller}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Controllers/\mbox{\hyperlink{_user_controller_8cs}{User\+Controller.\+cs}}\end{DoxyCompactItemize}

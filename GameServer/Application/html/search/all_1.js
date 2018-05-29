@@ -1,0 +1,18 @@
+var searchData=
+[
+  ['cachelist',['CacheList',['../class_application_1_1_misc_1_1_cache_list.html',1,'Application.Misc.CacheList&lt; TClass &gt;'],['../class_application_1_1_misc_1_1_cache_list.html#aa90b33801fe1b0cba3437908aa470f25',1,'Application.Misc.CacheList.CacheList()']]],
+  ['cachelist_2ecs',['CacheList.cs',['../_cache_list_8cs.html',1,'']]],
+  ['cachelist_3c_20string_20_3e',['CacheList&lt; string &gt;',['../class_application_1_1_misc_1_1_cache_list.html',1,'Application::Misc']]],
+  ['checkloginstatus',['CheckLoginStatus',['../interface_application_1_1_interfaces_1_1_i_login_manager.html#a31282ac878dc798af1a542f23efc7c8b',1,'Application.Interfaces.ILoginManager.CheckLoginStatus()'],['../class_application_1_1_managers_1_1_login_manager.html#ab485bd570a5d994461c54eb07e97a43a',1,'Application.Managers.LoginManager.CheckLoginStatus()']]],
+  ['collection',['Collection',['../class_application_1_1_misc_1_1_cache_list.html#a76ecbd816361d086f756cbe086b505e6',1,'Application::Misc::CacheList']]],
+  ['confirm',['Confirm',['../interface_application_1_1_interfaces_1_1_i_user_cache.html#a4978aad56d7292eafa02e8e7ad66f2c2',1,'Application.Interfaces.IUserCache.Confirm()'],['../class_application_1_1_misc_1_1_user_cache.html#a77b10de2cba0f07aa9af6fd5ad53e2c6',1,'Application.Misc.UserCache.Confirm()']]],
+  ['confirmandrefresh',['ConfirmAndRefresh',['../interface_application_1_1_interfaces_1_1_i_user_cache.html#a3516a7abf1f40f9ddd10243cad03bb65',1,'Application.Interfaces.IUserCache.ConfirmAndRefresh()'],['../class_application_1_1_misc_1_1_user_cache.html#ad11a0422af31b1492098415d8e4aaad8',1,'Application.Misc.UserCache.ConfirmAndRefresh()']]],
+  ['containeditem',['ContainedItem',['../class_application_1_1_misc_1_1_cache_list_1_1_contained_item.html',1,'Application::Misc::CacheList']]],
+  ['contains',['Contains',['../interface_application_1_1_interfaces_1_1_i_lobby_pool.html#a9a09df8415ae760c99d5a6bcd1ac91f9',1,'Application.Interfaces.ILobbyPool.Contains()'],['../class_application_1_1_misc_1_1_lobby_pool.html#af9f3a5b65c1a948fa63796a907c1684d',1,'Application.Misc.LobbyPool.Contains()']]],
+  ['containsoutdateditem',['ContainsOutdatedItem',['../class_application_1_1_misc_1_1_cache_list.html#ab84c82298def7a9d3c11d3c401f43b45',1,'Application::Misc::CacheList']]],
+  ['countdowntimer',['CountDownTimer',['../class_application_1_1_misc_1_1_count_down_timer.html',1,'Application.Misc.CountDownTimer'],['../class_application_1_1_misc_1_1_count_down_timer.html#af178bc6b12712cd232e490c99446837d',1,'Application.Misc.CountDownTimer.CountDownTimer()']]],
+  ['countdowntimer_2ecs',['CountDownTimer.cs',['../_count_down_timer_8cs.html',1,'']]],
+  ['createlobby',['CreateLobby',['../class_application_1_1_controllers_1_1_lobby_controller.html#ad0684f9eace44951fcb75c805fb8574c',1,'Application.Controllers.LobbyController.CreateLobby()'],['../interface_application_1_1_interfaces_1_1_i_lobby_controller.html#abefe3510b20e3db41c4d8062f8cdc2bc',1,'Application.Interfaces.ILobbyController.CreateLobby()']]],
+  ['createlobbyasync',['CreateLobbyAsync',['../class_application_1_1_controllers_1_1_lobby_controller.html#ac08d941f7da12f7791a691dbbdf0c1f3',1,'Application.Controllers.LobbyController.CreateLobbyAsync()'],['../interface_application_1_1_interfaces_1_1_i_lobby_controller.html#ae507a1d23088662b8c37692bbb93040e',1,'Application.Interfaces.ILobbyController.CreateLobbyAsync()']]],
+  ['createuser',['CreateUser',['../class_application_1_1_controllers_1_1_user_controller.html#abf08955a5adc363fa137399a961a14fc',1,'Application.Controllers.UserController.CreateUser()'],['../interface_application_1_1_interfaces_1_1_i_user_controller.html#aca064ba3a4c3c2d0dd1339b8a4995e86',1,'Application.Interfaces.IUserController.CreateUser()']]]
+];

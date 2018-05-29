@@ -1,0 +1,138 @@
+\hypertarget{class_application_1_1_managers_1_1_login_manager}{}\section{Application.\+Managers.\+Login\+Manager Class Reference}
+\label{class_application_1_1_managers_1_1_login_manager}\index{Application.\+Managers.\+Login\+Manager@{Application.\+Managers.\+Login\+Manager}}
+Inheritance diagram for Application.\+Managers.\+Login\+Manager\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_application_1_1_managers_1_1_login_manager}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_application_1_1_managers_1_1_login_manager_a561516fbf8f97f695efdb1cb696899e8}{Login}} (I\+User user)
+\begin{DoxyCompactList}\small\item\em Logs in the user \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_application_1_1_managers_1_1_login_manager_ab485bd570a5d994461c54eb07e97a43a}{Check\+Login\+Status}} (string username, string password)
+\begin{DoxyCompactList}\small\item\em Returns whether the user with username is logged in. If this is the case it updates the users time stamp \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_application_1_1_managers_1_1_login_manager_a9502ab9e9e8d04a42a9c3cdf451b405b}{Subscribe\+On\+Log\+Out}} (string username, User\+Logged\+Out\+Handle handle)
+\begin{DoxyCompactList}\small\item\em Subscribe to the username with the given handler. If the user is logged out the handler will get called. Make sure to call Check\+Login\+Status prior to this call \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_application_1_1_managers_1_1_login_manager_a4490bbdc301ad6eab762fd1a567fd970}{Unsubscribe\+On\+Log\+Out}} (string username, User\+Logged\+Out\+Handle handle)
+\begin{DoxyCompactList}\small\item\em Unsubscribes the handler from the username. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_application_1_1_managers_1_1_login_manager_a22b0fe0bd49da0a911f1cf39a5658d2b}{Login\+Manager}} (\mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_user_cache}{I\+User\+Cache}} logged\+In\+Pool)
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_login_manager}{I\+Login\+Manager}} \mbox{\hyperlink{class_application_1_1_managers_1_1_login_manager_ad9e40fd5ba6a176474a914bb94142ee7}{Get\+Instance}} (\mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_user_cache}{I\+User\+Cache}} pool=null)
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_application_1_1_managers_1_1_login_manager_a22b0fe0bd49da0a911f1cf39a5658d2b}\label{class_application_1_1_managers_1_1_login_manager_a22b0fe0bd49da0a911f1cf39a5658d2b}} 
+\index{Application\+::\+Managers\+::\+Login\+Manager@{Application\+::\+Managers\+::\+Login\+Manager}!Login\+Manager@{Login\+Manager}}
+\index{Login\+Manager@{Login\+Manager}!Application\+::\+Managers\+::\+Login\+Manager@{Application\+::\+Managers\+::\+Login\+Manager}}
+\subsubsection{\texorpdfstring{Login\+Manager()}{LoginManager()}}
+{\footnotesize\ttfamily Application.\+Managers.\+Login\+Manager.\+Login\+Manager (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_user_cache}{I\+User\+Cache}}}]{logged\+In\+Pool }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{class_application_1_1_managers_1_1_login_manager_ab485bd570a5d994461c54eb07e97a43a}\label{class_application_1_1_managers_1_1_login_manager_ab485bd570a5d994461c54eb07e97a43a}} 
+\index{Application\+::\+Managers\+::\+Login\+Manager@{Application\+::\+Managers\+::\+Login\+Manager}!Check\+Login\+Status@{Check\+Login\+Status}}
+\index{Check\+Login\+Status@{Check\+Login\+Status}!Application\+::\+Managers\+::\+Login\+Manager@{Application\+::\+Managers\+::\+Login\+Manager}}
+\subsubsection{\texorpdfstring{Check\+Login\+Status()}{CheckLoginStatus()}}
+{\footnotesize\ttfamily bool Application.\+Managers.\+Login\+Manager.\+Check\+Login\+Status (\begin{DoxyParamCaption}\item[{string}]{username,  }\item[{string}]{password }\end{DoxyParamCaption})}
+
+
+
+Returns whether the user with username is logged in. If this is the case it updates the users time stamp 
+
+
+\begin{DoxyParams}{Parameters}
+{\em username} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_login_manager_a31282ac878dc798af1a542f23efc7c8b}{Application.\+Interfaces.\+I\+Login\+Manager}}.
+
+\mbox{\Hypertarget{class_application_1_1_managers_1_1_login_manager_ad9e40fd5ba6a176474a914bb94142ee7}\label{class_application_1_1_managers_1_1_login_manager_ad9e40fd5ba6a176474a914bb94142ee7}} 
+\index{Application\+::\+Managers\+::\+Login\+Manager@{Application\+::\+Managers\+::\+Login\+Manager}!Get\+Instance@{Get\+Instance}}
+\index{Get\+Instance@{Get\+Instance}!Application\+::\+Managers\+::\+Login\+Manager@{Application\+::\+Managers\+::\+Login\+Manager}}
+\subsubsection{\texorpdfstring{Get\+Instance()}{GetInstance()}}
+{\footnotesize\ttfamily static \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_login_manager}{I\+Login\+Manager}} Application.\+Managers.\+Login\+Manager.\+Get\+Instance (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_user_cache}{I\+User\+Cache}}}]{pool = {\ttfamily null} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{class_application_1_1_managers_1_1_login_manager_a561516fbf8f97f695efdb1cb696899e8}\label{class_application_1_1_managers_1_1_login_manager_a561516fbf8f97f695efdb1cb696899e8}} 
+\index{Application\+::\+Managers\+::\+Login\+Manager@{Application\+::\+Managers\+::\+Login\+Manager}!Login@{Login}}
+\index{Login@{Login}!Application\+::\+Managers\+::\+Login\+Manager@{Application\+::\+Managers\+::\+Login\+Manager}}
+\subsubsection{\texorpdfstring{Login()}{Login()}}
+{\footnotesize\ttfamily void Application.\+Managers.\+Login\+Manager.\+Login (\begin{DoxyParamCaption}\item[{I\+User}]{user }\end{DoxyParamCaption})}
+
+
+
+Logs in the user 
+
+
+\begin{DoxyParams}{Parameters}
+{\em user} & \\
+\hline
+\end{DoxyParams}
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_login_manager_abfad12b55f211087464278f6301ba2e6}{Application.\+Interfaces.\+I\+Login\+Manager}}.
+
+\mbox{\Hypertarget{class_application_1_1_managers_1_1_login_manager_a9502ab9e9e8d04a42a9c3cdf451b405b}\label{class_application_1_1_managers_1_1_login_manager_a9502ab9e9e8d04a42a9c3cdf451b405b}} 
+\index{Application\+::\+Managers\+::\+Login\+Manager@{Application\+::\+Managers\+::\+Login\+Manager}!Subscribe\+On\+Log\+Out@{Subscribe\+On\+Log\+Out}}
+\index{Subscribe\+On\+Log\+Out@{Subscribe\+On\+Log\+Out}!Application\+::\+Managers\+::\+Login\+Manager@{Application\+::\+Managers\+::\+Login\+Manager}}
+\subsubsection{\texorpdfstring{Subscribe\+On\+Log\+Out()}{SubscribeOnLogOut()}}
+{\footnotesize\ttfamily bool Application.\+Managers.\+Login\+Manager.\+Subscribe\+On\+Log\+Out (\begin{DoxyParamCaption}\item[{string}]{username,  }\item[{User\+Logged\+Out\+Handle}]{handle }\end{DoxyParamCaption})}
+
+
+
+Subscribe to the username with the given handler. If the user is logged out the handler will get called. Make sure to call Check\+Login\+Status prior to this call 
+
+
+\begin{DoxyParams}{Parameters}
+{\em username} & \\
+\hline
+{\em handle} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_login_manager_a81fc028c701e8e372d635d6bd9664570}{Application.\+Interfaces.\+I\+Login\+Manager}}.
+
+\mbox{\Hypertarget{class_application_1_1_managers_1_1_login_manager_a4490bbdc301ad6eab762fd1a567fd970}\label{class_application_1_1_managers_1_1_login_manager_a4490bbdc301ad6eab762fd1a567fd970}} 
+\index{Application\+::\+Managers\+::\+Login\+Manager@{Application\+::\+Managers\+::\+Login\+Manager}!Unsubscribe\+On\+Log\+Out@{Unsubscribe\+On\+Log\+Out}}
+\index{Unsubscribe\+On\+Log\+Out@{Unsubscribe\+On\+Log\+Out}!Application\+::\+Managers\+::\+Login\+Manager@{Application\+::\+Managers\+::\+Login\+Manager}}
+\subsubsection{\texorpdfstring{Unsubscribe\+On\+Log\+Out()}{UnsubscribeOnLogOut()}}
+{\footnotesize\ttfamily bool Application.\+Managers.\+Login\+Manager.\+Unsubscribe\+On\+Log\+Out (\begin{DoxyParamCaption}\item[{string}]{username,  }\item[{User\+Logged\+Out\+Handle}]{handle }\end{DoxyParamCaption})}
+
+
+
+Unsubscribes the handler from the username. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em username} & \\
+\hline
+{\em handle} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_login_manager_aeb60a7935fa777e629db6098ce2f458d}{Application.\+Interfaces.\+I\+Login\+Manager}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Managers/\mbox{\hyperlink{_login_manager_8cs}{Login\+Manager.\+cs}}\end{DoxyCompactItemize}

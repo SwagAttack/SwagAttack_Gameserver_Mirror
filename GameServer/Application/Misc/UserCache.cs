@@ -7,12 +7,7 @@ using Application.Interfaces;
 
 namespace Application.Misc
 {
-    /// <summary>
-    ///     Implementation for Interval Heap can be found at:
-    ///     https://github.com/sestoft/C5/blob/master/C5/heaps/IntervalHeap.cs
-    ///     Documentation:
-    ///     https://www.itu.dk/research/c5/latest/ITU-TR-2006-76.pdf
-    /// </summary>
+
     public class UserCache : IUserCache
     {
         private const int Timeout = 10; // 10 second timeout

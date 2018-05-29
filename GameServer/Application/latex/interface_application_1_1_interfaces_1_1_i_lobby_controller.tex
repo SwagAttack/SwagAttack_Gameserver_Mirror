@@ -1,0 +1,191 @@
+\hypertarget{interface_application_1_1_interfaces_1_1_i_lobby_controller}{}\section{Application.\+Interfaces.\+I\+Lobby\+Controller Interface Reference}
+\label{interface_application_1_1_interfaces_1_1_i_lobby_controller}\index{Application.\+Interfaces.\+I\+Lobby\+Controller@{Application.\+Interfaces.\+I\+Lobby\+Controller}}
+Inheritance diagram for Application.\+Interfaces.\+I\+Lobby\+Controller\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{interface_application_1_1_interfaces_1_1_i_lobby_controller}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+I\+Lobby \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_controller_abefe3510b20e3db41c4d8062f8cdc2bc}{Create\+Lobby}} (string lobby\+Id, string admin\+Username)
+\begin{DoxyCompactList}\small\item\em Creates a new lobby and returns this \end{DoxyCompactList}\item 
+I\+Lobby \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_controller_a17c37ec6dbb98ab07deb4e4f9800a68e}{Join\+Lobby}} (string lobby\+Id, string username)
+\item 
+bool \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_controller_ad95e5c656813094f7abec7b81ea568e1}{Leave\+Lobby}} (string lobby\+Id, string username)
+\item 
+I\+Lobby \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_controller_aaa584fec6fc0e1e0690aa81e7fde3af2}{Get\+Lobby\+By\+Id}} (string lobby\+Id)
+\item 
+I\+Lobby \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_controller_a4d0618e880423f15785360453bf90f90}{Update\+Lobby}} (string admin\+Username, I\+Lobby lobby)
+\begin{DoxyCompactList}\small\item\em Might not be useful. Is meant to update a lobby in scenarios where the admin user wishes to pass on this role to another user. \end{DoxyCompactList}\item 
+I\+Collection$<$ string $>$ \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_controller_a2e1d8f72361ee48e956fb473ceabadf4}{Get\+All\+Lobbies}} ()
+\item 
+Task$<$ I\+Lobby $>$ \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_controller_ae507a1d23088662b8c37692bbb93040e}{Create\+Lobby\+Async}} (string lobby\+Id, string admin\+Username)
+\item 
+Task$<$ I\+Lobby $>$ \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_controller_aba87a2245b2c274cf977aeaf193eef73}{Join\+Lobby\+Async}} (string lobby\+Id, string username)
+\item 
+Task$<$ bool $>$ \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_controller_a46975c7e9219d5324f786542a23d9e7e}{Leave\+Lobby\+Async}} (string lobbyid, string username)
+\item 
+Task$<$ I\+Lobby $>$ \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_controller_a40457a8fb8d6801a8e42f1e75f9d3480}{Update\+Lobby\+Async}} (string admin\+Username, I\+Lobby lobby)
+\item 
+Task$<$ I\+Collection$<$ string $>$ $>$ \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_controller_acf938121367844d623fa4127cf643e50}{Get\+All\+Lobbies\+Async}} ()
+\item 
+Task$<$ I\+Lobby $>$ \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_controller_abe3ce90e900391a0c4ffa25195800ab2}{Get\+Lobby\+By\+Id\+Async}} (string lobby\+Id)
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{interface_application_1_1_interfaces_1_1_i_lobby_controller_abefe3510b20e3db41c4d8062f8cdc2bc}\label{interface_application_1_1_interfaces_1_1_i_lobby_controller_abefe3510b20e3db41c4d8062f8cdc2bc}} 
+\index{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}!Create\+Lobby@{Create\+Lobby}}
+\index{Create\+Lobby@{Create\+Lobby}!Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}}
+\subsubsection{\texorpdfstring{Create\+Lobby()}{CreateLobby()}}
+{\footnotesize\ttfamily I\+Lobby Application.\+Interfaces.\+I\+Lobby\+Controller.\+Create\+Lobby (\begin{DoxyParamCaption}\item[{string}]{lobby\+Id,  }\item[{string}]{admin\+Username }\end{DoxyParamCaption})}
+
+
+
+Creates a new lobby and returns this 
+
+
+\begin{DoxyParams}{Parameters}
+{\em lobby\+Id} & The id of the lobby to create\\
+\hline
+{\em admin\+Username} & The username to be assigned as admin of the lobby\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns a new lobby with the passed information if the lobby id isen\textquotesingle{}t taken and if the user is not currently attached to another lobby. Else null.
+\end{DoxyReturn}
+
+
+Implemented in \mbox{\hyperlink{class_application_1_1_controllers_1_1_lobby_controller_ad0684f9eace44951fcb75c805fb8574c}{Application.\+Controllers.\+Lobby\+Controller}}.
+
+\mbox{\Hypertarget{interface_application_1_1_interfaces_1_1_i_lobby_controller_ae507a1d23088662b8c37692bbb93040e}\label{interface_application_1_1_interfaces_1_1_i_lobby_controller_ae507a1d23088662b8c37692bbb93040e}} 
+\index{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}!Create\+Lobby\+Async@{Create\+Lobby\+Async}}
+\index{Create\+Lobby\+Async@{Create\+Lobby\+Async}!Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}}
+\subsubsection{\texorpdfstring{Create\+Lobby\+Async()}{CreateLobbyAsync()}}
+{\footnotesize\ttfamily Task$<$I\+Lobby$>$ Application.\+Interfaces.\+I\+Lobby\+Controller.\+Create\+Lobby\+Async (\begin{DoxyParamCaption}\item[{string}]{lobby\+Id,  }\item[{string}]{admin\+Username }\end{DoxyParamCaption})}
+
+
+
+Implemented in \mbox{\hyperlink{class_application_1_1_controllers_1_1_lobby_controller_ac08d941f7da12f7791a691dbbdf0c1f3}{Application.\+Controllers.\+Lobby\+Controller}}.
+
+\mbox{\Hypertarget{interface_application_1_1_interfaces_1_1_i_lobby_controller_a2e1d8f72361ee48e956fb473ceabadf4}\label{interface_application_1_1_interfaces_1_1_i_lobby_controller_a2e1d8f72361ee48e956fb473ceabadf4}} 
+\index{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}!Get\+All\+Lobbies@{Get\+All\+Lobbies}}
+\index{Get\+All\+Lobbies@{Get\+All\+Lobbies}!Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}}
+\subsubsection{\texorpdfstring{Get\+All\+Lobbies()}{GetAllLobbies()}}
+{\footnotesize\ttfamily I\+Collection$<$string$>$ Application.\+Interfaces.\+I\+Lobby\+Controller.\+Get\+All\+Lobbies (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Implemented in \mbox{\hyperlink{class_application_1_1_controllers_1_1_lobby_controller_a1aec115271209fc4ea59ed5f790d3011}{Application.\+Controllers.\+Lobby\+Controller}}.
+
+\mbox{\Hypertarget{interface_application_1_1_interfaces_1_1_i_lobby_controller_acf938121367844d623fa4127cf643e50}\label{interface_application_1_1_interfaces_1_1_i_lobby_controller_acf938121367844d623fa4127cf643e50}} 
+\index{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}!Get\+All\+Lobbies\+Async@{Get\+All\+Lobbies\+Async}}
+\index{Get\+All\+Lobbies\+Async@{Get\+All\+Lobbies\+Async}!Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}}
+\subsubsection{\texorpdfstring{Get\+All\+Lobbies\+Async()}{GetAllLobbiesAsync()}}
+{\footnotesize\ttfamily Task$<$I\+Collection$<$string$>$ $>$ Application.\+Interfaces.\+I\+Lobby\+Controller.\+Get\+All\+Lobbies\+Async (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Implemented in \mbox{\hyperlink{class_application_1_1_controllers_1_1_lobby_controller_a881adadc726a5daa68fe702439723630}{Application.\+Controllers.\+Lobby\+Controller}}.
+
+\mbox{\Hypertarget{interface_application_1_1_interfaces_1_1_i_lobby_controller_aaa584fec6fc0e1e0690aa81e7fde3af2}\label{interface_application_1_1_interfaces_1_1_i_lobby_controller_aaa584fec6fc0e1e0690aa81e7fde3af2}} 
+\index{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}!Get\+Lobby\+By\+Id@{Get\+Lobby\+By\+Id}}
+\index{Get\+Lobby\+By\+Id@{Get\+Lobby\+By\+Id}!Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}}
+\subsubsection{\texorpdfstring{Get\+Lobby\+By\+Id()}{GetLobbyById()}}
+{\footnotesize\ttfamily I\+Lobby Application.\+Interfaces.\+I\+Lobby\+Controller.\+Get\+Lobby\+By\+Id (\begin{DoxyParamCaption}\item[{string}]{lobby\+Id }\end{DoxyParamCaption})}
+
+
+
+Implemented in \mbox{\hyperlink{class_application_1_1_controllers_1_1_lobby_controller_a5ea797c6456dc8d40e16b87077a16693}{Application.\+Controllers.\+Lobby\+Controller}}.
+
+\mbox{\Hypertarget{interface_application_1_1_interfaces_1_1_i_lobby_controller_abe3ce90e900391a0c4ffa25195800ab2}\label{interface_application_1_1_interfaces_1_1_i_lobby_controller_abe3ce90e900391a0c4ffa25195800ab2}} 
+\index{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}!Get\+Lobby\+By\+Id\+Async@{Get\+Lobby\+By\+Id\+Async}}
+\index{Get\+Lobby\+By\+Id\+Async@{Get\+Lobby\+By\+Id\+Async}!Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}}
+\subsubsection{\texorpdfstring{Get\+Lobby\+By\+Id\+Async()}{GetLobbyByIdAsync()}}
+{\footnotesize\ttfamily Task$<$I\+Lobby$>$ Application.\+Interfaces.\+I\+Lobby\+Controller.\+Get\+Lobby\+By\+Id\+Async (\begin{DoxyParamCaption}\item[{string}]{lobby\+Id }\end{DoxyParamCaption})}
+
+
+
+Implemented in \mbox{\hyperlink{class_application_1_1_controllers_1_1_lobby_controller_afe14da64961a1667fd7411484204c692}{Application.\+Controllers.\+Lobby\+Controller}}.
+
+\mbox{\Hypertarget{interface_application_1_1_interfaces_1_1_i_lobby_controller_a17c37ec6dbb98ab07deb4e4f9800a68e}\label{interface_application_1_1_interfaces_1_1_i_lobby_controller_a17c37ec6dbb98ab07deb4e4f9800a68e}} 
+\index{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}!Join\+Lobby@{Join\+Lobby}}
+\index{Join\+Lobby@{Join\+Lobby}!Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}}
+\subsubsection{\texorpdfstring{Join\+Lobby()}{JoinLobby()}}
+{\footnotesize\ttfamily I\+Lobby Application.\+Interfaces.\+I\+Lobby\+Controller.\+Join\+Lobby (\begin{DoxyParamCaption}\item[{string}]{lobby\+Id,  }\item[{string}]{username }\end{DoxyParamCaption})}
+
+
+
+Implemented in \mbox{\hyperlink{class_application_1_1_controllers_1_1_lobby_controller_ac081cab03ea49323b57c294ca95c6a09}{Application.\+Controllers.\+Lobby\+Controller}}.
+
+\mbox{\Hypertarget{interface_application_1_1_interfaces_1_1_i_lobby_controller_aba87a2245b2c274cf977aeaf193eef73}\label{interface_application_1_1_interfaces_1_1_i_lobby_controller_aba87a2245b2c274cf977aeaf193eef73}} 
+\index{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}!Join\+Lobby\+Async@{Join\+Lobby\+Async}}
+\index{Join\+Lobby\+Async@{Join\+Lobby\+Async}!Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}}
+\subsubsection{\texorpdfstring{Join\+Lobby\+Async()}{JoinLobbyAsync()}}
+{\footnotesize\ttfamily Task$<$I\+Lobby$>$ Application.\+Interfaces.\+I\+Lobby\+Controller.\+Join\+Lobby\+Async (\begin{DoxyParamCaption}\item[{string}]{lobby\+Id,  }\item[{string}]{username }\end{DoxyParamCaption})}
+
+
+
+Implemented in \mbox{\hyperlink{class_application_1_1_controllers_1_1_lobby_controller_af9484a4c054717c0975175d93e45149c}{Application.\+Controllers.\+Lobby\+Controller}}.
+
+\mbox{\Hypertarget{interface_application_1_1_interfaces_1_1_i_lobby_controller_ad95e5c656813094f7abec7b81ea568e1}\label{interface_application_1_1_interfaces_1_1_i_lobby_controller_ad95e5c656813094f7abec7b81ea568e1}} 
+\index{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}!Leave\+Lobby@{Leave\+Lobby}}
+\index{Leave\+Lobby@{Leave\+Lobby}!Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}}
+\subsubsection{\texorpdfstring{Leave\+Lobby()}{LeaveLobby()}}
+{\footnotesize\ttfamily bool Application.\+Interfaces.\+I\+Lobby\+Controller.\+Leave\+Lobby (\begin{DoxyParamCaption}\item[{string}]{lobby\+Id,  }\item[{string}]{username }\end{DoxyParamCaption})}
+
+
+
+Implemented in \mbox{\hyperlink{class_application_1_1_controllers_1_1_lobby_controller_aa075018713d8ac7fdf84cf6349e2f10d}{Application.\+Controllers.\+Lobby\+Controller}}.
+
+\mbox{\Hypertarget{interface_application_1_1_interfaces_1_1_i_lobby_controller_a46975c7e9219d5324f786542a23d9e7e}\label{interface_application_1_1_interfaces_1_1_i_lobby_controller_a46975c7e9219d5324f786542a23d9e7e}} 
+\index{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}!Leave\+Lobby\+Async@{Leave\+Lobby\+Async}}
+\index{Leave\+Lobby\+Async@{Leave\+Lobby\+Async}!Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}}
+\subsubsection{\texorpdfstring{Leave\+Lobby\+Async()}{LeaveLobbyAsync()}}
+{\footnotesize\ttfamily Task$<$bool$>$ Application.\+Interfaces.\+I\+Lobby\+Controller.\+Leave\+Lobby\+Async (\begin{DoxyParamCaption}\item[{string}]{lobbyid,  }\item[{string}]{username }\end{DoxyParamCaption})}
+
+
+
+Implemented in \mbox{\hyperlink{class_application_1_1_controllers_1_1_lobby_controller_a7f0fb3932a42b76d5e4a9788aa0510e0}{Application.\+Controllers.\+Lobby\+Controller}}.
+
+\mbox{\Hypertarget{interface_application_1_1_interfaces_1_1_i_lobby_controller_a4d0618e880423f15785360453bf90f90}\label{interface_application_1_1_interfaces_1_1_i_lobby_controller_a4d0618e880423f15785360453bf90f90}} 
+\index{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}!Update\+Lobby@{Update\+Lobby}}
+\index{Update\+Lobby@{Update\+Lobby}!Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}}
+\subsubsection{\texorpdfstring{Update\+Lobby()}{UpdateLobby()}}
+{\footnotesize\ttfamily I\+Lobby Application.\+Interfaces.\+I\+Lobby\+Controller.\+Update\+Lobby (\begin{DoxyParamCaption}\item[{string}]{admin\+Username,  }\item[{I\+Lobby}]{lobby }\end{DoxyParamCaption})}
+
+
+
+Might not be useful. Is meant to update a lobby in scenarios where the admin user wishes to pass on this role to another user. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em admin\+Username} & Username of the current admin of the passed \mbox{\hyperlink{}{I\+Lobby}} lobby\\
+\hline
+{\em lobby} & The lobby to update\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The updated lobby upon succes. Else null.
+\end{DoxyReturn}
+
+
+Implemented in \mbox{\hyperlink{class_application_1_1_controllers_1_1_lobby_controller_a415b61b5c78ba52619ac4d3606ecc32e}{Application.\+Controllers.\+Lobby\+Controller}}.
+
+\mbox{\Hypertarget{interface_application_1_1_interfaces_1_1_i_lobby_controller_a40457a8fb8d6801a8e42f1e75f9d3480}\label{interface_application_1_1_interfaces_1_1_i_lobby_controller_a40457a8fb8d6801a8e42f1e75f9d3480}} 
+\index{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}!Update\+Lobby\+Async@{Update\+Lobby\+Async}}
+\index{Update\+Lobby\+Async@{Update\+Lobby\+Async}!Application\+::\+Interfaces\+::\+I\+Lobby\+Controller@{Application\+::\+Interfaces\+::\+I\+Lobby\+Controller}}
+\subsubsection{\texorpdfstring{Update\+Lobby\+Async()}{UpdateLobbyAsync()}}
+{\footnotesize\ttfamily Task$<$I\+Lobby$>$ Application.\+Interfaces.\+I\+Lobby\+Controller.\+Update\+Lobby\+Async (\begin{DoxyParamCaption}\item[{string}]{admin\+Username,  }\item[{I\+Lobby}]{lobby }\end{DoxyParamCaption})}
+
+
+
+Implemented in \mbox{\hyperlink{class_application_1_1_controllers_1_1_lobby_controller_a2f30842e0480f28ddbe51ab420b35049}{Application.\+Controllers.\+Lobby\+Controller}}.
+
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Interfaces/\mbox{\hyperlink{_i_lobby_controller_8cs}{I\+Lobby\+Controller.\+cs}}\end{DoxyCompactItemize}

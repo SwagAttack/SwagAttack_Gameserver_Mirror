@@ -1,0 +1,192 @@
+\hypertarget{class_application_1_1_misc_1_1_user_cache}{}\section{Application.\+Misc.\+User\+Cache Class Reference}
+\label{class_application_1_1_misc_1_1_user_cache}\index{Application.\+Misc.\+User\+Cache@{Application.\+Misc.\+User\+Cache}}
+Inheritance diagram for Application.\+Misc.\+User\+Cache\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_application_1_1_misc_1_1_user_cache}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_application_1_1_misc_1_1_user_cache_ab52d91840d3b6c3d4162992b35bbf3a5}{User\+Cache}} (\mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_timer}{I\+Timer}} timer)
+\item 
+void \mbox{\hyperlink{class_application_1_1_misc_1_1_user_cache_ab56ecb52b9a7bc855729b439a5c5bb36}{Add\+Or\+Update}} (string username, string password)
+\begin{DoxyCompactList}\small\item\em Adds a user to the cache with the default timeout of 20 minutes. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_application_1_1_misc_1_1_user_cache_a7c8d6acdc76809a72a36db8ba8fdd8f8}{Add\+Or\+Update}} (string username, string password, Date\+Time timeout)
+\begin{DoxyCompactList}\small\item\em Adds a user to the cache with the timeout given in the paramater timeout. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_application_1_1_misc_1_1_user_cache_a77b10de2cba0f07aa9af6fd5ad53e2c6}{Confirm}} (string username)
+\begin{DoxyCompactList}\small\item\em Confirms that the user is currently in the cache. Does N\+OT refresh his timeout. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_application_1_1_misc_1_1_user_cache_ad11a0422af31b1492098415d8e4aaad8}{Confirm\+And\+Refresh}} (string username, string password)
+\begin{DoxyCompactList}\small\item\em Confirms that the user is currenty in the cache and if so refreshes the user\textquotesingle{}s timeout. The password must match. Returns true if user is found and refreshed, else false. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_application_1_1_misc_1_1_user_cache_af685f56bf378e2bde07f7f6f933a8e0e}{Remove}} (string username, string password)
+\begin{DoxyCompactList}\small\item\em Removes the user from the cache. Returns true if succesful. Else false. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+I\+Read\+Only\+Dictionary$<$ string, Date\+Time $>$ \mbox{\hyperlink{class_application_1_1_misc_1_1_user_cache_ad5b655841c5a15022a372cfe9fb6960d}{Expiration\+Stamps}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em This was added for unit-\/testing purposes. This is not thread-\/safe and should not be used for anything other than testing Will return a dictionary with usernames as keys and the value coresponding to the timeout of the user \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Events}
+\begin{DoxyCompactItemize}
+\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_application_1_1_interfaces_1_1_timed_out_user_event_args}{Timed\+Out\+User\+Event\+Args}} $>$ \mbox{\hyperlink{class_application_1_1_misc_1_1_user_cache_aac04127fb652a14238e2742d0bba6558}{Users\+Timed\+Out\+Event}}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_application_1_1_misc_1_1_user_cache_ab52d91840d3b6c3d4162992b35bbf3a5}\label{class_application_1_1_misc_1_1_user_cache_ab52d91840d3b6c3d4162992b35bbf3a5}} 
+\index{Application\+::\+Misc\+::\+User\+Cache@{Application\+::\+Misc\+::\+User\+Cache}!User\+Cache@{User\+Cache}}
+\index{User\+Cache@{User\+Cache}!Application\+::\+Misc\+::\+User\+Cache@{Application\+::\+Misc\+::\+User\+Cache}}
+\subsubsection{\texorpdfstring{User\+Cache()}{UserCache()}}
+{\footnotesize\ttfamily Application.\+Misc.\+User\+Cache.\+User\+Cache (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_timer}{I\+Timer}}}]{timer }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{class_application_1_1_misc_1_1_user_cache_ab56ecb52b9a7bc855729b439a5c5bb36}\label{class_application_1_1_misc_1_1_user_cache_ab56ecb52b9a7bc855729b439a5c5bb36}} 
+\index{Application\+::\+Misc\+::\+User\+Cache@{Application\+::\+Misc\+::\+User\+Cache}!Add\+Or\+Update@{Add\+Or\+Update}}
+\index{Add\+Or\+Update@{Add\+Or\+Update}!Application\+::\+Misc\+::\+User\+Cache@{Application\+::\+Misc\+::\+User\+Cache}}
+\subsubsection{\texorpdfstring{Add\+Or\+Update()}{AddOrUpdate()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Application.\+Misc.\+User\+Cache.\+Add\+Or\+Update (\begin{DoxyParamCaption}\item[{string}]{username,  }\item[{string}]{password }\end{DoxyParamCaption})}
+
+
+
+Adds a user to the cache with the default timeout of 20 minutes. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em username} & Username of user\\
+\hline
+{\em password} & password of user\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_user_cache_a607deb5ebf1cfb0f237daf9981206d73}{Application.\+Interfaces.\+I\+User\+Cache}}.
+
+\mbox{\Hypertarget{class_application_1_1_misc_1_1_user_cache_a7c8d6acdc76809a72a36db8ba8fdd8f8}\label{class_application_1_1_misc_1_1_user_cache_a7c8d6acdc76809a72a36db8ba8fdd8f8}} 
+\index{Application\+::\+Misc\+::\+User\+Cache@{Application\+::\+Misc\+::\+User\+Cache}!Add\+Or\+Update@{Add\+Or\+Update}}
+\index{Add\+Or\+Update@{Add\+Or\+Update}!Application\+::\+Misc\+::\+User\+Cache@{Application\+::\+Misc\+::\+User\+Cache}}
+\subsubsection{\texorpdfstring{Add\+Or\+Update()}{AddOrUpdate()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Application.\+Misc.\+User\+Cache.\+Add\+Or\+Update (\begin{DoxyParamCaption}\item[{string}]{username,  }\item[{string}]{password,  }\item[{Date\+Time}]{timeout }\end{DoxyParamCaption})}
+
+
+
+Adds a user to the cache with the timeout given in the paramater timeout. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em username} & Username of user\\
+\hline
+{\em password} & password of user\\
+\hline
+{\em timeout} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_user_cache_aec631e3f0e466a067018b3196457056a}{Application.\+Interfaces.\+I\+User\+Cache}}.
+
+\mbox{\Hypertarget{class_application_1_1_misc_1_1_user_cache_a77b10de2cba0f07aa9af6fd5ad53e2c6}\label{class_application_1_1_misc_1_1_user_cache_a77b10de2cba0f07aa9af6fd5ad53e2c6}} 
+\index{Application\+::\+Misc\+::\+User\+Cache@{Application\+::\+Misc\+::\+User\+Cache}!Confirm@{Confirm}}
+\index{Confirm@{Confirm}!Application\+::\+Misc\+::\+User\+Cache@{Application\+::\+Misc\+::\+User\+Cache}}
+\subsubsection{\texorpdfstring{Confirm()}{Confirm()}}
+{\footnotesize\ttfamily bool Application.\+Misc.\+User\+Cache.\+Confirm (\begin{DoxyParamCaption}\item[{string}]{username }\end{DoxyParamCaption})}
+
+
+
+Confirms that the user is currently in the cache. Does N\+OT refresh his timeout. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em username} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_user_cache_a4978aad56d7292eafa02e8e7ad66f2c2}{Application.\+Interfaces.\+I\+User\+Cache}}.
+
+\mbox{\Hypertarget{class_application_1_1_misc_1_1_user_cache_ad11a0422af31b1492098415d8e4aaad8}\label{class_application_1_1_misc_1_1_user_cache_ad11a0422af31b1492098415d8e4aaad8}} 
+\index{Application\+::\+Misc\+::\+User\+Cache@{Application\+::\+Misc\+::\+User\+Cache}!Confirm\+And\+Refresh@{Confirm\+And\+Refresh}}
+\index{Confirm\+And\+Refresh@{Confirm\+And\+Refresh}!Application\+::\+Misc\+::\+User\+Cache@{Application\+::\+Misc\+::\+User\+Cache}}
+\subsubsection{\texorpdfstring{Confirm\+And\+Refresh()}{ConfirmAndRefresh()}}
+{\footnotesize\ttfamily bool Application.\+Misc.\+User\+Cache.\+Confirm\+And\+Refresh (\begin{DoxyParamCaption}\item[{string}]{username,  }\item[{string}]{password }\end{DoxyParamCaption})}
+
+
+
+Confirms that the user is currenty in the cache and if so refreshes the user\textquotesingle{}s timeout. The password must match. Returns true if user is found and refreshed, else false. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em username} & \\
+\hline
+{\em password} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_user_cache_a3516a7abf1f40f9ddd10243cad03bb65}{Application.\+Interfaces.\+I\+User\+Cache}}.
+
+\mbox{\Hypertarget{class_application_1_1_misc_1_1_user_cache_af685f56bf378e2bde07f7f6f933a8e0e}\label{class_application_1_1_misc_1_1_user_cache_af685f56bf378e2bde07f7f6f933a8e0e}} 
+\index{Application\+::\+Misc\+::\+User\+Cache@{Application\+::\+Misc\+::\+User\+Cache}!Remove@{Remove}}
+\index{Remove@{Remove}!Application\+::\+Misc\+::\+User\+Cache@{Application\+::\+Misc\+::\+User\+Cache}}
+\subsubsection{\texorpdfstring{Remove()}{Remove()}}
+{\footnotesize\ttfamily bool Application.\+Misc.\+User\+Cache.\+Remove (\begin{DoxyParamCaption}\item[{string}]{username,  }\item[{string}]{password }\end{DoxyParamCaption})}
+
+
+
+Removes the user from the cache. Returns true if succesful. Else false. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em username} & \\
+\hline
+{\em password} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_user_cache_ac8ccbf20ac25069528e1e5117d5481ee}{Application.\+Interfaces.\+I\+User\+Cache}}.
+
+
+
+\subsection{Property Documentation}
+\mbox{\Hypertarget{class_application_1_1_misc_1_1_user_cache_ad5b655841c5a15022a372cfe9fb6960d}\label{class_application_1_1_misc_1_1_user_cache_ad5b655841c5a15022a372cfe9fb6960d}} 
+\index{Application\+::\+Misc\+::\+User\+Cache@{Application\+::\+Misc\+::\+User\+Cache}!Expiration\+Stamps@{Expiration\+Stamps}}
+\index{Expiration\+Stamps@{Expiration\+Stamps}!Application\+::\+Misc\+::\+User\+Cache@{Application\+::\+Misc\+::\+User\+Cache}}
+\subsubsection{\texorpdfstring{Expiration\+Stamps}{ExpirationStamps}}
+{\footnotesize\ttfamily I\+Read\+Only\+Dictionary$<$string, Date\+Time$>$ Application.\+Misc.\+User\+Cache.\+Expiration\+Stamps\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+This was added for unit-\/testing purposes. This is not thread-\/safe and should not be used for anything other than testing Will return a dictionary with usernames as keys and the value coresponding to the timeout of the user 
+
+
+
+\subsection{Event Documentation}
+\mbox{\Hypertarget{class_application_1_1_misc_1_1_user_cache_aac04127fb652a14238e2742d0bba6558}\label{class_application_1_1_misc_1_1_user_cache_aac04127fb652a14238e2742d0bba6558}} 
+\index{Application\+::\+Misc\+::\+User\+Cache@{Application\+::\+Misc\+::\+User\+Cache}!Users\+Timed\+Out\+Event@{Users\+Timed\+Out\+Event}}
+\index{Users\+Timed\+Out\+Event@{Users\+Timed\+Out\+Event}!Application\+::\+Misc\+::\+User\+Cache@{Application\+::\+Misc\+::\+User\+Cache}}
+\subsubsection{\texorpdfstring{Users\+Timed\+Out\+Event}{UsersTimedOutEvent}}
+{\footnotesize\ttfamily Event\+Handler$<$\mbox{\hyperlink{class_application_1_1_interfaces_1_1_timed_out_user_event_args}{Timed\+Out\+User\+Event\+Args}}$>$ Application.\+Misc.\+User\+Cache.\+Users\+Timed\+Out\+Event}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Misc/\mbox{\hyperlink{_user_cache_8cs}{User\+Cache.\+cs}}\end{DoxyCompactItemize}

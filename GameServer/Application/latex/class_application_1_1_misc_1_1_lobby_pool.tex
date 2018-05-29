@@ -1,0 +1,125 @@
+\hypertarget{class_application_1_1_misc_1_1_lobby_pool}{}\section{Application.\+Misc.\+Lobby\+Pool Class Reference}
+\label{class_application_1_1_misc_1_1_lobby_pool}\index{Application.\+Misc.\+Lobby\+Pool@{Application.\+Misc.\+Lobby\+Pool}}
+Inheritance diagram for Application.\+Misc.\+Lobby\+Pool\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_application_1_1_misc_1_1_lobby_pool}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_application_1_1_misc_1_1_lobby_pool_adefb9ad44d5c53d09f31a79ff5a96e89}{Lobby\+Pool}} ()
+\item 
+bool \mbox{\hyperlink{class_application_1_1_misc_1_1_lobby_pool_a442eb666b16bc75025732413f38b0846}{Add\+Lobby}} (I\+Lobby lobby)
+\item 
+I\+Lobby \mbox{\hyperlink{class_application_1_1_misc_1_1_lobby_pool_a61b2a303bd4bc1e72e31b3ee3d1e06d5}{Get\+Lobby}} (string lobby\+Id)
+\item 
+bool \mbox{\hyperlink{class_application_1_1_misc_1_1_lobby_pool_a747cfa417f8932fa8b006b6662c45099}{Release\+Lobby}} (string lobby\+Id)
+\item 
+I\+Enumerable$<$ I\+Lobby $>$ \mbox{\hyperlink{class_application_1_1_misc_1_1_lobby_pool_a3d1c9e496386713ad5d8ede307e6c28c}{Find}} (Func$<$ I\+Lobby, bool $>$ expression)
+\item 
+I\+Lobby \mbox{\hyperlink{class_application_1_1_misc_1_1_lobby_pool_a5676f006bc10c46224c1b3bb266702a3}{First\+Or\+Default}} (Func$<$ I\+Lobby, bool $>$ func)
+\item 
+bool \mbox{\hyperlink{class_application_1_1_misc_1_1_lobby_pool_af9f3a5b65c1a948fa63796a907c1684d}{Contains}} (string lobby\+Id)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+I\+Collection$<$ string $>$ \mbox{\hyperlink{class_application_1_1_misc_1_1_lobby_pool_a458073f24e69b53446da0a03050664e1}{Lobbies\+Collection}} =$>$ \+\_\+lobby\+Dictionary\+Pool.\+Keys.\+To\+List()
+\item 
+I\+Read\+Only\+Dictionary$<$ string, I\+Lobby $>$ \mbox{\hyperlink{class_application_1_1_misc_1_1_lobby_pool_a807b21ba18c87a433c8d9ff1fc5c00f1}{Lobby\+Dictionary}} =$>$ \+\_\+lobby\+Dictionary\+Pool
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_application_1_1_misc_1_1_lobby_pool_adefb9ad44d5c53d09f31a79ff5a96e89}\label{class_application_1_1_misc_1_1_lobby_pool_adefb9ad44d5c53d09f31a79ff5a96e89}} 
+\index{Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}!Lobby\+Pool@{Lobby\+Pool}}
+\index{Lobby\+Pool@{Lobby\+Pool}!Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}}
+\subsubsection{\texorpdfstring{Lobby\+Pool()}{LobbyPool()}}
+{\footnotesize\ttfamily Application.\+Misc.\+Lobby\+Pool.\+Lobby\+Pool (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{class_application_1_1_misc_1_1_lobby_pool_a442eb666b16bc75025732413f38b0846}\label{class_application_1_1_misc_1_1_lobby_pool_a442eb666b16bc75025732413f38b0846}} 
+\index{Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}!Add\+Lobby@{Add\+Lobby}}
+\index{Add\+Lobby@{Add\+Lobby}!Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}}
+\subsubsection{\texorpdfstring{Add\+Lobby()}{AddLobby()}}
+{\footnotesize\ttfamily bool Application.\+Misc.\+Lobby\+Pool.\+Add\+Lobby (\begin{DoxyParamCaption}\item[{I\+Lobby}]{lobby }\end{DoxyParamCaption})}
+
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_pool_a2aa933d501630b665f67c68e39012a4c}{Application.\+Interfaces.\+I\+Lobby\+Pool}}.
+
+\mbox{\Hypertarget{class_application_1_1_misc_1_1_lobby_pool_af9f3a5b65c1a948fa63796a907c1684d}\label{class_application_1_1_misc_1_1_lobby_pool_af9f3a5b65c1a948fa63796a907c1684d}} 
+\index{Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}!Contains@{Contains}}
+\index{Contains@{Contains}!Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}}
+\subsubsection{\texorpdfstring{Contains()}{Contains()}}
+{\footnotesize\ttfamily bool Application.\+Misc.\+Lobby\+Pool.\+Contains (\begin{DoxyParamCaption}\item[{string}]{lobby\+Id }\end{DoxyParamCaption})}
+
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_pool_a9a09df8415ae760c99d5a6bcd1ac91f9}{Application.\+Interfaces.\+I\+Lobby\+Pool}}.
+
+\mbox{\Hypertarget{class_application_1_1_misc_1_1_lobby_pool_a3d1c9e496386713ad5d8ede307e6c28c}\label{class_application_1_1_misc_1_1_lobby_pool_a3d1c9e496386713ad5d8ede307e6c28c}} 
+\index{Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}!Find@{Find}}
+\index{Find@{Find}!Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}}
+\subsubsection{\texorpdfstring{Find()}{Find()}}
+{\footnotesize\ttfamily I\+Enumerable$<$I\+Lobby$>$ Application.\+Misc.\+Lobby\+Pool.\+Find (\begin{DoxyParamCaption}\item[{Func$<$ I\+Lobby, bool $>$}]{expression }\end{DoxyParamCaption})}
+
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_pool_ac64adf71b4ab967725dec520bab627c3}{Application.\+Interfaces.\+I\+Lobby\+Pool}}.
+
+\mbox{\Hypertarget{class_application_1_1_misc_1_1_lobby_pool_a5676f006bc10c46224c1b3bb266702a3}\label{class_application_1_1_misc_1_1_lobby_pool_a5676f006bc10c46224c1b3bb266702a3}} 
+\index{Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}!First\+Or\+Default@{First\+Or\+Default}}
+\index{First\+Or\+Default@{First\+Or\+Default}!Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}}
+\subsubsection{\texorpdfstring{First\+Or\+Default()}{FirstOrDefault()}}
+{\footnotesize\ttfamily I\+Lobby Application.\+Misc.\+Lobby\+Pool.\+First\+Or\+Default (\begin{DoxyParamCaption}\item[{Func$<$ I\+Lobby, bool $>$}]{func }\end{DoxyParamCaption})}
+
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_pool_aa518351cc8b58ef5997f7ecef19633bb}{Application.\+Interfaces.\+I\+Lobby\+Pool}}.
+
+\mbox{\Hypertarget{class_application_1_1_misc_1_1_lobby_pool_a61b2a303bd4bc1e72e31b3ee3d1e06d5}\label{class_application_1_1_misc_1_1_lobby_pool_a61b2a303bd4bc1e72e31b3ee3d1e06d5}} 
+\index{Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}!Get\+Lobby@{Get\+Lobby}}
+\index{Get\+Lobby@{Get\+Lobby}!Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}}
+\subsubsection{\texorpdfstring{Get\+Lobby()}{GetLobby()}}
+{\footnotesize\ttfamily I\+Lobby Application.\+Misc.\+Lobby\+Pool.\+Get\+Lobby (\begin{DoxyParamCaption}\item[{string}]{lobby\+Id }\end{DoxyParamCaption})}
+
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_pool_a044d19c090cbd70a17de4b487fd6d613}{Application.\+Interfaces.\+I\+Lobby\+Pool}}.
+
+\mbox{\Hypertarget{class_application_1_1_misc_1_1_lobby_pool_a747cfa417f8932fa8b006b6662c45099}\label{class_application_1_1_misc_1_1_lobby_pool_a747cfa417f8932fa8b006b6662c45099}} 
+\index{Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}!Release\+Lobby@{Release\+Lobby}}
+\index{Release\+Lobby@{Release\+Lobby}!Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}}
+\subsubsection{\texorpdfstring{Release\+Lobby()}{ReleaseLobby()}}
+{\footnotesize\ttfamily bool Application.\+Misc.\+Lobby\+Pool.\+Release\+Lobby (\begin{DoxyParamCaption}\item[{string}]{lobby\+Id }\end{DoxyParamCaption})}
+
+
+
+Implements \mbox{\hyperlink{interface_application_1_1_interfaces_1_1_i_lobby_pool_a61058848af185e20841421e7f52e8b94}{Application.\+Interfaces.\+I\+Lobby\+Pool}}.
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{class_application_1_1_misc_1_1_lobby_pool_a458073f24e69b53446da0a03050664e1}\label{class_application_1_1_misc_1_1_lobby_pool_a458073f24e69b53446da0a03050664e1}} 
+\index{Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}!Lobbies\+Collection@{Lobbies\+Collection}}
+\index{Lobbies\+Collection@{Lobbies\+Collection}!Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}}
+\subsubsection{\texorpdfstring{Lobbies\+Collection}{LobbiesCollection}}
+{\footnotesize\ttfamily I\+Collection$<$string$>$ Application.\+Misc.\+Lobby\+Pool.\+Lobbies\+Collection =$>$ \+\_\+lobby\+Dictionary\+Pool.\+Keys.\+To\+List()}
+
+\mbox{\Hypertarget{class_application_1_1_misc_1_1_lobby_pool_a807b21ba18c87a433c8d9ff1fc5c00f1}\label{class_application_1_1_misc_1_1_lobby_pool_a807b21ba18c87a433c8d9ff1fc5c00f1}} 
+\index{Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}!Lobby\+Dictionary@{Lobby\+Dictionary}}
+\index{Lobby\+Dictionary@{Lobby\+Dictionary}!Application\+::\+Misc\+::\+Lobby\+Pool@{Application\+::\+Misc\+::\+Lobby\+Pool}}
+\subsubsection{\texorpdfstring{Lobby\+Dictionary}{LobbyDictionary}}
+{\footnotesize\ttfamily I\+Read\+Only\+Dictionary$<$string, I\+Lobby$>$ Application.\+Misc.\+Lobby\+Pool.\+Lobby\+Dictionary =$>$ \+\_\+lobby\+Dictionary\+Pool}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Misc/\mbox{\hyperlink{_lobby_pool_8cs}{Lobby\+Pool.\+cs}}\end{DoxyCompactItemize}
